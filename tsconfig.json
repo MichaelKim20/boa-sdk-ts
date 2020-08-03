@@ -74,5 +74,9 @@
   "exclude": [
     "node_modules",
     "**/*.test.ts"
-  ]
+  ],
+  "typedocOptions": {
+    "mode": "library",
+    "out": "docs"
+  }
 }
