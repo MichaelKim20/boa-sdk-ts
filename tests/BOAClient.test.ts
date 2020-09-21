@@ -649,7 +649,7 @@ describe ('BOA Client', () =>
         }
     });
 
-    it ('Test sending a vote data', async () =>
+    it ('Test saving a vote data', async () =>
     {
         // Set URL
         let uri = URI("http://localhost").port(port);
@@ -660,7 +660,7 @@ describe ('BOA Client', () =>
 
         try
         {
-            let res = await boa_client.registerVoteData(
+            let res = await boa_client.saveData(
                 [
                     new boasdk.TxInput(
                         boasdk.Hash.createFromString("0x81a326afa790003c32517a2a" +

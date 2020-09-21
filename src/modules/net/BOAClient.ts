@@ -224,14 +224,14 @@ export class BOAClient
     }
 
     /**
-     * Register the vote data
+     * Saves the data to the blockchain
      * @param inputs An array of 1 or more UTXOs to be spent
      * @param outputs An array of 1 or more output
      * @param keys An array of length matching `inputs` which are the keys controlling the UTXOs
      * @param data The data to store
      * @returns Returns true if success, otherwise returns false
      */
-    public registerVoteData (inputs: Array<TxInput>, outputs: Array<TxOutput>, keys: Array<Seed>, data: Buffer): Promise<boolean>
+    public saveData (inputs: Array<TxInput>, outputs: Array<TxOutput>, keys: Array<Seed>, data: Buffer): Promise<boolean>
     {
         return new Promise<boolean>((resolve, reject) =>
         {
