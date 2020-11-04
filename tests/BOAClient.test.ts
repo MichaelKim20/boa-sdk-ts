@@ -587,7 +587,7 @@ describe ('BOA Client', () =>
 
         let outputs = [
             new boasdk.TxOutput(
-                "100000000",
+                BigInt(100000000),
                 boasdk.PublicKey.fromString("GDD5RFGBIUAFCOXQA246BOUPHCK" +
                     "7ZL2NSHDU7DVAPNPTJJKVPJMNLQFW")
             )
@@ -672,7 +672,7 @@ describe ('BOA Client', () =>
                 ],
                 [
                     new boasdk.TxOutput(
-                        "100000000",
+                        BigInt(100000000),
                         boasdk.PublicKey.fromString("GDD5RFGBIUAFCOXQA246BOUPHCK" +
                             "7ZL2NSHDU7DVAPNPTJJKVPJMNLQFW")
                     )

@@ -14,7 +14,6 @@
 import { PublicKey } from './KeyPair';
 
 import { SmartBuffer } from 'smart-buffer';
-import { UInt64 } from 'spu-integer-math';
 
 /**
  * The class that defines the transaction's output in a block.
@@ -24,7 +23,7 @@ export class TxOutput
     /**
      * The monetary value of this output, in 1/10^7
      */
-    public value: UInt64;
+    public value: bigint;
 
     /**
      * The public key that can spend this output
@@ -36,12 +35,12 @@ export class TxOutput
      * @param value The monetary value
      * @param address The public key
      */
-    constructor (value?: string, address?: PublicKey)
+    constructor (value?: bigint, address?: PublicKey)
     {
         if (value !== undefined)
-            this.value = UInt64.fromString(value);
+            this.value = value;
         else
-            this.value = UInt64.fromString("0");
+            this.value = BigInt(0);
 
         if (address !== undefined)
             this.address = address;
@@ -55,8 +54,12 @@ export class TxOutput
      */
     public computeHash (buffer: SmartBuffer)
     {
-        buffer.writeInt32LE(this.value.lo);
-        buffer.writeInt32LE(this.value.hi);
+        buffer.writeBigUInt64LE(this.value);
         this.address.computeHash(buffer);
+    }
+
+    public toString(): string
+    {
+        return "";
     }
 }
