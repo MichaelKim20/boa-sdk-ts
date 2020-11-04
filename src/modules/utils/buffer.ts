@@ -39,6 +39,8 @@ export function readFromString (hex: string, target?: Buffer): Buffer
  */
 export function writeToString (source: Buffer): string
 {
+    if (source.length == 0)
+        return "";
     let temp = Buffer.alloc(source.length);
     for (let idx = 0; idx < source.length; idx++)
         temp.writeUInt8(source.readUInt8(idx), source.length - idx - 1);
