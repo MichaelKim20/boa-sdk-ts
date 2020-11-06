@@ -1,4 +1,4 @@
-import {Hash, hashFull, Transaction, TxType, TxInput, TxOutput, KeyPair, PublicKey, Seed} from '../..';
+import {Hash, hashFull, makeUTXOKey, Transaction, TxType, TxInput, TxOutput, KeyPair, PublicKey, Seed} from '../..';
 import { WK } from './WK';
 
 export class TransactionBuilder
@@ -28,7 +28,7 @@ export class TransactionBuilder
         {
             if (index < tx.outputs.length) {
                 this.inputs.push(
-                    new RefInput(hashFull(tx), index, tx.outputs[index].address)
+                    new RefInput(makeUTXOKey(hashFull(tx), index), tx.outputs[index].address)
                 );
                 this.value += tx.outputs[index].value;
             }
@@ -39,7 +39,7 @@ export class TransactionBuilder
             for (let idx = 0; idx < tx.outputs.length; idx++)
             {
                 this.inputs.push(
-                    new RefInput(tx_hash, idx, tx.outputs[idx].address)
+                    new RefInput(makeUTXOKey(tx_hash, idx), tx.outputs[idx].address)
                 );
                 this.value += tx.outputs[idx].value;
             }
@@ -92,7 +92,7 @@ export class TransactionBuilder
         this.tx = new Transaction();
         this.tx.type = type;
         for (let elem of this.inputs)
-            this.tx.inputs.push(new TxInput(elem.previous, elem.index));
+            this.tx.inputs.push(new TxInput(elem.utxo));
 
         for (let elem of this.outputs)
             this.tx.outputs.push(new TxOutput(elem.value, elem.address));
@@ -111,20 +111,17 @@ export class TransactionBuilder
 }
 
 class RefInput {
-    public previous: Hash;
-    public index: number;
+    public utxo: Hash;
     public address: PublicKey;
 
     /**
      * Constructor
-     * @param previous The hash of the previous transaction containing the output to spend
-     * @param index The index of the output in the previous transaction
+     * @param utxo The hash of the UTXO to be spent
      * @param address The public key
      */
-    constructor(previous: Hash, index: number, address: PublicKey)
+    constructor(utxo: Hash, address: PublicKey)
     {
-        this.previous = new Hash(previous.data);
-        this.index = index;
+        this.utxo = new Hash(utxo.data);
         this.address = address;
     }
 }
