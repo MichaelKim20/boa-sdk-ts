@@ -10,7 +10,7 @@
     "build_test": "rimraf ./lib && tsc && mocha -r ts-node/register tests/**/*.test.ts",
     "browser": "rimraf ./dist && webpack --config webpack.config.js --mode=production",
     "docs": "rimraf ./docs && ./node_modules/.bin/typedoc --options ./typedoc.js --module commonjs",
-    "start": "ts-node src/tests/SendTransaction.ts",
+    "start": "ts-node src/tests/SendContiuous.ts",
     "key": "ts-node src/tests/Key.ts"
   },
   "repository": {

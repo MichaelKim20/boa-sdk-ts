@@ -81,25 +81,32 @@ function wait (interval: number): Promise<void>
     })
 }
 
+function makeBlock(): Promise<void>
+{
+    return new Promise<void>(async (resolve) => {
+        console.log(`Started`);
+        await prepare();
+        let height = await boa_client.getBlockHeight();
+
+        console.log(`Current height is ${height}`);
+        let txs = createTransaction(height + 1);
+
+        console.log(`Send for height is ${height + 1}`);
+        for (let idx = 0; idx < txs.length; idx++) {
+            console.log(`${idx + 1}th transactions`);
+            console.log(JSON.stringify({"tx": txs[idx].toObject()}));
+            await boa_client.sendTransaction(txs[idx]);
+            await wait(15000);
+        }
+
+        await waitFor(height + 1);
+        console.log(`Fished`);
+
+        resolve();
+    });
+}
 
 (async () => {
-    console.log(`Started`);
-    await prepare();
-    let height = await boa_client.getBlockHeight();
-
-    console.log(`Current height is ${height}`);
-    let txs = createTransaction(height+1);
-
-    console.log(`Send for height is ${height+1}`);
-    for (let idx = 0; idx < txs.length; idx++)
-    {
-        console.log(`${idx+1}th transactions`);
-        console.log(JSON.stringify({"tx" : txs[idx].toObject()}));
-        await boa_client.sendTransaction(txs[idx]);
-        await wait(15000);
-    }
-
-    await waitFor(height+1);
-    console.log(`Fished`);
+    for (let idx = 0; idx < 100; idx++)
+        await makeBlock();
 })();
-

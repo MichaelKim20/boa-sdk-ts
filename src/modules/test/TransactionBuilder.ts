@@ -101,10 +101,7 @@ export class TransactionBuilder
         for (let idx = 0; idx < this.inputs.length; idx++)
         {
             let keypair = WK.keys(this.inputs[idx].address.toString());
-            if (keypair !== undefined)
-                this.tx.inputs[idx].signature = keypair.secret.sign(tx_hash.data);
-            else
-                console.error("Can not found KeyPair in WK")
+            this.tx.inputs[idx].signature = keypair.secret.sign(tx_hash.data);
         }
 
         let res = this.tx;
