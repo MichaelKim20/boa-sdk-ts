@@ -21,15 +21,16 @@ export { KeyPair, PublicKey, SecretKey, Seed } from './modules/data/KeyPair';
 export { Signature } from './modules/data/Signature';
 export { Validator } from './modules/data/Validator';
 export { Transaction, TxType } from './modules/data/Transaction';
-export { TxInput } from './modules/data/TxInput';
-export { TxOutput } from './modules/data/TxOutput';
+export { TxInput, ITxInput } from './modules/data/TxInput';
+export { TxOutput, ITxOutput } from './modules/data/TxOutput';
 
 export { BOAClient } from './modules/net/BOAClient';
 export { Request } from './modules/net/Request';
 
-
-export { TransactionBuilder } from './modules/utils/TransactionBuilder';
-
 // For BinInt
 import { default as JSBInt } from 'jsbi';
 export { JSBInt };
+
+export { TransactionBuilder } from './modules/test/TransactionBuilder';
+export { WK } from './modules/test/WK';
+export { GenesisTx } from './modules/test/Genesis';

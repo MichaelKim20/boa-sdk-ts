@@ -1,8 +1,5 @@
-import {Hash, hashFull} from "../data/Hash";
-import {Transaction, TxType} from '../data/Transaction';
-import {TxInput} from '../data/TxInput';
-import {TxOutput} from '../data/TxOutput';
-import {KeyPair, PublicKey} from "../data/KeyPair";
+import {Hash, hashFull, Transaction, TxType, TxInput, TxOutput, KeyPair, PublicKey, Seed} from '../..';
+import { WK } from './WK';
 
 export class TransactionBuilder
 {
@@ -17,7 +14,6 @@ export class TransactionBuilder
         this.outputs = [];
         this.tx = null;
         this.value = BigInt(0);
-
         this.attach(tx, index);
     }
 
@@ -88,7 +84,7 @@ export class TransactionBuilder
         return this;
     }
 
-    public sign (keypair: KeyPair, type?: TxType) : Transaction
+    public sign (type?: TxType) : Transaction
     {
         if (type === undefined)
             type = TxType.Payment;
@@ -102,8 +98,14 @@ export class TransactionBuilder
             this.tx.outputs.push(new TxOutput(elem.value, elem.address));
 
         let tx_hash = hashFull(this.tx);
-        for (let elem of this.tx.inputs)
-            elem.signature = keypair.secret.sign(tx_hash.data);
+        for (let idx = 0; idx < this.inputs.length; idx++)
+        {
+            let keypair = WK.keys(this.inputs[idx].address.toString());
+            if (keypair !== undefined)
+                this.tx.inputs[idx].signature = keypair.secret.sign(tx_hash.data);
+            else
+                console.error("Can not found KeyPair in WK")
+        }
 
         let res = this.tx;
         this.tx = null;

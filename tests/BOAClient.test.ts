@@ -559,6 +559,7 @@ describe ('BOA Client', () =>
             });
     });
 
+/*
     it ('Test creating a vote data', () =>
     {
         let inputs = [
@@ -690,4 +691,5 @@ describe ('BOA Client', () =>
             assert.fail(err);
         }
     });
+*/
 });

@@ -271,6 +271,87 @@ export class BOAClient
             }
         });
     }
+
+    public sendTransaction (tx: Transaction): Promise<boolean>
+    {
+        return new Promise<boolean>((resolve, reject) =>
+        {
+            try
+            {
+                let url = uri(this.agora_url)
+                    .filename("transaction");
+
+                let data = {"tx" : tx.toObject()};
+                Request.put(url.toString(), data)
+                    .then((response: AxiosResponse) =>
+                    {
+                        if (response.status == 200)
+                        {
+                            resolve(true);
+                        }
+                        else
+                        {
+                            // It is not yet defined in Stoa.
+                            reject(new Error(response.statusText));
+                        }
+                    })
+                    .catch((reason: any) =>
+                    {
+                        reject(handleNetworkError(reason));
+                    });
+            } catch (err)
+            {
+                reject(err);
+            }
+        });
+    }
+
+    /**
+     * Request an Agora node's current block height.
+     */
+    public getBlockHeight (): Promise<number>
+    {
+        let url = uri(this.agora_url)
+            .filename("/block_height");
+
+        return Request.get(url.toString())
+            .then((res) => {
+                return Number(res.data);
+            });
+    }
+
+    /**
+     * Requests and receives data needed for recovery from Agora.
+     * @param block_height - The height of the block
+     * @param max_blocks - The maximum number of block to request
+     */
+    public getBlocksFrom (block_height: number, max_blocks: number): Promise<Array<any>>
+    {
+        return new Promise<Array<any>>((resolve, reject) =>
+        {
+            let url = uri(this.agora_url)
+                .filename("/blocks_from")
+                .addSearch("block_height", block_height)
+                .addSearch("max_blocks", max_blocks);
+
+            Request.get(url
+                .toString())
+                .then((response: AxiosResponse) =>
+                {
+                    if (response.status == 200)
+                    {
+                        resolve(response.data);
+                    }
+                    else
+                    {
+                        reject(new Error(response.statusText));
+                    }
+                })
+                .catch((reason: any) => {
+                    reject(handleNetworkError(reason));
+                });
+        });
+    }
 }
 
 export interface IsValidPreimageResponse

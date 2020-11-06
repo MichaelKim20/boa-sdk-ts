@@ -11,10 +11,10 @@
 
 *******************************************************************************/
 
-import { hashFull } from "./Hash";
+import { hashFull } from './Hash';
 import { KeyPair, Seed } from "./KeyPair";
-import { TxInput } from './TxInput';
-import { TxOutput } from './TxOutput';
+import { TxInput, ITxInput } from './TxInput';
+import { TxOutput, ITxOutput } from './TxOutput';
 import * as Utils from '../utils'
 
 import { SmartBuffer } from 'smart-buffer';
@@ -138,53 +138,21 @@ export class Transaction
     {
         let inputs = [];
         for (let elem of this.inputs)
-            inputs.push(
-                {
-                    "previous": elem.previous.toString(),
-                    "index": elem.index,
-                    "signature": elem.signature.toString()
-                }
-            );
+            inputs.push(elem.toObject());
 
         let outputs = [];
         for (let elem of this.outputs)
-            outputs.push(
-                {
-                    "value": elem.value.toString(),
-                    "address": elem.address.toString(),
-                }
-            );
+            outputs.push(elem.toObject());
 
-        this.data.readOffset = 0;
         return {
             "type": this.type,
             "inputs": inputs,
             "outputs": outputs,
-            "data": Utils.writeToString(this.data.readBuffer())
         }
     }
 }
 
-/**
- * @ignore
- * The interface of Transaction input for JSON
- */
-interface ITxInput
-{
-    previous: string;
-    index: number;
-    signature: string;
-}
 
-/**
- * @ignore
- * The interface of Transaction input for JSON
- */
-interface ITxOutput
-{
-    value: string;
-    address: string;
-}
 
 /**
  * @ignore
@@ -195,5 +163,4 @@ interface ITransaction
     type: number;
     inputs: Array<ITxInput>;
     outputs: Array<ITxOutput>;
-    data: string;
 }

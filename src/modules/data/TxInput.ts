@@ -69,4 +69,28 @@ export class TxInput
         this.previous.computeHash(buffer);
         buffer.writeUInt32LE(this.index);
     }
+
+    /**
+     * Gets the JSON object
+     * @returns The JSON object
+     */
+    public toObject (): ITxInput
+    {
+        return {
+            "previous": this.previous.toString(),
+            "index": this.index,
+            "signature": this.signature.toString()
+        }
+    }
+}
+
+/**
+ * @ignore
+ * The interface of Transaction input for JSON
+ */
+export interface ITxInput
+{
+    previous: string;
+    index: number;
+    signature: string;
 }

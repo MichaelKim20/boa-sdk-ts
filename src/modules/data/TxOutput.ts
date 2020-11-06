@@ -58,8 +58,25 @@ export class TxOutput
         this.address.computeHash(buffer);
     }
 
-    public toString(): string
+    /**
+     * Gets the JSON object
+     * @returns The JSON object
+     */
+    public toObject (): ITxOutput
     {
-        return "";
+        return {
+            "value": this.value.toString(),
+            "address": this.address.toString()
+        }
     }
+}
+
+/**
+ * @ignore
+ * The interface of Transaction input for JSON
+ */
+export interface ITxOutput
+{
+    value: string;
+    address: string;
 }
