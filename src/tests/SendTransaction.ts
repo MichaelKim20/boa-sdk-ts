@@ -65,6 +65,7 @@ function createTransaction (height: number): Array<boasdk.Transaction>
     }
     return txs1;
 }
+
 /*
 if (process.argv.length < 3)
     process.exit(1);
@@ -80,7 +81,6 @@ function wait (interval: number): Promise<void>
         }, interval)
     })
 }
-
 
 (async () => {
     console.log(`Started`);
@@ -102,4 +102,3 @@ function wait (interval: number): Promise<void>
     await waitFor(height+1);
     console.log(`Fished`);
 })();
-

@@ -1,5 +1,5 @@
-import {Hash, hashFull, makeUTXOKey, Transaction, TxType, TxInput, TxOutput, KeyPair, PublicKey, Seed} from '../..';
-import { WK } from './WK';
+import {Hash, hashFull, makeUTXOKey, PublicKey, Transaction, TxInput, TxOutput, TxType} from '../..';
+import {WK} from './WK';
 
 export class TransactionBuilder
 {
@@ -24,6 +24,9 @@ export class TransactionBuilder
 
     public attach (tx: Transaction, index?: number): TransactionBuilder
     {
+        if (tx.type == TxType.Freeze)
+            return this;
+
         if (index !== undefined)
         {
             if (index < tx.outputs.length) {
@@ -110,7 +113,8 @@ export class TransactionBuilder
     }
 }
 
-class RefInput {
+class RefInput
+{
     public utxo: Hash;
     public address: PublicKey;
 

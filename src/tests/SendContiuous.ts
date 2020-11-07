@@ -41,7 +41,7 @@ function createTransaction (height: number): Array<boasdk.Transaction>
     let txs1: Array<boasdk.Transaction> = [];
     for (let idx = 0; idx < 8; idx++) {
         txs1.push(
-            boasdk.TransactionBuilder.create(boasdk.GenesisTx(), idx)
+            boasdk.TransactionBuilder.create(boasdk.Genesis.transaction(), idx)
                 .refund(boasdk.WK.keys(idx).address)
                 .sign()
         );
@@ -83,7 +83,8 @@ function wait (interval: number): Promise<void>
 
 function makeBlock(): Promise<void>
 {
-    return new Promise<void>(async (resolve) => {
+    return new Promise<void>(async (resolve) =>
+    {
         console.log(`Started`);
         await prepare();
         let height = await boa_client.getBlockHeight();
@@ -92,11 +93,12 @@ function makeBlock(): Promise<void>
         let txs = createTransaction(height + 1);
 
         console.log(`Send for height is ${height + 1}`);
-        for (let idx = 0; idx < txs.length; idx++) {
+        for (let idx = 0; idx < txs.length; idx++)
+        {
             console.log(`${idx + 1}th transactions`);
             console.log(JSON.stringify({"tx": txs[idx].toObject()}));
             await boa_client.sendTransaction(txs[idx]);
-            await wait(15000);
+            await wait(2000);
         }
 
         await waitFor(height + 1);
@@ -108,5 +110,8 @@ function makeBlock(): Promise<void>
 
 (async () => {
     for (let idx = 0; idx < 100; idx++)
+    {
         await makeBlock();
+        await wait(5000);
+    }
 })();
