@@ -41,7 +41,7 @@ function createTransaction (height: number): Array<boasdk.Transaction>
     let txs1: Array<boasdk.Transaction> = [];
     for (let idx = 0; idx < 8; idx++) {
         txs1.push(
-            boasdk.TransactionBuilder.create(boasdk.GenesisTx(), idx)
+            boasdk.TransactionBuilder.create(boasdk.Genesis.transaction(), idx)
                 .refund(boasdk.WK.keys(idx).address)
                 .sign()
         );

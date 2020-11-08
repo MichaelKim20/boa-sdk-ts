@@ -42,7 +42,8 @@ function createTransaction (height: number): Array<boasdk.Transaction>
     for (let idx = 0; idx < 8; idx++) {
         txs1.push(
             boasdk.TransactionBuilder.create(boasdk.Genesis.transaction(), idx)
-                .refund(boasdk.WK.keys(idx).address)
+                .refund(boasdk.WK.Genesis().address)
+                //.refund(boasdk.WK.keys(idx).address)
                 .sign()
         );
     }
@@ -56,7 +57,9 @@ function createTransaction (height: number): Array<boasdk.Transaction>
         for (let idx = 0; idx < txs1.length; idx++) {
             txs2.push(
                 boasdk.TransactionBuilder.create(txs1[idx])
-                    .refund(boasdk.WK.keys(idx + 8*(h%2)).address)
+                    //.refund(boasdk.WK.keys(idx).address)
+                    .refund(boasdk.WK.Genesis().address)
+                    //.refund(boasdk.WK.keys(idx + 8*(h%2)).address)
                     .sign()
             );
         }
@@ -98,7 +101,7 @@ function makeBlock(): Promise<void>
             console.log(`${idx + 1}th transactions`);
             console.log(JSON.stringify({"tx": txs[idx].toObject()}));
             await boa_client.sendTransaction(txs[idx]);
-            await wait(2000);
+            await wait(1000);
         }
 
         await waitFor(height + 1);
@@ -112,6 +115,6 @@ function makeBlock(): Promise<void>
     for (let idx = 0; idx < 100; idx++)
     {
         await makeBlock();
-        await wait(5000);
+        await wait(15000);
     }
 })();
