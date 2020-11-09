@@ -398,7 +398,7 @@ function handleNetworkError (reason: any): Error
         {
             let message = "";
             if (e.response.statusText != undefined) message = e.response.statusText + ", ";
-            if (e.response.data != undefined) message += e.response.data;
+            if (e.response.data != undefined) message += JSON.stringify(e.response.data);
             return new Error(message);
         }
     }

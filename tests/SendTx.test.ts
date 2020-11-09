@@ -2,6 +2,7 @@ import * as boasdk from '../src/index';
 
 import * as assert from 'assert';
 import URI from 'urijs';
+import {hashFull} from "../src/index";
 
 describe ('Send Transaction', () =>
 {
@@ -50,12 +51,13 @@ describe ('Send Transaction', () =>
 
         //console.log(gen_tx_hash.toString());
 
-        assert.strictEqual(gen_tx_hash.toString(), "0x7a5bfeb96f9caefa377cb9" +
-            "a7ffe3ea3dd59ea84d4a1c66304ab8c307a4f47706fe0aec2a73ce2b186a9f4" +
-            "5641620995f8c7e4c157cee7940872d96d9b2f0f95c");
+
+        assert.strictEqual(gen_tx_hash.toString(), "0x7a5bfeb96f9caefa377cb" +
+            "9a7ffe3ea3dd59ea84d4a1c66304ab8c307a4f47706fe0aec2a73ce2b186a9f" +
+            "45641620995f8c7e4c157cee7940872d96d9b2f0f95c", gen_tx_hash.toString());
 
         let txs1 = [];
-        for (let idx = 0; idx < 8; idx++) {
+        for (let idx = 0; idx < 1; idx++) {
             txs1.push(
                 boasdk.TransactionBuilder.create(genesisTx, idx)
                     .refund(gen_key.address)
@@ -79,7 +81,7 @@ describe ('Send Transaction', () =>
                 }
             });
         };
-
+/*
         console.log("waiting");
 
         await waitFor(1);
@@ -101,7 +103,7 @@ describe ('Send Transaction', () =>
             await boa_client.sendTransaction(tx);
 
         console.log("waiting");
-
+*/
         await waitFor(2);
     });
 
@@ -246,8 +248,8 @@ describe ('Send Transaction', () =>
                     "0x788c159d62b565655d9f725786c38e6802038ee73d7a9d187b3be1c7de95aa0ba856bf81bb556d7448488e71f4b89ce6eba319d0536798308112416413289254"
                 ]
             };
-        //assert.deepStrictEqual(blocks[0], expected);
-        console.log(`아고라의 제네시스블록 = ${JSON.stringify(blocks)}`)
+        assert.deepStrictEqual(blocks[0], expected);
+        //console.log(`아고라의 제네시스블록 = ${JSON.stringify(blocks)}`)
     });
 });
 /*
@@ -384,3 +386,5 @@ let g = [
     }
 ];
  */
+[
+]
