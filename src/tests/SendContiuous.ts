@@ -96,7 +96,7 @@ function makeBlock(): Promise<void>
             console.log(`${idx + 1}th transactions`);
             console.log(JSON.stringify({"tx": txs[idx].toObject()}));
             await boa_client.sendTransaction(txs[idx]);
-            await wait(15000);
+            await wait(5000);
         }
 
         await waitFor(height + 1);
@@ -108,5 +108,8 @@ function makeBlock(): Promise<void>
 
 (async () => {
     for (let idx = 0; idx < 100; idx++)
+    {
         await makeBlock();
+        await wait(15000);
+    }
 })();
