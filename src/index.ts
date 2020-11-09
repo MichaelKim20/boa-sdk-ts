@@ -33,4 +33,4 @@ export { JSBInt };
 
 export { TransactionBuilder } from './modules/test/TransactionBuilder';
 export { WK } from './modules/test/WK';
-export { GenesisTx } from './modules/test/Genesis';
+export { Genesis } from './modules/test/Genesis';
