@@ -276,33 +276,27 @@ export class BOAClient
     {
         return new Promise<boolean>((resolve, reject) =>
         {
-            try
-            {
-                let url = uri(this.agora_url)
-                    .filename("transaction");
+            let url = uri(this.agora_url)
+                .filename("transaction");
 
-                let data = {"tx" : tx.toObject()};
-                Request.put(url.toString(), data)
-                    .then((response: AxiosResponse) =>
+            let data = {"tx" : tx.toObject()};
+            Request.put(url.toString(), data)
+                .then((response: AxiosResponse) =>
+                {
+                    if (response.status == 200)
                     {
-                        if (response.status == 200)
-                        {
-                            resolve(true);
-                        }
-                        else
-                        {
-                            // It is not yet defined in Stoa.
-                            reject(new Error(response.statusText));
-                        }
-                    })
-                    .catch((reason: any) =>
+                        resolve(true);
+                    }
+                    else
                     {
-                        reject(handleNetworkError(reason));
-                    });
-            } catch (err)
-            {
-                reject(err);
-            }
+                        // It is not yet defined in Stoa.
+                        reject(new Error(response.statusText));
+                    }
+                })
+                .catch((reason: any) =>
+                {
+                    reject(handleNetworkError(reason));
+                });
         });
     }
 

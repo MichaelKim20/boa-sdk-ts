@@ -6,9 +6,7 @@ export class Genesis
     public static transaction (): Transaction
     {
         let address = WK.Genesis().address;
-        let tx;
-
-        tx = new Transaction(
+        let tx = new Transaction(
             TxType.Payment,
             [],
             [

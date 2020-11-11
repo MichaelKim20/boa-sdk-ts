@@ -1,7 +1,8 @@
 import * as boasdk from '../index';
 
 // Create BOA Client
-let boa_client = new boasdk.BOAClient("http://localhost:4242/", "http://localhost:4000/");
+//let boa_client = new boasdk.BOAClient("http://localhost:4242/", "http://localhost:4000/");
+let boa_client = new boasdk.BOAClient("http://localhost:4242/", "http://eu-002.bosagora.io:2826/");
 
 function prepare (): Promise<void>
 {
@@ -42,8 +43,8 @@ function createTransaction (height: number): Array<boasdk.Transaction>
     for (let idx = 0; idx < 8; idx++) {
         txs1.push(
             boasdk.TransactionBuilder.create(boasdk.Genesis.transaction(), idx)
-                .refund(boasdk.WK.Genesis().address)
                 //.refund(boasdk.WK.keys(idx).address)
+                .refund(boasdk.WK.keys(idx).address)
                 .sign()
         );
     }
@@ -57,9 +58,8 @@ function createTransaction (height: number): Array<boasdk.Transaction>
         for (let idx = 0; idx < txs1.length; idx++) {
             txs2.push(
                 boasdk.TransactionBuilder.create(txs1[idx])
-                    //.refund(boasdk.WK.keys(idx).address)
-                    .refund(boasdk.WK.Genesis().address)
-                    //.refund(boasdk.WK.keys(idx + 8*(h%2)).address)
+                    //.refund(boasdk.WK.Genesis().address)
+                    .refund(boasdk.WK.keys(idx + 8 * (h%2)).address)
                     .sign()
             );
         }
@@ -68,6 +68,7 @@ function createTransaction (height: number): Array<boasdk.Transaction>
     }
     return txs1;
 }
+
 /*
 if (process.argv.length < 3)
     process.exit(1);
@@ -101,7 +102,7 @@ function makeBlock(): Promise<void>
             console.log(`${idx + 1}th transactions`);
             console.log(JSON.stringify({"tx": txs[idx].toObject()}));
             await boa_client.sendTransaction(txs[idx]);
-            await wait(1000);
+            await wait(5000);
         }
 
         await waitFor(height + 1);
@@ -115,6 +116,6 @@ function makeBlock(): Promise<void>
     for (let idx = 0; idx < 100; idx++)
     {
         await makeBlock();
-        await wait(15000);
+        await wait(5000);
     }
 })();
