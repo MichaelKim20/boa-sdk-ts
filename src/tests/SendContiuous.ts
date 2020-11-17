@@ -1,8 +1,8 @@
 import * as boasdk from '../index';
 
 // Create BOA Client
-//let boa_client = new boasdk.BOAClient("http://localhost:4242/", "http://localhost:4000/");
-let boa_client = new boasdk.BOAClient("http://localhost:4242/", "http://eu-002.bosagora.io:2826/");
+let boa_client = new boasdk.BOAClient("http://localhost:4242/", "http://localhost:4000/");
+//let boa_client = new boasdk.BOAClient("http://localhost:4242/", "http://eu-002.bosagora.io:2826/");
 
 function prepare (): Promise<void>
 {
