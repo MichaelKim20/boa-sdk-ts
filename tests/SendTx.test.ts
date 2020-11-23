@@ -3,6 +3,7 @@ import * as boasdk from '../src/index';
 import * as assert from 'assert';
 import URI from 'urijs';
 import {hashFull} from "../src/index";
+import {WK} from '../src/modules/test/WK';
 
 describe ('Send Transaction', () =>
 {
@@ -256,4 +257,10 @@ describe ('Send Transaction', () =>
         let blocks = await boa_client.getBlocksFrom(0, 2);
         console.log(`아고라의 제네시스블록 = ${JSON.stringify(blocks)}`)
     });
+
+
+    it ('1212', () => {
+        let k = WK.keys("GDNODE7J5EUK7T6HLEO2FDUBWZEXVXHJO7C4AF5VZAKZENGQ4WR3IX2U");
+        console.log(k.seed.toString());
+    })
 });

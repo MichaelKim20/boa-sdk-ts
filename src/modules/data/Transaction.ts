@@ -147,6 +147,7 @@ export class Transaction
             "type": this.type,
             "inputs": inputs,
             "outputs": outputs,
+            "payload": "",
         }
     }
 }
@@ -162,4 +163,5 @@ interface ITransaction
     type: number;
     inputs: Array<ITxInput>;
     outputs: Array<ITxOutput>;
+    payload: string;
 }
