@@ -12,7 +12,6 @@
 *******************************************************************************/
 
 import { Hash }  from '../../data/Hash';
-import { Height } from '../../data/Height';
 import { TxType } from '../../data/Transaction';
 import { Utils } from '../../utils/Utils';
 
