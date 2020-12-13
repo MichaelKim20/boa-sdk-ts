@@ -292,6 +292,20 @@ export class BOAClient
             });
         });
     }
+
+    /**
+     * Request an Agora node's current block height.
+     */
+    public getBlockHeight (): Promise<bigint>
+    {
+        let url = uri(this.agora_url)
+            .filename("/block_height");
+
+        return Request.get(url.toString())
+            .then((res) => {
+                return BigInt(res.data);
+            });
+    }
 }
 
 export interface IsValidPreimageResponse

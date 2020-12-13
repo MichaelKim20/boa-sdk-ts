@@ -41,3 +41,6 @@ export { PreImage  } from './modules/net/response/PreImage';
 
 export { BOAClient } from './modules/net/BOAClient';
 export { Request } from './modules/net/Request';
+
+export { WK } from './modules/test/WK';
+export { Genesis } from './modules/test/Genesis';

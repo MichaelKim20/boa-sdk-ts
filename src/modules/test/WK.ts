@@ -1,4 +1,4 @@
-import { KeyPair, Seed } from "../..";
+import { KeyPair, Seed } from "../../index";
 
 export class WK
 {
@@ -1505,5 +1505,10 @@ export class WK
             WK.make();
 
         return WK.Node7Key;
+    }
+
+    public get length (): number
+    {
+        return WK._keys.length;
     }
 }
