@@ -79,32 +79,31 @@ describe('Hash', () =>
         let payment_tx = new boasdk.Transaction(
             boasdk.TxType.Payment,
             [
-                new boasdk.TxInput(new boasdk.Hash(Buffer.alloc(boasdk.Hash.Width)), BigInt(0))
+                boasdk.TxInput.fromTxHash(new boasdk.Hash(Buffer.alloc(boasdk.Hash.Width)), BigInt(0))
             ],
             [
-                new boasdk.TxOutput(BigInt(0), new boasdk.PublicKey(Buffer.alloc(boasdk.SodiumHelper.sodium.crypto_sign_PUBLICKEYBYTES)))
+                new boasdk.TxOutput(BigInt(0), boasdk.Lock.Null)
             ],
             boasdk.DataPayload.init
         );
-
         assert.strictEqual(boasdk.hashFull(payment_tx).toString(),
-            "0x35927f79ab7f2c8273f5dc24bb1efa5ebe3ac050fd4fd84d014b51124d0322ed" +
-            "709225b92ba28b3ee6b70144d4acafb9a5289fc48ecb4a4f273b537837c78cb0");
+            "0x6dbcc8c36bd1f95986d8b06a6bad320b0719e14bb1afe2cf824618c3311a23b" +
+            "5ac9c35f474dc67182cf17bb609f46e4049f793b996321f6fad88a2925badf198");
 
         let freeze_tx = new boasdk.Transaction(
             boasdk.TxType.Freeze,
             [
-                new boasdk.TxInput(new boasdk.Hash(Buffer.alloc(boasdk.Hash.Width)), BigInt(0))
+                boasdk.TxInput.fromTxHash(new boasdk.Hash(Buffer.alloc(boasdk.Hash.Width)), BigInt(0))
             ],
             [
-                new boasdk.TxOutput(BigInt(0), new boasdk.PublicKey(Buffer.alloc(boasdk.SodiumHelper.sodium.crypto_sign_PUBLICKEYBYTES)))
+                new boasdk.TxOutput(BigInt(0), boasdk.Lock.Null)
             ],
             boasdk.DataPayload.init
         );
 
         assert.strictEqual(boasdk.hashFull(freeze_tx).toString(),
-            "0x0277044f0628605485a8f8a999f9a2519231e8c59c1568ef2dac2f241ce569d8" +
-            "54e15f950e0fd3d88460309d3e0ef3fbd57b8f5af998f8bacbe391ddb9aea328");
+            "0xf028cecf9498bc615e3ac4ff18efa98c6428b8af1f26a2cfa73518d039a4f2e" +
+            "f4f600f28cd25403ad588f0d42e3987863bbd26cdd28b136fee4b80b7f0cc061a");
     });
 
     // See_Also: https://github.com/bpfkorea/agora/blob/73a7cd593afab6726021e05cf16b90d246343d65/source/agora/consensus/data/Block.d#L118-L138
@@ -130,8 +129,8 @@ describe('Hash', () =>
             [ ]
         );
         assert.strictEqual(boasdk.hashFull(header).toString(),
-            "0xc49255b83a9e125377df3de687abd883dd57df98aa75bd5f26a7e7de89d78e2" +
-            "922fa426524aef0b7651467051736fb4c98e1d4737b2c91cfa0b866a3fae8bec8");
+            "0x30858769c56e08daaeddb29ee2b33002e8b0102765afadf981df5ada640cbfc" +
+            "2144e72348cf3793191c6b19ba36d84d955dfe69ab94dc337a95322a6fe332be3");
     });
 
     it ('Test for hash value of BlockHeader with missing validators', () =>
@@ -156,7 +155,7 @@ describe('Hash', () =>
             [ 1, 2, 3, 256, 257, 258, 70000, 80000, 90000 ]
         );
         assert.strictEqual(boasdk.hashFull(header).toString(),
-            "0x9aa7eee8d482bc225c4550b56c602811e1c4288a1e34b038188b75ecc98ea27" +
-            "2c2f98f3d36db67db06977135d2d2fcd412fe246a5df3e4812325a3b7665eea18");
+            "0x27984125102874b88a229f9782d02a410458e62df6a75f6262187b6a300c61a" +
+            "2bd392a228e6216a5a680aaf5a69d5d949cc7fbae95c6c5a66793ed29e291a940");
     });
 });
