@@ -136,6 +136,16 @@ export class Utils
         hi = hi >> 8;
         buffer[7] = hi;
     }
+
+    public static readBigIntLE (buffer: Buffer): bigint
+    {
+        let lo = BigInt(buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24));
+        let hi = BigInt(buffer[4] | (buffer[5] << 8) | (buffer[6] << 16) | (buffer[7] << 24));
+
+        let value = lo | (hi << BigInt(32));
+        return value;
+    }
+
     /**
      * This checks that the JSON data has all the properties of the class.
      * @param obj  The instance of a class

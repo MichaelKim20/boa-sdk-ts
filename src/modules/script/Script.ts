@@ -13,7 +13,7 @@
 
 import { OP, isOpcode } from './Opcodes'
 
-import { SmartBuffer} from "smart-buffer";
+import { SmartBuffer } from 'smart-buffer';
 
 /**
  * The type of script

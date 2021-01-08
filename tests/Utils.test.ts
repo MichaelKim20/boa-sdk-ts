@@ -90,4 +90,35 @@ describe ('Test of Utils', () =>
         assert.ok(boasdk.Utils.compareBuffer(x, y) < 0);
         assert.ok(boasdk.Utils.compareBuffer(y, x) > 0);
     });
+
+    it ('Test of writeBigIntLE, readBigIntLE', () =>
+    {
+        let buffer = Buffer.alloc(8);
+        let actual: bigint;
+        let value: bigint;
+
+        actual = BigInt("65536");
+        boasdk.Utils.writeBigIntLE(buffer, actual);
+        value = boasdk.Utils.readBigIntLE(buffer);
+        assert.strictEqual(value.toString(), "65536");
+        assert.strictEqual(actual, value);
+
+        actual = BigInt("4294967296");
+        boasdk.Utils.writeBigIntLE(buffer, actual);
+        value = boasdk.Utils.readBigIntLE(buffer);
+        assert.strictEqual(value.toString(), "4294967296");
+        assert.strictEqual(actual, value);
+
+        actual = BigInt("4503599627370496");
+        boasdk.Utils.writeBigIntLE(buffer, actual);
+        value = boasdk.Utils.readBigIntLE(buffer);
+        assert.strictEqual(value.toString(), "4503599627370496");
+        assert.strictEqual(actual, value);
+
+        actual = BigInt("9007199254740993");
+        boasdk.Utils.writeBigIntLE(buffer, actual);
+        value = boasdk.Utils.readBigIntLE(buffer);
+        assert.strictEqual(value.toString(), "9007199254740993");
+        assert.strictEqual(actual, value);
+    });
 });
