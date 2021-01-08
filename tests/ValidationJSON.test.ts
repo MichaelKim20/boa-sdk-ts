@@ -26,7 +26,8 @@ describe ('Test that validation with JSON schema', () =>
             ("Transaction", {
                 "inputs": [],
                 "outputs": [],
-                "payload": ""
+                "payload": "",
+                "lock_height": "0"
             });
         }, new Error("Validation failed: Transaction" +
             " - should have required property 'type'"));
@@ -39,7 +40,8 @@ describe ('Test that validation with JSON schema', () =>
                 "type": 1,
                 "inputs": {},
                 "outputs": [],
-                "payload": ""
+                "payload": "",
+                "lock_height": "0"
             });
         }, new Error("Validation failed: Transaction - should be array"));
 
@@ -48,7 +50,8 @@ describe ('Test that validation with JSON schema', () =>
         ("Transaction", {
             "inputs": [],
             "outputs": [],
-            "payload": ""
+            "payload": "",
+            "lock_height": "0"
         }));
 
         // When attribute `inputs` is not an array
@@ -57,7 +60,8 @@ describe ('Test that validation with JSON schema', () =>
             "type": 1,
             "inputs": {},
             "outputs": [],
-            "payload": ""
+            "payload": "",
+            "lock_height": "0"
         }));
 
         // When everything is normal
@@ -69,11 +73,11 @@ describe ('Test that validation with JSON schema', () =>
             "outputs": [
                 {
                     "value": "400000000000",
-                    "address": "GA3DMXTREDC4AIUTHRFIXCKWKF7BDIXRWM2KLV74OPK2" +
-                        "OKDM2VJ235GN"
+                    "lock": {"type": 0, "bytes": "KkpengSTntVIh037afPquSSwuq/KlbhEr/ydUPM4no4="}
                 }
             ],
-            "payload": ""
+            "payload": "",
+            "lock_height": "0"
         }));
 
         // When everything is normal
@@ -83,22 +87,22 @@ describe ('Test that validation with JSON schema', () =>
             "type": 0,
             "inputs": [
                 {
-                    "previous": "0x5d7f6a7a30f7ff591c8649f61eb8a35d034824ed5" +
-                        "cd252c2c6f10cdbd2236713dc369ef2a44b62ba113814a9d819" +
-                        "a276ff61582874c9aee9c98efa2aa1f10d73",
-                    "signature": "0x07557ce0845a7ccbba61643b95e310bd3ae06c41" +
-                        "fab9e8761ff3b0e5d28a5d625a3b951223c618910b239e7b779" +
-                        "c6c671252a78edff4d0f37bdb25982e4f4228"
+                    "utxo": "0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32",
+                    "unlock": {"bytes": "WEjSPkXBh0iqzGnYinwWYyNckuHdOU3TNbVr7oURPBxFKyXaCXkRc0o3O2IwNZKple6+qmNp3VkAPr1jHsjoCw=="},
+                    "unlock_age": 0
                 }
             ],
             "outputs": [
                 {
                     "value": "400000000000",
-                    "address": "GA3DMXTREDC4AIUTHRFIXCKWKF7BDIXRWM2KLV74OPK2" +
-                        "OKDM2VJ235GN"
+                    "lock": {
+                        "type": 0,
+                        "bytes": [156,198,57,161,53,47,119,242,37,22,12,66,255,137,26,106,250,91,70,161,26,105,169,73,32,134,215,120,6,118,244,42]
+                    }
                 }
             ],
-            "payload": ""
+            "payload": "",
+            "lock_height": "0"
         }));
 
     });
@@ -164,7 +168,7 @@ describe ('Test that JSON.stringify of Transaction', () =>
             [
                 new boasdk.TxInput(
                     new boasdk.Hash("0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32"),
-                    new boasdk.Signature("0x09039e412cd8bf8cb0364454f6737aaeee9e403e69198e418e87589ea6b3acd6171fe8d29fd6e5d5abc62390fbad0649f62e392be0c3228abd069c14c3fea5bd"))
+                    boasdk.Unlock.fromSignature(new boasdk.Signature("0x09039e412cd8bf8cb0364454f6737aaeee9e403e69198e418e87589ea6b3acd6171fe8d29fd6e5d5abc62390fbad0649f62e392be0c3228abd069c14c3fea5bd")))
             ],
             [
                 new boasdk.TxOutput(
@@ -178,6 +182,7 @@ describe ('Test that JSON.stringify of Transaction', () =>
             ],
             new boasdk.DataPayload("0x0001")
         )
-        assert.strictEqual(JSON.stringify(tx), `{"type":0,"inputs":[{"utxo":"0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32","signature":"0x09039e412cd8bf8cb0364454f6737aaeee9e403e69198e418e87589ea6b3acd6171fe8d29fd6e5d5abc62390fbad0649f62e392be0c3228abd069c14c3fea5bd"}],"outputs":[{"value":"1663400000","address":"GCOMMONBGUXXP4RFCYGEF74JDJVPUW2GUENGTKKJECDNO6AGO32CUWGU"},{"value":"24398336600000","address":"GDID227ETHPOMLRLIHVDJSNSJVLDS4D4ANYOUHXPMG2WWEZN5JO473ZO"}],"payload":"0x0001"}`);
+        assert.strictEqual(JSON.stringify(tx),
+            `{"type":0,"inputs":[{"utxo":"0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32","unlock":{"bytes":"vaX+wxScBr2KIsPgKzku9kkGrfuQI8ar1eXWn9LoHxfWrLOmnliHjkGOGWk+QJ7urnpz9lRENrCMv9gsQZ4DCQ=="},"unlock_age":0}],"outputs":[{"value":"1663400000","lock":{"type":0,"bytes":"nMY5oTUvd/IlFgxC/4kaavpbRqEaaalJIIbXeAZ29Co="}},{"value":"24398336600000","lock":{"type":0,"bytes":"0D1r5Jne5i4rQeo0ybJNVjlwfANw6h7vYbVrEy3qXc8="}}],"payload":"0x0001","lock_height":"0"}`);
     });
 });

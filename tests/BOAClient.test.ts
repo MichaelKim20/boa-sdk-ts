@@ -25,37 +25,38 @@ import URI from 'urijs';
  * sample JSON
  */
 let sample_validators =
-[
-    {
-        "address":"GA3DMXTREDC4AIUTHRFIXCKWKF7BDIXRWM2KLV74OPK2OKDM2VJ235GN",
-        "enrolled_at":0,
-        "stake":"0x210b66053c73e7bd7b27673706f0272617d09b8cda76605e91ab66ad1cc3bfc1f3f5fede91fd74bb2d2073de587c6ee495cfb0d981f03a83651b48ce0e576a1a",
-        "preimage":
+    [
         {
-            "distance":1,
-            "hash":"0"
-        }
-    },
-    {
-        "address":"GBUVRIIBMHKC4PE6BK7MO2O26U2NJLW4WGGWKLAVLAA2DLFZTBHHKOEK",
-        "enrolled_at":0,"stake":"0x86f1a6dff3b1f2256d2417b71ecc5511293b224894da5fd75c192965aa1874824ca777ecac678c871e717ad38c295046f4f64130f31750aa967c30c35529944a",
-        "preimage":
+            "address": "GA3DMXTREDC4AIUTHRFIXCKWKF7BDIXRWM2KLV74OPK2OKDM2VJ235GN",
+            "enrolled_at": 0,
+            "stake": "0x210b66053c73e7bd7b27673706f0272617d09b8cda76605e91ab66ad1cc3bfc1f3f5fede91fd74bb2d2073de587c6ee495cfb0d981f03a83651b48ce0e576a1a",
+            "preimage":
+                {
+                    "distance": 1,
+                    "hash": "0"
+                }
+        },
         {
-            "distance":1,
-            "hash":"0"
-        }
-    },
-    {
-        "address":"GBJABNUCDJCIL5YJQMB5OZ7VCFPKYLMTUXM2ZKQJACT7PXL7EVOMEKNZ",
-        "enrolled_at":0,
-        "stake":"0xf21f606e96d6130b02a807655fda22c8888111f2045c0d45eda9c26d3c97741ca32fc68960ae68220809843d92671083e32395a848203380e5dfd46e4b0261f0",
-        "preimage":
+            "address": "GBUVRIIBMHKC4PE6BK7MO2O26U2NJLW4WGGWKLAVLAA2DLFZTBHHKOEK",
+            "enrolled_at": 0,
+            "stake": "0x86f1a6dff3b1f2256d2417b71ecc5511293b224894da5fd75c192965aa1874824ca777ecac678c871e717ad38c295046f4f64130f31750aa967c30c35529944a",
+            "preimage":
+                {
+                    "distance": 1,
+                    "hash": "0"
+                }
+        },
         {
-            "distance":1,
-            "hash":"0"
+            "address": "GBJABNUCDJCIL5YJQMB5OZ7VCFPKYLMTUXM2ZKQJACT7PXL7EVOMEKNZ",
+            "enrolled_at": 0,
+            "stake": "0xf21f606e96d6130b02a807655fda22c8888111f2045c0d45eda9c26d3c97741ca32fc68960ae68220809843d92671083e32395a848203380e5dfd46e4b0261f0",
+            "preimage":
+                {
+                    "distance": 1,
+                    "hash": "0"
+                }
         }
-    }
-];
+    ];
 
 /**
  * Sample UTXOs
@@ -152,8 +153,7 @@ let sample_utxo =
  * When this is executed, the local web server is run,
  * the test codes are performed, and the web server is shut down.
  */
-export class TestStoa
-{
+export class TestStoa {
     /**
      * The bind port
      */
@@ -173,8 +173,7 @@ export class TestStoa
      * Constructor
      * @param port The bind port
      */
-    constructor (port: number | string)
-    {
+    constructor (port: number | string) {
         if (typeof port == "string")
             this.port = parseInt(port, 10);
         else
@@ -186,16 +185,13 @@ export class TestStoa
     /**
      * Start the web server
      */
-    public start (): Promise<void>
-    {
+    public start (): Promise<void> {
         // http://localhost/validators
         this.app.get("/validators",
-            (req: express.Request , res: express.Response) =>
-            {
+            (req: express.Request, res: express.Response) => {
                 let height: number = Number(req.query.height);
 
-                if (!Number.isNaN(height) && (!Number.isInteger(height) || height < 0))
-                {
+                if (!Number.isNaN(height) && (!Number.isInteger(height) || height < 0)) {
                     res.status(400).send("The Height value is not valid.");
                     return;
                 }
@@ -203,8 +199,7 @@ export class TestStoa
                 let enrolled_height: number = 0;
                 if (Number.isNaN(height)) height = enrolled_height;
 
-                for (let elem of sample_validators)
-                {
+                for (let elem of sample_validators) {
                     elem.preimage.distance = height - enrolled_height;
                 }
 
@@ -213,13 +208,11 @@ export class TestStoa
 
         // http://localhost/validator
         this.app.get("/validator/:address",
-            (req : express.Request , res : express.Response) =>
-            {
+            (req: express.Request, res: express.Response) => {
                 let height: number = Number(req.query.height);
                 let address: string = String(req.params.address);
 
-                if (!Number.isNaN(height) && (!Number.isInteger(height) || height < 0))
-                {
+                if (!Number.isNaN(height) && (!Number.isInteger(height) || height < 0)) {
                     res.status(400).send("The Height value is not valid.");
                     return;
                 }
@@ -227,10 +220,8 @@ export class TestStoa
                 let enrolled_height: number = 0;
                 if (Number.isNaN(height)) height = enrolled_height;
 
-                for (let elem of sample_validators)
-                {
-                    if (elem.address == address)
-                    {
+                for (let elem of sample_validators) {
+                    if (elem.address == address) {
                         elem.preimage.distance = height - enrolled_height;
                         res.status(200).send(JSON.stringify([elem]));
                         return;
@@ -242,8 +233,7 @@ export class TestStoa
 
         // http://localhost/client_info
         this.app.get("/client_info",
-            (req : express.Request, res : express.Response) =>
-            {
+            (req: express.Request, res: express.Response) => {
                 res.status(200).send({
                     "X-Client-Name": req.header("X-Client-Name"),
                     "X-Client-Version": req.header("X-Client-Version"),
@@ -252,12 +242,10 @@ export class TestStoa
 
         // http://localhost/utxo
         this.app.get("/utxo/:address",
-            (req : express.Request , res : express.Response) =>
-            {
+            (req: express.Request, res: express.Response) => {
                 let address: boasdk.PublicKey = new boasdk.PublicKey(req.params.address);
 
-                if (sample_utxo_address == address.toString())
-                {
+                if (sample_utxo_address == address.toString()) {
                     res.status(200).send(JSON.stringify(sample_utxo));
                     return;
                 }
@@ -268,8 +256,7 @@ export class TestStoa
 
         // http://localhost/block_height
         this.app.get("/block_height",
-            (req : express.Request , res : express.Response) =>
-            {
+            (req: express.Request, res: express.Response) => {
                 res.status(200).send("10");
             });
 
@@ -286,11 +273,12 @@ export class TestStoa
         });
     }
 
-    public stop (): Promise<void>
-    {
+    public stop (): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if (this.server != null)
-                this.server.close((err?) => { err === undefined ? resolve() : reject(err); });
+                this.server.close((err?) => {
+                    err === undefined ? resolve() : reject(err);
+                });
             else
                 resolve();
         });
@@ -301,8 +289,7 @@ export class TestStoa
  * This is an Agora node for testing.
  * The test code allows the Agora node to be started and shut down.
  */
-class TestAgora
-{
+class TestAgora {
     /**
      * The bind port
      */
@@ -322,8 +309,7 @@ class TestAgora
      * Constructor
      * @param port The bind port
      */
-    constructor (port: number | string)
-    {
+    constructor (port: number | string) {
         if (typeof port == "string")
             this.port = parseInt(port, 10);
         else
@@ -335,18 +321,15 @@ class TestAgora
     /**
      * Start the web server
      */
-    public start (): Promise<void>
-    {
+    public start (): Promise<void> {
         // parse application/x-www-form-urlencoded
-        this.app.use(bodyParser.urlencoded({ extended: false }))
+        this.app.use(bodyParser.urlencoded({extended: false}))
         // parse application/json
         this.app.use(bodyParser.json())
 
         this.app.put("/transaction",
-            (req : express.Request, res : express.Response) =>
-            {
-                if (req.body.tx === undefined)
-                {
+            (req: express.Request, res: express.Response) => {
+                if (req.body.tx === undefined) {
                     res.status(400).send("Missing 'tx' object in body");
                     return;
                 }
@@ -366,19 +349,19 @@ class TestAgora
         });
     }
 
-    public stop (): Promise<void>
-    {
+    public stop (): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if (this.server != null)
-                this.server.close((err?) => { err === undefined ? resolve() : reject(err); });
+                this.server.close((err?) => {
+                    err === undefined ? resolve() : reject(err);
+                });
             else
                 resolve();
         });
     }
 }
 
-describe ('BOA Client', () =>
-{
+describe('BOA Client', () => {
     let stoa_server: TestStoa;
     let agora_server: TestAgora;
     let stoa_port: string = '5000';
@@ -492,8 +475,7 @@ describe ('BOA Client', () =>
         assert.strictEqual(height, BigInt(10));
     });
 
-    it ('Test a function of the BOA Client using async, await - `getAllValidators`', async () =>
-    {
+    it('Test a function of the BOA Client using async, await - `getAllValidators`', async () => {
         // Set URL
         let stoa_uri = URI("http://localhost").port(stoa_port);
         let agora_uri = URI("http://localhost").port(agora_port);
@@ -508,8 +490,7 @@ describe ('BOA Client', () =>
         assert.strictEqual(validators[0].preimage.distance, 10);
     });
 
-    it ('Test a function of the BOA Client using async, await - `getAllValidator`', async () =>
-    {
+    it('Test a function of the BOA Client using async, await - `getAllValidator`', async () => {
         // Set URL
         let stoa_uri = URI("http://localhost").port(stoa_port);
         let agora_uri = URI("http://localhost").port(agora_port);
@@ -575,8 +556,7 @@ describe ('BOA Client', () =>
     /**
      * See_Also: https://github.com/bpfkorea/agora/blob/93c31daa616e76011deee68a8645e1b86624ce3d/source/agora/consensus/validation/PreImage.d#L79-L106
      */
-    it ('test for validity of pre-image', (doneIt: () => void) =>
-    {
+    it('test for validity of pre-image', (doneIt: () => void) => {
         // Set URL
         let stoa_uri = URI("http://localhost").port(stoa_port);
         let agora_uri = URI("http://localhost").port(agora_port);
@@ -586,8 +566,7 @@ describe ('BOA Client', () =>
 
         let pre_images: boasdk.Hash[] = [];
         pre_images.push(boasdk.hash(randomBytes(boasdk.Hash.Width)));
-        for (let idx = 0; idx < 20; idx++)
-        {
+        for (let idx = 0; idx < 20; idx++) {
             pre_images.push(boasdk.hash(pre_images[idx].data))
         }
         pre_images = pre_images.reverse();
@@ -674,8 +653,7 @@ describe ('BOA Client', () =>
         assert.strictEqual(response.data["X-Client-Version"], version);
     });
 
-    it ('Test creating a vote data', () =>
-    {
+    it('Test creating a vote data', () => {
         let utxos = [
             {
                 utxo: new boasdk.Hash("0x81a326afa790003c32517a2a" +
@@ -714,40 +692,56 @@ describe ('BOA Client', () =>
 
         let vote_tx =
             builder
-                .addInput(utxos[0].utxo,utxos[0].amount, keys[0].secret)
-                .addInput(utxos[1].utxo,utxos[1].amount, keys[1].secret)
-                .addInput(utxos[2].utxo,utxos[2].amount, keys[2].secret)
+                .addInput(utxos[0].utxo, utxos[0].amount, keys[0].secret)
+                .addInput(utxos[1].utxo, utxos[1].amount, keys[1].secret)
+                .addInput(utxos[2].utxo, utxos[2].amount, keys[2].secret)
                 .assignPayload(vote_data)
                 .addOutput(new boasdk.PublicKey(boasdk.TxPayloadFee.CommonsBudgetAddress), fee)
                 .sign(boasdk.TxType.Payment)
 
         let expected_object = {
-            type: 0,
-            inputs: [
+            "type": 0,
+            "inputs": [
                 {
-                    utxo: '0x81a326afa790003c32517a2a2556613004e6147edac28d576cf7bcc2daadf4bb60be1f644c229b775e7894844ec66b2d70ddf407b8196b46bc1dfe42061c7497',
-                    signature: '0x02780c8abbc9b9e1fb1bdcd74787e968fdd53818980922543a60ffbccb4c9b67535e78293a0f5f76fff7bceefb4b5c0d5b9614f38b8e24161b1ae35408c690ef'
+                    "utxo": "0x81a326afa790003c32517a2a2556613004e6147edac28d576cf7bcc2daadf4bb60be1f644c229b775e7894844ec66b2d70ddf407b8196b46bc1dfe42061c7497",
+                    "unlock": {
+                        "bytes": "gajqhaHFapefk2PtV0Ps3WUw9BQvYFPuR0eCRTNJcNabUSe22Grbq8hunhktQvoIIU+uAJ+m3wkTpLlklUhaCg=="
+                    },
+                    "unlock_age": 0
                 },
                 {
-                    utxo: '0xb82cb96710af2e9804c59d1f1e1679f8b8b69f4c0f6cd79c8c12f365dd766c09aaa4febcc18b3665d33301cb248ac7afd343ac7b98b27beaf246ad12d3b3219a',
-                    signature: '0x00e851b18b0ab681f5ca5982ecc5340b6cdf5151960bf0a98af5cc647a3cba758200f35da264a8b0a6f01051fb418f37f3827a5c0971f6b4ff71c9ad888d6779'
+                    "utxo": "0xb82cb96710af2e9804c59d1f1e1679f8b8b69f4c0f6cd79c8c12f365dd766c09aaa4febcc18b3665d33301cb248ac7afd343ac7b98b27beaf246ad12d3b3219a",
+                    "unlock": {
+                        "bytes": "d81P4a1i2Hmejbny6CRwC/tnn7RSIYKjClvcpj9GSqj1wUIuPBTa/koQ39m4E5SxQ8RlINg8G5dDiPc89IxQAg=="
+                    },
+                    "unlock_age": 0
                 },
                 {
-                    utxo: '0x4028965b7408566a66e4cf8c603a1cdebc7659a3e693d36d2fdcb39b196da967914f40ef4966d5b4b1f4b3aae00fbd68ffe8808b070464c2a101d44f4d7b0170',
-                    signature: '0x04828c97c29b41838e41a5b3327824409f6413c90c68bc926ef7cefce70d53539b29786c0fbe0519574ec089ae5814c6fd3efdafb34bea37cb082bf1b8bdd02e'
+                    "utxo": "0x4028965b7408566a66e4cf8c603a1cdebc7659a3e693d36d2fdcb39b196da967914f40ef4966d5b4b1f4b3aae00fbd68ffe8808b070464c2a101d44f4d7b0170",
+                    "unlock": {
+                        "bytes": "7Z3g5aXbRkCbkMLZ5nxQkcdJM4GwB7IVCdHuKSEjmjM7GYKrnc7RLFydQ0UuPIhaJPB3nDnpbWvtSb0cHIOBCQ=="
+                    },
+                    "unlock_age": 0
                 }
             ],
-            outputs: [
+            "outputs": [
                 {
-                    value: '500000',
-                    address: 'GCOMMONBGUXXP4RFCYGEF74JDJVPUW2GUENGTKKJECDNO6AGO32CUWGU'
+                    "value": "500000",
+                    "lock": {
+                        "type": 0,
+                        "bytes": "nMY5oTUvd/IlFgxC/4kaavpbRqEaaalJIIbXeAZ29Co="
+                    }
                 },
                 {
-                    value: '100000',
-                    address: 'GAVEUXU6ASJZ5VKIQ5G7W2PT5K4SJMF2V7FJLOCEV76J2UHTHCPI4IYM'
+                    "value": "100000",
+                    "lock": {
+                        "type": 0,
+                        "bytes": "KkpengSTntVIh037afPquSSwuq/KlbhEr/ydUPM4no4="
+                    }
                 }
             ],
-            payload: '0x617461642065746f76'
+            "payload": "0x617461642065746f76",
+            "lock_height": "0"
         };
 
         assert.deepStrictEqual(
@@ -755,9 +749,9 @@ describe ('BOA Client', () =>
             JSON.stringify(expected_object));
 
         // Verify the signature
-        let tx_hash = boasdk.hashFull(vote_tx);
         for (let idx = 0; idx < vote_tx.inputs.length; idx++)
-            assert.ok(keys[idx].address.verify(vote_tx.inputs[idx].signature, tx_hash.data));
+            assert.ok(keys[idx].address.verify(new boasdk.Signature(vote_tx.inputs[idx].unlock.bytes),
+                boasdk.hashFull(vote_tx).data));
     });
 
     it ('Test saving a vote data', async () =>
@@ -771,8 +765,8 @@ describe ('BOA Client', () =>
 
         let utxo = {
             utxo: new boasdk.Hash("0x81a326afa790003c32517a2a2556613004e61" +
-                    "47edac28d576cf7bcc2daadf4bb60be1f644c229b775e789484" +
-                    "4ec66b2d70ddf407b8196b46bc1dfe42061c7497"),
+                "47edac28d576cf7bcc2daadf4bb60be1f644c229b775e789484" +
+                "4ec66b2d70ddf407b8196b46bc1dfe42061c7497"),
             amount : BigInt(100000000)
         };
         let vote_data = new boasdk.DataPayload("0x617461642065746f76");
@@ -814,39 +808,61 @@ describe ('BOA Client', () =>
         utxo_manager.getUTXO(fee, block_height)
             .forEach((u:boasdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
 
+        let expected =
+            {
+                "type": 0,
+                "inputs": [
+                    {
+                        "utxo": "0x3451d94322524e3923fd26f0597fb8a9cdbf3a9427c38ed1ca61104796d39c5b9b5ea33d576f17c2dc17bebc5d84a0559de8c8c521dfe725d4c352255fc71e85",
+                        "unlock": {
+                            "bytes": "cZxcDw1Njiwv2w4fGc552PlRVID9Eg4al7HST0+QeS3vAO/ieiAC206EAHLokgzywh6TFbpjj7DF/90XHyOaAg=="
+                        },
+                        "unlock_age": 0
+                    },
+                    {
+                        "utxo": "0xfca92fe76629311c6208a49e89cb26f5260777278cd8b272e7bb3021adf429957fd6844eb3b8ff64a1f6074126163fd636877fa92a1f4329c5116873161fbaf8",
+                        "unlock": {
+                            "bytes": "cZxcDw1Njiwv2w4fGc552PlRVID9Eg4al7HST0+QeS3vAO/ieiAC206EAHLokgzywh6TFbpjj7DF/90XHyOaAg=="
+                        },
+                        "unlock_age": 0
+                    },
+                    {
+                        "utxo": "0x7e1958dbe6839d8520d65013bbc85d36d47a9f64cf608cc66c0d816f0b45f5c8a85a8990725ffbb1ab13c3c65b45fdc06f4745d455e00e1068c4c5c0b661d685",
+                        "unlock": {
+                            "bytes": "cZxcDw1Njiwv2w4fGc552PlRVID9Eg4al7HST0+QeS3vAO/ieiAC206EAHLokgzywh6TFbpjj7DF/90XHyOaAg=="
+                        },
+                        "unlock_age": 0
+                    }
+                ],
+                "outputs": [
+                    {
+                        "value": "500000",
+                        "lock": {
+                            "type": 0,
+                            "bytes": "nMY5oTUvd/IlFgxC/4kaavpbRqEaaalJIIbXeAZ29Co="
+                        }
+                    },
+                    {
+                        "value": "100000",
+                        "lock": {
+                            "type": 0,
+                            "bytes": "2L1pan7b6W/iwgJYgbeuPqYliGn7UoBmGVZkWa6O8U8="
+                        }
+                    }
+                ],
+                "payload": "0x617461642065746f76",
+                "lock_height": "0"
+            };
+
         let tx = builder
             .addOutput(new boasdk.PublicKey(boasdk.TxPayloadFee.CommonsBudgetAddress), fee)
             .assignPayload(vote_data)
             .sign(boasdk.TxType.Payment);
 
-        let expected = {
-            type: 0,
-            inputs: [
-                {
-                    utxo: '0x3451d94322524e3923fd26f0597fb8a9cdbf3a9427c38ed1ca61104796d39c5b9b5ea33d576f17c2dc17bebc5d84a0559de8c8c521dfe725d4c352255fc71e85',
-                    signature: '0x0ffb3ea5d227c2e2691f6a8ade638354c6665b1828512399c0a5df155f371baece80d6537619baeb3d6746677f9a92d06914292762b1b07b4938874340797c1b'
-                },
-                {
-                    utxo: '0xfca92fe76629311c6208a49e89cb26f5260777278cd8b272e7bb3021adf429957fd6844eb3b8ff64a1f6074126163fd636877fa92a1f4329c5116873161fbaf8',
-                    signature: '0x0ffb3ea5d227c2e2691f6a8ade638354c6665b1828512399c0a5df155f371baece80d6537619baeb3d6746677f9a92d06914292762b1b07b4938874340797c1b'
-                },
-                {
-                    utxo: '0x7e1958dbe6839d8520d65013bbc85d36d47a9f64cf608cc66c0d816f0b45f5c8a85a8990725ffbb1ab13c3c65b45fdc06f4745d455e00e1068c4c5c0b661d685',
-                    signature: '0x0ffb3ea5d227c2e2691f6a8ade638354c6665b1828512399c0a5df155f371baece80d6537619baeb3d6746677f9a92d06914292762b1b07b4938874340797c1b'
-                }
-            ],
-            outputs: [
-                {
-                    value: '500000',
-                    address: 'GCOMMONBGUXXP4RFCYGEF74JDJVPUW2GUENGTKKJECDNO6AGO32CUWGU'
-                },
-                {
-                    value: '100000',
-                    address: 'GDML22LKP3N6S37CYIBFRANXVY7KMJMINH5VFADGDFLGIWNOR3YU7T6I'
-                }
-            ],
-            payload: '0x617461642065746f76'
-        }
+        tx.inputs.forEach((value, idx) => {
+            expected.inputs[idx].unlock = value.unlock.toJSON();
+        });
+
         assert.strictEqual(JSON.stringify(expected), JSON.stringify(tx));
 
         let res = await boa_client.sendTransaction(tx);
