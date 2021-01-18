@@ -10,7 +10,8 @@
     "testnobuild": "mocha -r ts-node/register tests/**/*.test.ts",
     "build": "rimraf ./lib && tsc",
     "browser": "rimraf ./dist && webpack --config webpack.config.js",
-    "docs": "rimraf ./docs && ./node_modules/.bin/typedoc --options ./typedoc.js --module commonjs"
+    "docs": "rimraf ./docs && ./node_modules/.bin/typedoc --options ./typedoc.js --module commonjs",
+    "sendtx": "ts-node ./src/sendtx/main.ts"
   },
   "repository": {
     "type": "git",
