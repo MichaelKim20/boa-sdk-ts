@@ -82,13 +82,13 @@ function createTransaction (): Promise<sdk.Transaction[]>
                 let builder = new sdk.TxBuilder(WK.GenesisKey);
                 builder.addInput(u.utxo, u.amount);
 
-                console.log(`utxo amount: ${u.amount}`);
+                //console.log(`utxo amount: ${u.amount}`);
                 let amount = u.amount / BigInt(count);
-                console.log(`amount: ${amount}`);
+                //console.log(`amount: ${amount}`);
                 let remain = u.amount - amount * BigInt(count);
                 for (let idx = 0; idx < count; idx++)
                 {
-                    console.log(`${WK.GenesisKey.address.toString()} -> ${WK.keys(key_count).address.toString()}`)
+                    //console.log(`${WK.GenesisKey.address.toString()} -> ${WK.keys(key_count).address.toString()}`)
                     if (idx < count - 1)
                         builder.addOutput(WK.keys(key_count).address, amount);
                     else
@@ -119,7 +119,7 @@ function createTransaction (): Promise<sdk.Transaction[]>
                 let source_key_pair = WK.keys(source);
                 let destination_key_pair = WK.keys(destination);
 
-                console.log(`${source_key_pair.address.toString()} -> ${destination_key_pair.address.toString()}`)
+                //console.log(`${source_key_pair.address.toString()} -> ${destination_key_pair.address.toString()}`)
 
                 let utxos = await boa_client.getUTXOs(source_key_pair.address);
                 let builder = new sdk.TxBuilder(source_key_pair);
@@ -168,13 +168,14 @@ function makeBlock(): Promise<void>
             await wait(5000);
         } else {
             for (let tx of txs) {
-                console.log(JSON.stringify({"tx": tx}));
+                //console.log(JSON.stringify({"tx": tx}));
                 try {
                     await boa_client.sendTransaction(tx);
                 } catch (e)
                 {
                     console.log(e);
                 }
+                console.log(`tx_hash = ${sdk.hashFull(tx).toString()}`)
                 await wait(15000);
             }
         }
@@ -188,9 +189,8 @@ function makeBlock(): Promise<void>
 (async () => {
     await prepare();
     WK.make();
-    for (let idx = 0; idx < 100; idx++)
+    for (let idx = 0; idx < 1000; idx++)
     {
         await makeBlock();
-        await wait(1000);
     }
 })();
