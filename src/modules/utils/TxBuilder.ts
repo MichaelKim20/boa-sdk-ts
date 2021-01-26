@@ -73,7 +73,7 @@ export class TxBuilder
      */
     public addInput (utxo: Hash, amount: bigint, secret?: SecretKey): TxBuilder
     {
-        if (amount <= 0)
+        if (amount <= BigInt(0))
             throw new Error(`Positive amount expected, not ${amount.toString()}`);
 
         if (secret === undefined)
@@ -144,7 +144,7 @@ export class TxBuilder
         if ((type === TxType.Freeze) && (this.payload !== undefined) && (this.payload.data.length > 0))
             throw (new Error("Freeze transaction cannot have data payload."));
 
-        if (this.amount > 0)
+        if (this.amount > BigInt(0))
             this.addOutput(this.owner_keypair.address, this.amount);
 
         let tx = new Transaction(type,
