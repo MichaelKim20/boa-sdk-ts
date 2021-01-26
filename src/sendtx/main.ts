@@ -135,7 +135,7 @@ function createTransaction (): Promise<sdk.Transaction[]>
                     tx = builder
                         .addOutput(destination_key_pair.address, send_amount)
                         .sign(sdk.TxType.Payment);
-                    res.push(builder.sign(sdk.TxType.Payment));
+                    res.push(tx);
                     idx++
                 }
             }
