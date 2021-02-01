@@ -146,14 +146,14 @@ describe ('TxBuilder', () =>
                 {
                     "utxo": "0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32",
                     "unlock": {
-                        "bytes": "yCqednqeYPY3cNxjyxoKJWWdKtAYAxQ2mu2SUzSfAN7suQhUo8xn2G9uJFNkq1rpKXKYcN77SNaGJaWSZ4y1Cw=="
+                        "bytes": "2jPCqENPCJCXlrzkqNdtWnzeR98LTVH1VmIxPV2pXbJopuEIefcXKLr7BzzZzYc3HbTIb9ztmgMVQCehllATDg=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0x4dde806d2e09367f9d5bdaaf46deab01a336a64fdb088dbb94edb171560c63cf6a39377bf0c4d35118775681d989dee46531926299463256da303553f09be6ef",
                     "unlock": {
-                        "bytes": "yCqednqeYPY3cNxjyxoKJWWdKtAYAxQ2mu2SUzSfAN7suQhUo8xn2G9uJFNkq1rpKXKYcN77SNaGJaWSZ4y1Cw=="
+                        "bytes": "2jPCqENPCJCXlrzkqNdtWnzeR98LTVH1VmIxPV2pXbJopuEIefcXKLr7BzzZzYc3HbTIb9ztmgMVQCehllATDg=="
                     },
                     "unlock_age": 0
                 }
