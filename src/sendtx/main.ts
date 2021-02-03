@@ -1,5 +1,6 @@
 import * as sdk from '../index';
 import { WK } from './WK';
+import * as boasdk from "../../lib";
 
 // Create BOA Client
 let boa_client = new sdk.BOAClient("http://localhost:2828/", "http://localhost:4002/");
@@ -277,14 +278,23 @@ function createTransaction3 (): Promise<sdk.Transaction[]>
             let utxos = await  boa_client.getUTXOs(WK.GenesisKey.address);
             let manager = new sdk.UTXOManager(utxos);
             let builder = new sdk.TxBuilder(WK.GenesisKey);
+
+            let payload = Buffer.alloc(600);
+            for (let i = 0; i < payload.length; i++)
+                payload[i] = i % 256;
+            let vote_data = new sdk.DataPayload(payload);
+            let fee = sdk.TxPayloadFee.getFee(vote_data.data.length);
+
             let sum: bigint = manager.getSum()[0];
             console.log(`sum: ${sum}`);
-            let amount = sum / BigInt(key_count);
+            let amount = (sum - fee) / BigInt(key_count);
             console.log(`amount: ${amount}`);
-            let remain = sum - amount * BigInt(key_count);
+            let remain = (sum - fee) - amount * BigInt(key_count);
             console.log(`remain: ${remain}`);
             for (let u of utxos)
                 builder.addInput(u.utxo, u.amount);
+
+            builder.assignPayload(vote_data);
 
             for (let idx = 0; idx < key_count; idx++) {
                 if (idx < key_count-1)
@@ -292,13 +302,8 @@ function createTransaction3 (): Promise<sdk.Transaction[]>
                 else
                     builder.addOutput(WK.keys(idx % key_count).address, amount + remain);
             }
-            let payload = Buffer.alloc(600);
-            for (let i = 0; i < payload.length; i++)
-                payload[i] = i % 256;
-            let vote_data = new sdk.DataPayload(payload);
-            builder.assignPayload(vote_data)
-            let tx = builder.sign(sdk.TxType.Payment);
-            //console.log(JSON.stringify(tx));
+            let tx = builder.sign(sdk.TxType.Payment, BigInt(0), fee);
+            console.log(JSON.stringify(tx));
             //console.log(sdk.hashFull(tx).toString());
             //console.log(`TX_HASH (createTransaction3) : ${sdk.hashFull(tx).toString()}`);
             res.push(tx);
@@ -368,7 +373,7 @@ function makeBlock(): Promise<void>
         let height = await boa_client.getBlockHeight();
         console.log(`Current height is ${height}`);
 
-        let txs = await createTransaction();
+        let txs = await createTransaction3();
 
         if (txs.length === 0) {
             await wait(5000);

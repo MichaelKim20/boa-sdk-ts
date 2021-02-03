@@ -124,16 +124,15 @@ describe ('TxBuilder', () =>
         let builder = new boasdk.TxBuilder(owner);
         let tx: boasdk.Transaction;
         let payload = new boasdk.DataPayload("0x617461642065746f76");
-        let commons_budget_address = new boasdk.PublicKey("GCOMMONBGUXXP4RFCYGEF74JDJVPUW2GUENGTKKJECDNO6AGO32CUWGU");
-        let fee = BigInt(500000);
+        let payload_fee = BigInt(500000);
+        let tx_fee = BigInt(0);
 
         try {
             tx = builder
                 .addInput(utxo_data1.utxo, utxo_data1.amount)
                 .addInput(utxo_data2.utxo, utxo_data2.amount)
-                .addOutput(commons_budget_address, fee)
                 .assignPayload(payload)
-                .sign(boasdk.TxType.Payment);
+                .sign(boasdk.TxType.Payment, tx_fee, payload_fee);
         }
         catch (error)
         {
