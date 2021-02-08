@@ -1,6 +1,5 @@
 import * as sdk from '../index';
 import { WK } from './WK';
-import * as boasdk from "../../lib";
 
 // Create BOA Client
 let boa_client = new sdk.BOAClient("http://localhost:2828/", "http://localhost:4002/");
