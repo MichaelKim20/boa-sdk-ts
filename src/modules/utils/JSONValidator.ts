@@ -102,7 +102,7 @@ export class JSONValidator
                         },
                         "type": "array"
                     },
-                    "timestamp": {
+                    "time_offset": {
                         "type": "number"
                     }
                 },
@@ -116,7 +116,7 @@ export class JSONValidator
                     "enrollments",
                     "random_seed",
                     "missing_validators",
-                    "timestamp"
+                    "time_offset"
                 ]
             }
         ],

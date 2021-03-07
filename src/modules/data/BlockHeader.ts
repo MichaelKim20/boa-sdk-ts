@@ -70,9 +70,9 @@ export class BlockHeader
     public missing_validators: Array<number>;
 
     /**
-     * Block unix timestamp
+     * Block seconds offset from Genesis Timestamp in `ConsensusParams`
      */
-    public timestamp: number;
+    public time_offset: number;
 
     /**
      * Constructor
@@ -84,10 +84,10 @@ export class BlockHeader
      * @param enrollments The enrolled validators
      * @param random_seed Hash of random seed of the preimages for this this height
      * @param missing_validators List of indices to the validator UTXO set which have not revealed the preimage
-     * @param timestamp Block unix timestamp
+     * @param time_offset Block seconds offset from Genesis Timestamp in `ConsensusParams`
      */
     constructor (prev_block: Hash, height: Height, merkle_root: Hash,
-        validators: BitField, signature: Signature, enrollments: Enrollment[], random_seed: Hash, missing_validators: Array<number>, timestamp: number)
+        validators: BitField, signature: Signature, enrollments: Enrollment[], random_seed: Hash, missing_validators: Array<number>, time_offset: number)
     {
         this.prev_block = prev_block;
         this.height = height;
@@ -97,7 +97,7 @@ export class BlockHeader
         this.enrollments = enrollments;
         this.random_seed = random_seed;
         this.missing_validators = missing_validators;
-        this.timestamp = timestamp;
+        this.time_offset = time_offset;
     }
 
     /**
@@ -125,7 +125,7 @@ export class BlockHeader
             value.enrollments.map((elem: any) => Enrollment.reviver("", elem)),
             new Hash(value.random_seed),
             value.missing_validators.map((elem: number) => elem),
-            value.timestamp
+            value.time_offset
         );
     }
 
@@ -144,7 +144,7 @@ export class BlockHeader
         for (let elem of this.missing_validators)
             buffer.writeUInt32LE(elem);
         const buf = Buffer.allocUnsafe(8);
-        Utils.writeJSBigIntLE(buf, JSBI.BigInt(this.timestamp));
+        Utils.writeJSBigIntLE(buf, JSBI.BigInt(this.time_offset));
         buffer.writeBuffer(buf);
     }
 }
