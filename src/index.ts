@@ -58,5 +58,7 @@ export { Request } from './modules/net/Request';
 
 export { NetworkError, NotFoundError, BadRequestError, handleNetworkError } from './modules/net/error/ErrorTypes';
 
+export { crypto_core_ed25519_scalar_reduce } from './modules/crypto/sc25519_reduce';
+
 import JSBI from 'jsbi';
 export { JSBI };
