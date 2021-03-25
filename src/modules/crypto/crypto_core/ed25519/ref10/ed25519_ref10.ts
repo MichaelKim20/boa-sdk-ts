@@ -4,33 +4,52 @@ import JSBI from "jsbi";
 export class FE25519
 {
     public static WIDTH = 10;
+
     /* sqrt(-1) */
-    public static SqrtM1 = new FE25519([-32595792, -7943725,  9377950,  3500415, 12389472, -272473, -25146209, -2005654, 326686, 11406482]);
+    public static SqrtM1 =
+        new FE25519([-32595792, -7943725,  9377950,  3500415, 12389472, -272473, -25146209, -2005654, 326686, 11406482]);
+
     /* sqrt(-486664) */
-    public static SqrtAM2 = new FE25519([-12222970, -8312128, -11511410, 9067497, -15300785, -241793, 25456130, 14121551, -12187136, 3972024]);
+    public static SqrtAM2 =
+        new FE25519([-12222970, -8312128, -11511410, 9067497, -15300785, -241793, 25456130, 14121551, -12187136, 3972024]);
+
     /* 37095705934669439343138083508754565189542113879843219016388785533085940283555 */
-    public static D = new FE25519([-10913610, 13857413, -15372611, 6949391,   114729, -8787816, -6275908, -3247719, -18696448, -12055116]);
+    public static D =
+        new FE25519([-10913610, 13857413, -15372611, 6949391,   114729, -8787816, -6275908, -3247719, -18696448, -12055116]);
+
     /* 2 * d =
     * 16295367250680780974490674513165176452449235426866156013048779062215315747161
     */
-    public static D2 = new FE25519([-21827239, -5839606,  -30745221, 13898782, 229458, 15978800, -12551817, -6495438, 29715968, 9444199]);
+    public static D2 =
+        new FE25519([-21827239, -5839606,  -30745221, 13898782, 229458, 15978800, -12551817, -6495438, 29715968, 9444199]);
+
     /* A = 486662 */
-    public static A = new FE25519([486662, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    public static A =
+        new FE25519([486662, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
     /* sqrt(ad - 1) with a = -1 (mod p) */
-    public static SqrtADM1 = new FE25519([24849947, -153582, -23613485, 6347715, -21072328, -667138, -25271143, -15367704, -870347, 14525639]);
+    public static SqrtADM1 =
+        new FE25519([24849947, -153582, -23613485, 6347715, -21072328, -667138, -25271143, -15367704, -870347, 14525639]);
+
     /* 1 / sqrt(a - d) */
-    public static InvSqrtAMD = new FE25519([6111485, 4156064, -27798727, 12243468, -25904040, 120897, 20826367, -7060776, 6093568, -1986012]);
+    public static InvSqrtAMD =
+        new FE25519([6111485, 4156064, -27798727, 12243468, -25904040, 120897, 20826367, -7060776, 6093568, -1986012]);
+
     /* 1 - d ^ 2 */
-    public static OneMSqrtD = new FE25519([6275446, -16617371, -22938544, -3773710, 11667077, 7397348, -27922721, 1766195, -24433858, 672203]);
+    public static OneMSqrtD =
+        new FE25519([6275446, -16617371, -22938544, -3773710, 11667077, 7397348, -27922721, 1766195, -24433858, 672203]);
+
     /* (d - 1) ^ 2 */
-    public static SqrtDMOne = new FE25519([15551795, -11097455, -13425098, -10125071, -11896535, 10178284, -26634327, 4729244, -5282110, -10116402]);
+    public static SqrtDMOne =
+        new FE25519([15551795, -11097455, -13425098, -10125071, -11896535, 10178284, -26634327, 4729244, -5282110, -10116402]);
 
     public items: Int32Array;
 
     constructor (values?: Array<number> | Int32Array | FE25519)
     {
         this.items = new Int32Array(10);
-        if (values !== undefined) {
+        if (values !== undefined)
+        {
             if (values instanceof Int32Array)
                 values.forEach((m, i) => this.items[i] = m);
             else if (values instanceof FE25519)
@@ -93,7 +112,8 @@ export class FE25519
     public toBytes (): Uint8Array
     {
         let t = new FE25519();
-        t.reduce2(this);
+        FE25519.reduce2(t, this);
+
         let s = new Uint8Array(32);
 
         s[0]  = t.items[0] >> 0;
@@ -135,19 +155,19 @@ export class FE25519
     /**
      h = 0
      **/
-    public zero ()
+    public static zero (h: FE25519)
     {
-        this.items.fill(0);
+        h.items.fill(0);
     }
 
     /**
      h = 1
      **/
-    public one ()
+    public static one (h: FE25519)
     {
-        this.items[0] = 1;
-        this.items[1] = 0;
-        this.items.fill(0, 2);
+        h.items[0] = 1;
+        h.items[1] = 0;
+        h.items.fill(0, 2);
     }
 
     /**
@@ -161,10 +181,10 @@ export class FE25519
      * Postconditions:
      * |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
      **/
-    public add (f: FE25519, g: FE25519)
+    public static add (h: FE25519, f: FE25519, g: FE25519)
     {
         for (let idx = 0; idx < FE25519.WIDTH; idx++)
-            f.items[idx] = f.items[idx] + g.items[idx];
+            h.items[idx] = f.items[idx] + g.items[idx];
     }
 
     /**
@@ -178,10 +198,10 @@ export class FE25519
      * Postconditions:
      * |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
      **/
-    public sub (f: FE25519, g: FE25519)
+    public static sub (h: FE25519, f: FE25519, g: FE25519)
     {
         for (let idx = 0; idx < FE25519.WIDTH; idx++)
-            f.items[idx] = f.items[idx] - g.items[idx];
+            h.items[idx] = f.items[idx] - g.items[idx];
     }
 
     /**
@@ -193,26 +213,29 @@ export class FE25519
      * Postconditions:
      * |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
      **/
-    public negate ()
+    public static negate (h: FE25519, f: FE25519)
     {
-        this.items.forEach((m, i) => this.items[i] = -m);
+        f.items.forEach((mf, i) => h.items[i] = -mf);
     }
 
     /**
      * Replace (f,g) with (g,g) if b == 1;
      * Replace (f,g) with (f,g) if b == 0.
      */
-    public cmov (f: FE25519, g: FE25519, b: number)
+    public static cmov (f: FE25519, g: FE25519, b: number)
     {
         let mask = (b == 0) ? 0x00000000 : 0xFFFFFFFF;
         let x = g.items.map((mg,i) => f.items[i] ^ mg);
         x.forEach((mx, i) => x[i] = mx & mask);
-        x.forEach((mx, i) => this.items[i] = f.items[i] ^ mx);
+        x.forEach((mx, i) => f.items[i] ^= mx);
     }
 
-    public copy (h: FE25519)
+    /**
+     h = f
+     **/
+    public static copy (h: FE25519, f: FE25519)
     {
-        h.items.forEach((mh, i) => this.items[i] = mh);
+        f.items.forEach((mf, i) => h.items[i] = mf);
     }
 
     /**
@@ -222,9 +245,9 @@ export class FE25519
      * Preconditions:
      * |f| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
      **/
-    public isNegative (): number
+    public static isNegative (f: FE25519): number
     {
-        let s = this.toBytes();
+        let s = f.toBytes();
         return s[0] & 1;
     }
 
@@ -235,9 +258,9 @@ export class FE25519
      * Preconditions:
      * |f| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
      **/
-    public isZero (): number
+    public static isZero (f: FE25519): number
     {
-        let s = this.toBytes();
+        let s = f.toBytes();
         return ED25519Utils.sodium_is_zero(s, 32);
     }
 
@@ -252,7 +275,7 @@ export class FE25519
      * Postconditions:
      * |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
      */
-    public mul (f: FE25519, g: FE25519)
+    public static mul (h: FE25519, f: FE25519, g: FE25519)
     {
         let f0 = JSBI.BigInt(f.items[0]);
         let f1 = JSBI.BigInt(f.items[1]);
@@ -471,7 +494,7 @@ export class FE25519
         /* |h0| <= 2^25; from now on fits into int32 unchanged */
         /* |h1| <= 1.01*2^24 */
 
-        H.forEach((mh, i) => this.items[i] = JSBIUtils.toInt32(mh));
+        H.forEach((mh, i) => h.items[i] = JSBIUtils.toInt32(mh));
     }
 
     /**
@@ -484,7 +507,7 @@ export class FE25519
      * Postconditions:
      * |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
      **/
-    public sq (f: FE25519)
+    public static sq (h: FE25519, f: FE25519)
     {
         let f0 = JSBI.BigInt(f.items[0]);
         let f1 = JSBI.BigInt(f.items[1]);
@@ -621,7 +644,7 @@ export class FE25519
         func24(9);
         func25(0);
 
-        H.forEach((mh, i) => this.items[i] = JSBIUtils.toInt32(mh));
+        H.forEach((mh, i) => h.items[i] = JSBIUtils.toInt32(mh));
     }
 
     /**
@@ -634,7 +657,7 @@ export class FE25519
      * Postconditions:
      * |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
      **/
-    public sq2 (f: FE25519)
+    public static sq2 (h: FE25519, f: FE25519)
     {
         let f0 = JSBI.BigInt(f.items[0]);
         let f1 = JSBI.BigInt(f.items[1]);
@@ -773,11 +796,10 @@ export class FE25519
         func24(9);
         func25(0);
 
-        H.forEach((mh, i) => this.items[i] = JSBIUtils.toInt32(mh));
+        H.forEach((mh, i) => h.items[i] = JSBIUtils.toInt32(mh));
     }
 
-
-    public mul32 (f: FE25519, n: number)
+    public static mul32 (h: FE25519, f: FE25519, n: number)
     {
         let sn = JSBI.BigInt(n);
         let f0 = JSBI.BigInt(f.items[0]);
@@ -847,13 +869,13 @@ export class FE25519
         func25(6);
         func25(8);
 
-        H.forEach((mh, i) => this.items[i] = JSBIUtils.toInt32(mh));
+        H.forEach((mh, i) => h.items[i] = JSBIUtils.toInt32(mh));
     }
 
     /**
      * Inversion - returns 0 if z=0
      **/
-    public invert (z: FE25519)
+    public static invert (out: FE25519, z: FE25519)
     {
         let t0 = new FE25519();
         let t1 = new FE25519();
@@ -861,130 +883,131 @@ export class FE25519
         let t3 = new FE25519();
         let i: number;
 
-        t0.sq(z);
-        t1.sq(t0);
-        t1.sq(t1);
-        t1.mul(z, t1)
-        t0.mul(t0, t1);
-        t2.sq(t0);
-        t1.mul(t1, t2);
-        t2.sq(t1);
-        for (i = 1; i < 5; ++i) {
-            t2.sq(t2);
-        }
-        t1.mul(t2, t1);
-        t2.sq(t1);
-        for (i = 1; i < 10; ++i) {
-            t2.sq(t2);
-        }
-        t2.mul(t2, t1);
-        t3.sq(t2);
-        for (i = 1; i < 20; ++i) {
-            t3.sq(t3);
-        }
-        t2.mul(t3, t2);
-        for (i = 1; i < 11; ++i) {
-            t2.sq(t2);
-        }
-        t1.mul(t2, t1);
-        t2.sq(t1);
-        for (i = 1; i < 50; ++i) {
-            t2.sq(t2);
-        }
-        t2.mul(t2, t1);
-        t3.sq(t2);
-        for (i = 1; i < 100; ++i) {
-            t3.sq(t3);
-        }
-        t2.mul(t3, t2);
-        for (i = 1; i < 51; ++i) {
-            t2.sq(t2);
-        }
-        t1.mul(t2, t1);
-        for (i = 1; i < 6; ++i) {
-            t1.sq(t1);
-        }
-        this.mul(t1, t0);
+        FE25519.sq(t0, z);
+        FE25519.sq(t1, t0);
+        FE25519.sq(t1, t1);
+        FE25519.mul(t1, z, t1)
+        FE25519.mul(t0, t0, t1);
+        FE25519.sq(t2, t0);
+        FE25519.mul(t1, t1, t2);
+        FE25519.sq(t2, t1);
+        for (i = 1; i < 5; ++i)
+            FE25519.sq(t2, t2);
+
+        FE25519.mul(t1, t2, t1);
+        FE25519.sq(t2, t1);
+        for (i = 1; i < 10; ++i)
+            FE25519.sq(t2, t2);
+
+        FE25519.mul(t2, t2, t1);
+        FE25519.sq(t3, t2);
+        for (i = 1; i < 20; ++i)
+            FE25519.sq(t3, t3);
+
+        FE25519.mul(t2, t3, t2);
+        for (i = 1; i < 11; ++i)
+            FE25519.sq(t2, t2);
+
+        FE25519.mul(t1, t2, t1);
+        FE25519.sq(t2, t1);
+        for (i = 1; i < 50; ++i)
+            FE25519.sq(t2, t2);
+
+        FE25519.mul(t2, t2, t1);
+        FE25519.sq(t3, t2);
+        for (i = 1; i < 100; ++i)
+            FE25519.sq(t3, t3);
+
+        FE25519.mul(t2, t3, t2);
+        for (i = 1; i < 51; ++i)
+            FE25519.sq(t2, t2);
+
+        FE25519.mul(t1, t2, t1);
+        for (i = 1; i < 6; ++i)
+            FE25519.sq(t1, t1);
+
+        FE25519.mul(out, t1, t0);
     }
 
     /**
      * returns z^((p-5)/8) = z^(2^252-3)
      * used to compute square roots since we have p=5 (mod 8); see Cohen and Frey.
      **/
-    public pow22523 (z: FE25519)
+    public static pow22523 (out: FE25519, z: FE25519)
     {
         let t0 = new FE25519();
         let t1 = new FE25519();
         let t2 = new FE25519();
         let i: number;
 
-        t0.sq(z);
-        t1.sq(t0);
-        t1.sq(t1);
-        t1.mul(z, t1);
-        t0.mul(t0, t1);
-        t0.sq(t0);
-        t0.mul(t1, t0);
-        t1.sq(t0);
+        FE25519.sq(t0, z);
+        FE25519.sq(t1, t0);
+        FE25519.sq(t1, t1);
+        FE25519.mul(t1, z, t1);
+        FE25519.mul(t0, t0, t1);
+        FE25519.sq(t0, t0);
+        FE25519.mul(t0, t1, t0);
+        FE25519.sq(t1, t0);
         for (i = 1; i < 5; ++i) {
-            t1.sq(t1);
+            FE25519.sq(t1, t1);
         }
-        t0.mul(t1, t0);
-        t1.sq(t0);
+        FE25519.mul(t0, t1, t0);
+        FE25519.sq(t1, t0);
         for (i = 1; i < 10; ++i) {
-            t1.sq(t1);
+            FE25519.sq(t1, t1);
         }
-        t1.mul(t1, t0);
-        t2.sq(t1);
+        FE25519.mul(t1, t1, t0);
+        FE25519.sq(t2, t1);
         for (i = 1; i < 20; ++i) {
-            t2.sq(t2);
+            FE25519.sq(t2, t2);
         }
-        t1.mul(t2, t1);
+        FE25519.mul(t1, t2, t1);
         for (i = 1; i < 11; ++i) {
-            t1.sq(t1);
+            FE25519.sq(t1, t1);
         }
-        t0.mul(t1, t0);
-        t1.sq(t0);
+        FE25519.mul(t0, t1, t0);
+        FE25519.sq(t1, t0);
         for (i = 1; i < 50; ++i) {
-            t1.sq(t1);
+            FE25519.sq(t1, t1);
         }
-        t1.mul(t1, t0);
-        t2.sq(t1);
+        FE25519.mul(t1, t1, t0);
+        FE25519.sq(t2, t1);
         for (i = 1; i < 100; ++i) {
-            t2.sq(t2);
+            FE25519.sq(t2, t2);
         }
-        t1.mul(t2, t1);
+        FE25519.mul(t1, t2, t1);
         for (i = 1; i < 51; ++i) {
-            t1.sq(t1);
+            FE25519.sq(t1, t1);
         }
-        t0.mul(t1, t0);
-        t0.sq(t0);
-        t0.sq(t0);
-        this.mul(t0, z);
+        FE25519.mul(t0, t1, t0);
+        FE25519.sq(t0, t0);
+        FE25519.sq(t0, t0);
+        FE25519.mul(out, t0, z);
     }
 
-    public cneg (f: FE25519, b: number)
+    public static cneg (h: FE25519, f: FE25519, b: number)
     {
-        let neg_f = new FE25519(f);
-        neg_f.negate();
-        this.cmov(f, neg_f, b);
+        let neg_f = new FE25519();
+        FE25519.negate(neg_f, f);
+        FE25519.copy(h, f);
+        FE25519.cmov(h, neg_f, b);
     }
 
-    public abs (f: FE25519)
+    public static abs (h: FE25519, f: FE25519)
     {
-        this.cneg(f, f.isNegative());
+        FE25519.cneg(h, f, FE25519.isNegative(f));
     }
 
-    public unchecked_sqrt (x: FE25519, x2: FE25519)
+    public static unchecked_sqrt (x: FE25519, x2: FE25519)
     {
 
     }
 
-    public sqrt (x: FE25519, x2: FE25519)
+    public static sqrt (x: FE25519, x2: FE25519)
     {
         let check
     }
-    public reduce2 (f: FE25519)
+    public static reduce2 (h: FE25519, f: FE25519)
     {
         let H = f.items.map(m => m);
         let Q: number;
@@ -1017,9 +1040,8 @@ export class FE25519
             H[idx+1] -= Carry[idx+1] * (1 << 25);
         }
 
-        H.forEach((v, idx) => this.items[idx] = H[idx]);
+        H.forEach((v, idx) => h.items[idx] = H[idx]);
     }
-
 }
 
 export class GE25519_P3
@@ -1028,6 +1050,83 @@ export class GE25519_P3
     public Y: FE25519 = new FE25519();
     public Z: FE25519 = new FE25519();
     public T: FE25519 = new FE25519();
+
+    public static xmont_to_ymont (x: FE25519, y: FE25519)
+    {
+
+    }
+
+    public static elligator2 (x: FE25519, y: FE25519, r: FE25519): number
+    {
+        return 0;
+    }
+
+    /* montgomery to edwards */
+    public static mont_to_ed (xed: FE25519, yed: FE25519, x: FE25519, y: FE25519)
+    {
+        let one = new FE25519();
+        let x_plus_one = new FE25519();
+        let x_minus_one = new FE25519();
+        let x_plus_one_y_inv = new FE25519();
+
+        FE25519.one(one);
+        FE25519.add(x_plus_one, x, one);
+        FE25519.sub(x_minus_one, x, one);
+
+        /* xed = sqrt(-A-2)*x/y */
+        FE25519.mul(x_plus_one_y_inv, x_plus_one, y);
+        FE25519.invert(x_plus_one_y_inv, x_plus_one_y_inv); /* 1/((x+1)*y) */
+        FE25519.mul(xed, x, FE25519.SqrtAM2);
+        FE25519.mul(xed, xed, x_plus_one_y_inv);            /* sqrt(-A-2)*x/((x+1)*y) */
+        FE25519.mul(xed, xed, x_plus_one);
+
+        /* yed = (x-1)/(x+1) */
+        FE25519.mul(yed, x_plus_one_y_inv, y);              /* 1/(x+1) */
+        FE25519.mul(yed, yed, x_minus_one);
+        FE25519.cmov(yed, one, FE25519.isZero(x_plus_one_y_inv));
+    }
+    public static clear_cofactor (p3: GE25519_P3)
+    {
+
+    }
+
+    public static toBytes(s: Uint8Array, h: GE25519_P3)
+    {
+
+    }
+
+    public static from_uniform (r: Uint8Array): Uint8Array
+    {
+        let p3 = new GE25519_P3();
+        let x = new FE25519();
+        let y = new FE25519();
+        let r_fe = new FE25519();
+        let x_sign: number;
+        let s = new Uint8Array(32);
+
+        for (let idx = 0; idx < 32; idx++)
+            s[idx] = r[idx];
+
+        x_sign = s[31] >> 7;
+        s[31] &= 0x7f;
+
+        r_fe.fromBytes(s);
+
+        GE25519_P3.elligator2(x, y, r_fe);
+
+        GE25519_P3.mont_to_ed(p3.X, p3.Y, x, y);
+        let neg_xed = new FE25519();
+        FE25519.negate(p3.X, neg_xed);
+        FE25519.cmov(p3.X, neg_xed, FE25519.isNegative(p3.X) ^ x_sign);
+
+        FE25519.one(p3.Z);
+        FE25519.mul(p3.T, p3.X, p3.Y);
+
+        GE25519_P3.clear_cofactor(p3);
+        GE25519_P3.toBytes(s, p3);
+
+        return s;
+    }
 }
 
 export class GE25519_P1P1
@@ -1211,79 +1310,3 @@ export function sc25519_reduce (s: Uint8Array): Uint8Array
     return t;
 }
 
-export function ge25519_xmont_to_ymont (x: FE25519, y: FE25519)
-{
-
-}
-export function ge25519_elligator2 (x: FE25519, y: FE25519, r: FE25519): number
-{
-    return 0;
-}
-
-/* montgomery to edwards */
-export function ge25519_mont_to_ed (xed: FE25519, yed: FE25519, x: FE25519, y: FE25519)
-{
-    let one = new FE25519();
-    let x_plus_one = new FE25519();
-    let x_minus_one = new FE25519();
-    let x_plus_one_y_inv = new FE25519();
-
-    one.one();
-    x_plus_one.add(x, one);
-    x_minus_one.sub(x, one);
-
-    /* xed = sqrt(-A-2)*x/y */
-    x_plus_one_y_inv.mul(x_plus_one, y);
-    x_plus_one_y_inv.invert(x_plus_one_y_inv); /* 1/((x+1)*y) */
-    xed.mul(x, FE25519.SqrtAM2);
-    xed.mul(xed, x_plus_one_y_inv);            /* sqrt(-A-2)*x/((x+1)*y) */
-    xed.mul(xed, x_plus_one);
-
-    /* yed = (x-1)/(x+1) */
-    yed.mul(x_plus_one_y_inv, y);              /* 1/(x+1) */
-    yed.mul(yed, x_minus_one);
-    yed.cmov(yed, one, x_plus_one_y_inv.isZero());
-}
-
-export function ge25519_clear_cofactor (p3: GE25519_P3)
-{
-
-}
-
-export function ge25519_p3_tobytes(s: Uint8Array, h: GE25519_P3)
-{
-
-}
-
-export function ge25519_from_uniform (r: Uint8Array): Uint8Array
-{
-    let p3 = new GE25519_P3();
-    let x = new FE25519();
-    let y = new FE25519();
-    let r_fe = new FE25519();
-    let x_sign: number;
-    let s = new Uint8Array(32);
-
-    for (let idx = 0; idx < 32; idx++)
-        s[idx] = r[idx];
-
-    x_sign = s[31] >> 7;
-    s[31] &= 0x7f;
-
-    r_fe.fromBytes(s);
-
-    ge25519_elligator2(x, y, r_fe);
-
-    ge25519_mont_to_ed(p3.X, p3.Y, x, y);
-    let neg_xed = new FE25519(p3.X);
-    neg_xed.negate();
-    p3.X.cmov(p3.X, neg_xed, p3.X.isNegative() ^ x_sign);
-
-    p3.Z.one();
-    p3.T.mul(p3.X, p3.Y);
-
-    ge25519_clear_cofactor(p3);
-    ge25519_p3_tobytes(s, p3);
-
-    return s;
-}
