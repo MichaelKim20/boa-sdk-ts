@@ -25,4 +25,12 @@ export class ED25519Utils
             s[++offset] * 2 ** 16 +
             s[++offset] * 2 ** 24);
     }
+
+    public static sodium_is_zero (s: Uint8Array, len: number): number
+    {
+        let d = 0;
+        for (let i = 0; i < len; i++)
+            d |= s[i];
+        return 1 & ((d - 1) >> 8);
+    }
 }
