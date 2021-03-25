@@ -557,7 +557,7 @@ describe ('Crypto', () =>
 
     it ('Test of ED25519.Sum', () =>
     {
-        let sum = sdk.ED25519Utils.Sum(
+        let sum = sdk.JSBIUtils.Sum(
             [
                 sdk.JSBI.BigInt(1),
                 sdk.JSBI.BigInt(2)
