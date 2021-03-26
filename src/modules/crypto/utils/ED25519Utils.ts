@@ -8,7 +8,6 @@ export class ED25519Utils
     public static crypto_core_ed25519_SCALARBYTES: number = 32;
     public static crypto_core_ed25519_NONREDUCEDSCALARBYTES: number = 64;
 
-
     public static load_3 (s: Uint8Array, offset: number): JSBI
     {
         return JSBI.BigInt(

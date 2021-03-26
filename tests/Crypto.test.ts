@@ -14,6 +14,7 @@
 import * as sdk from '../lib';
 
 import * as assert from 'assert';
+import {ED25519Utils, randombytes_buf} from "../src/modules/crypto";
 
 describe ('Crypto', () =>
 {
@@ -478,6 +479,159 @@ describe ('Crypto', () =>
         }
     ];
 
+    let sample_random = [
+        {
+            random: 'd2ff19567cc66105ce550112c84750f23c94c36fba7d9d95f1311e5fe1e34f86'
+        },
+        {
+            random: 'df6a4ad6b420a240aef0e0d7a592eb9ea7f3ee3e16d1d9b5ae130cf9151356e9'
+        },
+        {
+            random: 'c9eead97c360cbeae8f3dbceaad35672050838f3b40dad34349bb5a94570d192'
+        },
+        {
+            random: 'f0084a74658529855116c9e0a4f830ba3267e0d5ff4a879b39e281b85c1ad2aa'
+        },
+        {
+            random: '76c178bdecebae2d68bc6e5265c13de712545543d96a510e4a3c5428ec2a1482'
+        },
+        {
+            random: 'a6b3a94e60a052d85735f98d00f56ef8e92b850f8492bc2bc9b47e2c01525f25'
+        },
+        {
+            random: '35800c9d96a83e831d2c9192987ad9680bd86e122589eacbd2009becf2a8d3e0'
+        },
+        {
+            random: 'e84adcc3d7201c29ced3da4eacb865bfcebe522beb08b83d60c14fb764802f7e'
+        },
+        {
+            random: '30b713cc9f72b4b370d115b9745b7c65bc6d0fffc89e5b2c446c41a9303049ec'
+        },
+        {
+            random: '2fd1d126c99f5c785400cc689a082bba6f871b7d8df3d3afa820fcf778eb74a3'
+        },
+        {
+            random: 'fda59e4dab4c466bb6d8b807dd6e9a3da941dfa0f435803cc03a141b1d5588fd'
+        },
+        {
+            random: '54eb3cd621b63fc752dfe1af358907f07b2b21ddc97d24c577cae1b58ddd6350'
+        },
+        {
+            random: '95346fc646da1550fc69777a39fc45131fe08f5ec94c041eeadc7a2805b940f8'
+        },
+        {
+            random: '237c76c39d16c97cdfb695aa1ccbb295fa265b6c456c2db94fc45afbfb12b229'
+        },
+        {
+            random: '6620e76b60c3928481dc7175df3c75f5a7d05b200aade5b231c27f6078b3fd77'
+        },
+        {
+            random: '43eeeafb970319ddaf2ff20be3e4f7e5050b3c467aca2be13b30131e9ebc474e'
+        },
+        {
+            random: '2895c2f015934ea4c358dbd607bd331ad9ac32946bd69cf2e34e6b571337470c'
+        },
+        {
+            random: '1c2b0df25c150daa97cf8ae69be839a9b0990bd1da06dfc4e33b7a5d556166f3'
+        },
+        {
+            random: '202011c9b118d2b929dfef949bff0df92723ed1d6bfd1136810a62feecdbcabf'
+        },
+        {
+            random: '55811dc82f8c77ca6f38f267f4b2e95fe8cf3d5071219fe93631d367cbfc17c7'
+        },
+        {
+            random: 'c1b0e0de4b5cdda6339c4147f5cec2ffb571788bb5696646ca3001119385bd29'
+        },
+        {
+            random: '705f8af67c898e08f04159fa58c9a2d6e072e04e3f639ac18d7b8475d8b3c2b8'
+        },
+        {
+            random: 'd20cfc6712cfc8897e5cc9cbcea7189cca239b378d39fed4be2d3603fbf68d2c'
+        },
+        {
+            random: 'e55201002d8ed82ebd464b7cf8470553d13ba8294eef0361e7a9e668eb8ba1f1'
+        },
+        {
+            random: '8bf3295ac7ef0c70bf225d5cbf3d7d139383a453d270ce1260d4c611d91ffe48'
+        },
+        {
+            random: '44674ef637609feea1ce7c3c89a6e9fd966fdf9b11121ff268619b79e1b4d2da'
+        },
+        {
+            random: '09e138099c7fa194c6b0b88de00e4f7a56b0de63da97914f47d07ac8c73bdca5'
+        },
+        {
+            random: 'f9b51f66306770852d3d4475f59bbb2388676f987111a5c540325af24a02a38c'
+        },
+        {
+            random: 'bfee24e9018789674a045047824b2ae1dba1b0729b0c70a4c98ed76df7c38b32'
+        },
+        {
+            random: '8920b73837967faaa3e00f1fefadd767ef3cd3f351dc0073a8ce0456b4171b37'
+        },
+        {
+            random: '3bd9a36db7c27d8d08d458cfd7cdffe6fdfa813e4f0b050e75019ef04b6f0beb'
+        },
+        {
+            random: 'e78294d5f39e860fdad2a4467fd337ff6f6eba1230c8de25636f18c5b6dedecb'
+        },
+        {
+            random: '01e318f9e1130d90e12cad95319d86210f385d8441fd2f37aed8b810650385c2'
+        },
+        {
+            random: '952194460b6a35e6c7aba7669640db400a8d28ddc39da827eb198c69cd30ac23'
+        },
+        {
+            random: 'dede1444241322c2182859d96abab820ea864b33f50b8345520a82cac6023e71'
+        },
+        {
+            random: '36050867488614f4c0759824e2be3f1462c41dc037e3241a4b99dba96ebf234e'
+        },
+        {
+            random: '94e7539ed5cff3ed1620290ecaf0f7eb7cc81edb54c0c16fedd2c32948f84e34'
+        },
+        {
+            random: '9da0c8922013eaf0d9b8faa441c0e42ca37adcc02e879aa2deab467852293ee1'
+        },
+        {
+            random: 'a06ec798af844cdc0494c92f10efbe3ea9153e075311e350d9bfd6cc4785ee1c'
+        },
+        {
+            random: '546854210116a81993dbb5c0ba7c9f533be7594ef73382a776ff41fcac9544ee'
+        },
+        {
+            random: '747bbfcef851edf18d126f4773db9e5603c2d181fddd946e15ce5bc4c97c6419'
+        },
+        {
+            random: '7b9c6b117dfacf958e91ce55c8ecdb5a8a05733ca9b1368a0d627ae3837c7dbb'
+        },
+        {
+            random: 'c6914414dd5c509726e9486074599b199b3b5bf50b07efc7818a65628fe60568'
+        },
+        {
+            random: 'ebf21643d660cdcc480927299ac15b5d731c9b0b34e3a36a93f9f9d1e0131287'
+        },
+        {
+            random: '319f4408e7f595ec25cf09089c67b0928ab21e094060cb825e4394b7c1dd9f4d'
+        },
+        {
+            random: 'e60dda3f8f51770f3ccffd4b279f31fc04bcea448dc4085c118978908d72508c'
+        },
+        {
+            random: '031baf348ddfcb7751df47c490107dc33d3d667c7657fa7836eb217ed6391881'
+        },
+        {
+            random: '804bd022072e8e89d80ef2dd71f835b22b81a94a04499d22730aeb1d9317cd39'
+        },
+        {
+            random: '6aa76c2fab061652f68195f0d1109688bd285a4b2b1e091e2175cb00fd530ecf'
+        },
+        {
+            random: 'a3409fc126a49491a901a6a2a21e599421d611ac98e0c537e1d4901203ba9b37'
+        }
+    ];
+
     before('Wait for the package libsodium to finish loading', () =>
     {
         return sdk.SodiumHelper.init();
@@ -565,4 +719,31 @@ describe ('Crypto', () =>
 
         assert.deepStrictEqual(sum, sdk.JSBI.BigInt(3));
     });
+
+
+    it ('Make Sample Random Data', () =>
+    {
+        let values:Array<any> = [];
+        for (let i = 0; i < 50; i++)
+        {
+            let r = sdk.randombytes_buf(sdk.ED25519Utils.crypto_core_ed25519_UNIFORMBYTES);
+            values.push(
+                {
+                    random: Buffer.from(r).toString("hex"),
+                }
+            );
+        }
+        console.log(values);
+    });
+
+    it ('Test crypto_core_ed25519_from_uniform', () =>
+    {
+        //sample_random.forEach((elem) => {
+            let random = Buffer.from(sample_random[0].random, "hex");
+            let r1 = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_from_uniform(random));
+            let r2 = Buffer.from(sdk.crypto_core_ed25519_from_uniform(random));
+            assert.deepStrictEqual(r1, r2);
+        //});
+    });
+
 });

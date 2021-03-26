@@ -58,10 +58,15 @@ export { Request } from './modules/net/Request';
 
 export { NetworkError, NotFoundError, BadRequestError, handleNetworkError } from './modules/net/error/ErrorTypes';
 
-export { crypto_core_ed25519_scalar_reduce } from './modules/crypto/crypto_core/ed25519/core_ed25519';
+export {
+    crypto_core_ed25519_scalar_reduce,
+    crypto_core_ed25519_random,
+    crypto_core_ed25519_from_uniform
+} from './modules/crypto/crypto_core/ed25519/core_ed25519';
 export { crypto_sign_ed25519_sk_to_curve25519 } from './modules/crypto/crypto_sign/ed25519/keypair';
 export { ED25519Utils } from './modules/crypto/utils/ED25519Utils';
 export { JSBIUtils } from './modules/crypto/utils/JSBIUtils';
+export { randombytes_buf } from './modules/crypto/utils/random';
 
 import JSBI from 'jsbi';
 export { JSBI };
