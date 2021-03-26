@@ -14,7 +14,6 @@
 import * as sdk from '../lib';
 
 import * as assert from 'assert';
-import {ED25519Utils, randombytes_buf} from "../src/modules/crypto";
 
 describe ('Crypto', () =>
 {
@@ -769,4 +768,30 @@ describe ('Crypto', () =>
         //});
     });
 
+    it ('Test FE25519', () =>
+    {
+        //console.log(sdk.FE25519.ed25519_A);
+
+        let one = new sdk.FE25519();
+        let two = new sdk.FE25519();
+        let one_1 = new sdk.FE25519();
+        let neg_one = new sdk.FE25519();
+        let sq_neg_one = new sdk.FE25519();
+        sdk.fe25519_1(one);
+        sdk.fe25519_add(two, one, one);
+        sdk.fe25519_sub(one_1, two, one);
+        sdk.fe25519_neg(neg_one, one);
+        sdk.fe25519_sq(sq_neg_one, two);
+        //console.log(sdk.FE25519.fe25519_sqrtm1);
+        console.log(one_1);
+        console.log(two);
+        console.log(sq_neg_one);
+
+        let dmo = new sdk.FE25519();
+        sdk.fe25519_sub(dmo, sdk.FE25519.ed25519_d, one)
+
+        let sqdmo = new sdk.FE25519();
+        sdk.fe25519_sq(sqdmo, dmo)
+        console.log(sqdmo);
+    })
 });

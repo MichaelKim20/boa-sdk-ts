@@ -59,6 +59,24 @@ export { Request } from './modules/net/Request';
 export { NetworkError, NotFoundError, BadRequestError, handleNetworkError } from './modules/net/error/ErrorTypes';
 
 export {
+    FE25519,
+    GE25519_P2,
+    GE25519_P3,
+    GE25519_P1P1,
+    GE25519_PreComp,
+    GE25519_Cached,
+    fe25519_reduce,
+    fe25519_tobytes,
+    fe25519_frombytes,
+    fe25519_0,
+    fe25519_1,
+    fe25519_add,
+    fe25519_sub,
+    fe25519_sq,
+    fe25519_neg
+} from './modules/crypto/crypto_core/ed25519/ref10/ed25519_ref10';
+
+export {
     crypto_core_ed25519_scalar_reduce,
     crypto_core_ed25519_random,
     crypto_core_ed25519_from_uniform

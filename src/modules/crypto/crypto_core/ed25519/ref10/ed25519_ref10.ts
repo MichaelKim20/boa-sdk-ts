@@ -6,43 +6,43 @@ export class FE25519
     public static WIDTH = 10;
 
     /* sqrt(-1) */
-    public static SqrtM1 =
+    public static fe25519_sqrtm1 =
         new FE25519([-32595792, -7943725,  9377950,  3500415, 12389472, -272473, -25146209, -2005654, 326686, 11406482]);
 
     /* sqrt(-486664) */
-    public static SqrtAM2 =
+    public static ed25519_sqrtam2 =
         new FE25519([-12222970, -8312128, -11511410, 9067497, -15300785, -241793, 25456130, 14121551, -12187136, 3972024]);
 
     /* 37095705934669439343138083508754565189542113879843219016388785533085940283555 */
-    public static D =
+    public static ed25519_d =
         new FE25519([-10913610, 13857413, -15372611, 6949391,   114729, -8787816, -6275908, -3247719, -18696448, -12055116]);
 
     /* 2 * d =
     * 16295367250680780974490674513165176452449235426866156013048779062215315747161
     */
-    public static D2 =
+    public static ed25519_d2 =
         new FE25519([-21827239, -5839606,  -30745221, 13898782, 229458, 15978800, -12551817, -6495438, 29715968, 9444199]);
 
-    public static A_32 = 486662;
+    public static ed25519_A_32 = 486662;
 
     /* A = 486662 */
-    public static A =
-        new FE25519([486662, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    public static ed25519_A =
+        new FE25519([FE25519.ed25519_A_32, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
     /* sqrt(ad - 1) with a = -1 (mod p) */
-    public static SqrtADM1 =
+    public static ed25519_sqrtadm1 =
         new FE25519([24849947, -153582, -23613485, 6347715, -21072328, -667138, -25271143, -15367704, -870347, 14525639]);
 
     /* 1 / sqrt(a - d) */
-    public static InvSqrtAMD =
+    public static ed25519_invsqrtamd =
         new FE25519([6111485, 4156064, -27798727, 12243468, -25904040, 120897, 20826367, -7060776, 6093568, -1986012]);
 
     /* 1 - d ^ 2 */
-    public static OneMSqrtD =
+    public static ed25519_onemsqd =
         new FE25519([6275446, -16617371, -22938544, -3773710, 11667077, 7397348, -27922721, 1766195, -24433858, 672203]);
 
     /* (d - 1) ^ 2 */
-    public static SqrtDMOne =
+    public static ed25519_sqdmone =
         new FE25519([15551795, -11097455, -13425098, -10125071, -11896535, 10178284, -26634327, 4729244, -5282110, -10116402]);
 
     public items: Int32Array;
@@ -543,6 +543,14 @@ export function fe25519_mul (h: FE25519, f: FE25519, g: FE25519)
         H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
     }
 
+    let func24_19 = (i: number) =>
+    {
+        let j = (i+1) % FE25519.WIDTH;
+        Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
+        H[j] = JSBI.add(H[j], JSBI.multiply(Carry[i], JSBI.BigInt(19)));
+        H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
+    }
+
     /*
      |h0| <= (1.65*1.65*2^52*(1+19+19+19+19)+1.65*1.65*2^50*(38+38+38+38+38))
      i.e. |h0| <= 1.4*2^60; narrower ranges for h2, h4, h6, h8
@@ -579,7 +587,7 @@ export function fe25519_mul (h: FE25519, f: FE25519, g: FE25519)
     /* |h8| <= 2^25; from now on fits into int32 unchanged */
     /* |h5| <= 1.01*2^24 */
     /* |h9| <= 1.71*2^59 */
-    func24(9);
+    func24_19(9);
     /* |h9| <= 2^24; from now on fits into int32 unchanged */
     /* |h0| <= 1.1*2^39 */
     func25(0);
@@ -718,6 +726,14 @@ export function fe25519_sq (h: FE25519, f: FE25519)
         H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
     }
 
+    let func24_19 = (i: number) =>
+    {
+        let j = (i+1) % FE25519.WIDTH;
+        Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
+        H[j] = JSBI.add(H[j], JSBI.multiply(Carry[i], JSBI.BigInt(19)));
+        H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
+    }
+
     func25(0);
     func25(4);
 
@@ -733,7 +749,7 @@ export function fe25519_sq (h: FE25519, f: FE25519)
     func25(4);
     func25(8);
 
-    func24(9);
+    func24_19(9);
     func25(0);
 
     H.forEach((mh, i) => h.items[i] = JSBIUtils.toInt32(mh));
@@ -868,6 +884,14 @@ export function fe25519_sq2 (h: FE25519, f: FE25519)
         H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
     }
 
+    let func24_19 = (i: number) =>
+    {
+        let j = (i+1) % FE25519.WIDTH;
+        Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
+        H[j] = JSBI.add(H[j], JSBI.multiply(Carry[i], JSBI.BigInt(19)));
+        H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
+    }
+
     for (let i = 0; i < FE25519.WIDTH; i++)
         H[i] = JSBI.add(H[i], H[i]);
 
@@ -886,7 +910,7 @@ export function fe25519_sq2 (h: FE25519, f: FE25519)
     func25(4);
     func25(8);
 
-    func24(9);
+    func24_19(9);
     func25(0);
 
     H.forEach((mh, i) => h.items[i] = JSBIUtils.toInt32(mh));
@@ -1110,7 +1134,7 @@ export function fe25519_unchecked_sqrt (x: FE25519, x2: FE25519)
 
     fe25519_pow22523(e, x2);
     fe25519_mul(p_root, e, x2);
-    fe25519_mul(m_root, p_root, FE25519.SqrtM1);
+    fe25519_mul(m_root, p_root, FE25519.fe25519_sqrtm1);
     fe25519_sq(m_root2, m_root);
     fe25519_sub(e, x2, m_root2);
     fe25519_copy(x, p_root);
@@ -1213,7 +1237,7 @@ export function ge25519_frombytes (h: GE25519_P3, s: Uint8Array)
     fe25519_frombytes(h.Y, s);
     fe25519_1(h.Z);
     fe25519_sq(u, h.Y);
-    fe25519_mul(v, u, FE25519.D);
+    fe25519_mul(v, u, FE25519.ed25519_d);
     fe25519_sub(u, u, h.Z); /* u = y^2-1 */
     fe25519_add(v, v, h.Z); /* v = dy^2+1 */
 
@@ -1233,7 +1257,7 @@ export function ge25519_frombytes (h: GE25519_P3, s: Uint8Array)
     fe25519_add(p_root_check, vxx, u); /* vx^2+u */
     has_m_root = fe25519_iszero(m_root_check);
     has_p_root = fe25519_iszero(p_root_check);
-    fe25519_mul(x_sqrtm1, h.X, FE25519.SqrtM1); /* x*sqrt(-1) */
+    fe25519_mul(x_sqrtm1, h.X, FE25519.fe25519_sqrtm1); /* x*sqrt(-1) */
     fe25519_cmov(h.X, x_sqrtm1, 1 - has_m_root);
 
     fe25519_neg(negx, h.X);
@@ -1258,7 +1282,7 @@ export function ge25519_mont_to_ed (xed: FE25519, yed: FE25519, x: FE25519, y: F
     /* xed = sqrt(-A-2)*x/y */
     fe25519_mul(x_plus_one_y_inv, x_plus_one, y);
     fe25519_invert(x_plus_one_y_inv, x_plus_one_y_inv); /* 1/((x+1)*y) */
-    fe25519_mul(xed, x, FE25519.SqrtAM2);
+    fe25519_mul(xed, x, FE25519.ed25519_sqrtam2);
     fe25519_mul(xed, xed, x_plus_one_y_inv);            /* sqrt(-A-2)*x/((x+1)*y) */
     fe25519_mul(xed, xed, x_plus_one);
 
@@ -1275,7 +1299,7 @@ export function ge25519_xmont_to_ymont (y: FE25519, /* const */ x: FE25519): num
 
     fe25519_sq(x2, x);
     fe25519_mul(x3, x, x2);
-    fe25519_mul32(x2, x2, FE25519.A_32);
+    fe25519_mul32(x2, x2, FE25519.ed25519_A_32);
     fe25519_add(y, x3, x);
     fe25519_add(y, y, x2);
 
@@ -1340,7 +1364,7 @@ export function ge25519_p3_to_cached (r: GE25519_Cached, p: GE25519_P3)
     fe25519_add(r.YplusX, p.Y, p.X);
     fe25519_sub(r.YminusX, p.Y, p.X);
     fe25519_copy(r.Z, p.Z);
-    fe25519_mul(r.T2d, p.T, FE25519.D2);
+    fe25519_mul(r.T2d, p.T, FE25519.ed25519_d2);
 }
 
 export function ge25519_p3_to_precomp (pi: GE25519_PreComp, p: GE25519_P3)
@@ -1356,7 +1380,7 @@ export function ge25519_p3_to_precomp (pi: GE25519_PreComp, p: GE25519_P3)
     fe25519_add(pi.yplusx, y, x);
     fe25519_sub(pi.yminusx, y, x);
     fe25519_mul(xy, x, y);
-    fe25519_mul(pi.xy2d, xy, FE25519.D2);
+    fe25519_mul(pi.xy2d, xy, FE25519.ed25519_d2);
 }
 
 export function ge25519_p3_to_p2 (r: GE25519_P2, p: GE25519_P3)
@@ -1411,12 +1435,12 @@ export function ge25519_elligator2 (x: FE25519, y: FE25519, r: FE25519): number
     fe25519_sq2(rr2, r);
     rr2.items[0] = rr2.items[0] + 1;
     fe25519_invert(rr2, rr2);
-    fe25519_mul32(x, rr2, FE25519.A_32);
+    fe25519_mul32(x, rr2, FE25519.ed25519_A_32);
     fe25519_neg(x, x); /* x=x1 */
 
     fe25519_sq(x2, x);
     fe25519_mul(x3, x, x2);
-    fe25519_mul32(x2, x2, FE25519.A_32); /* x2 = A*x1^2 */
+    fe25519_mul32(x2, x2, FE25519.ed25519_A_32); /* x2 = A*x1^2 */
     fe25519_add(gx1, x3, x);
     fe25519_add(gx1, gx1, x2); /* gx1 = x1^3 + A*x1^2 + x1 */
 
@@ -1426,14 +1450,14 @@ export function ge25519_elligator2 (x: FE25519, y: FE25519, r: FE25519): number
     fe25519_neg(negx, x);
     fe25519_cmov(x, negx, notsquare);
     fe25519_0(x2);
-    fe25519_cmov(x2, FE25519.A, notsquare);
+    fe25519_cmov(x2, FE25519.ed25519_A, notsquare);
     fe25519_sub(x, x, x2);
 
     /* y = sqrt(gx1) or sqrt(gx2) with gx2 = gx1 * (A+x1) / -x1 */
     /* but it is about as fast to just recompute from the curve equation. */
-    //if (ge25519_xmont_to_ymont(y, x) != 0) {
-    //    throw new Error("An error occurred")
-    //}
+    if (ge25519_xmont_to_ymont(y, x) != 0) {
+        throw new Error("An error occurred")
+    }
 
     return notsquare;
 }
