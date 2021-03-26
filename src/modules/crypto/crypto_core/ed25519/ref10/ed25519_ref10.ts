@@ -49,7 +49,7 @@ export class FE25519
 
     constructor (values?: Array<number> | Int32Array | FE25519)
     {
-        this.items = new Int32Array(10);
+        this.items = new Int32Array(FE25519.WIDTH);
         if (values !== undefined)
         {
             if (values instanceof Int32Array)
@@ -104,7 +104,7 @@ export function fe25519_reduce (h: FE25519, f: FE25519)
 {
     let H = f.items.map(m => m);
     let Q: number;
-    let Carry = new Int32Array(10);
+    let Carry = new Int32Array(FE25519.WIDTH);
 
     Q = (19 * H[9] + (1 << 24)) >> 25;
     Q = (H[0] + Q) >> 26;
@@ -133,57 +133,14 @@ export function fe25519_reduce (h: FE25519, f: FE25519)
         H[idx+1] -= Carry[idx+1] * (1 << 25);
     }
 
+    Carry[8] = H[8] >> 26;
+    H[9] += Carry[8];
+    H[8] -= Carry[8] * (1 << 26);
+
+    Carry[9] = H[9] >> 25;
+    H[9] -= Carry[9] * (1 << 25);
+
     H.forEach((v, idx) => h.items[idx] = H[idx]);
-}
-
-export function fe25519_frombytes (h: FE25519, s: Uint8Array)
-{
-    let H: Array<JSBI> = [];
-    let Carry: Array<JSBI> = [];
-
-    for (let idx = 0; idx < 10; idx++)
-        H.push(JSBI.BigInt(0));
-
-    for (let idx = 0; idx < 10; idx++)
-        Carry.push(JSBI.BigInt(0))
-
-    H[0] = ED25519Utils.load_4(s, 0);
-    H[1] = JSBI.leftShift(ED25519Utils.load_3(s, 4), JSBI.BigInt(6));
-    H[2] = JSBI.leftShift(ED25519Utils.load_3(s, 7), JSBI.BigInt(5));
-    H[3] = JSBI.leftShift(ED25519Utils.load_3(s, 10), JSBI.BigInt(3));
-    H[4] = JSBI.leftShift(ED25519Utils.load_3(s, 13), JSBI.BigInt(2));
-    H[5] = ED25519Utils.load_4(s, 16);
-    H[6] = JSBI.leftShift(ED25519Utils.load_3(s, 20), JSBI.BigInt(7));
-    H[7] = JSBI.leftShift(ED25519Utils.load_3(s, 23), JSBI.BigInt(5));
-    H[8] = JSBI.leftShift(ED25519Utils.load_3(s, 26), JSBI.BigInt(4));
-    H[9] = JSBI.leftShift(JSBI.bitwiseAnd(ED25519Utils.load_3(s, 29), JSBI.BigInt(8388607)), JSBI.BigInt(2));
-
-    let f1 = (i: number) => {
-        let j = (i+1) % FE25519.WIDTH;
-        Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
-        H[j] = JSBI.add(H[j], JSBI.multiply(Carry[i], JSBI.BigInt(19)));
-        H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
-    }
-    f1(0);
-
-    let f2 = (i: number) => {
-        let j = (i+1) % FE25519.WIDTH;
-        Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
-        H[j] = JSBI.add(H[j], Carry[i]);
-        H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
-    }
-
-    f2(1);
-    f2(3);
-    f2(5);
-    f2(7);
-    f2(0);
-    f2(2);
-    f2(4);
-    f2(6);
-    f2(8);
-
-    H.forEach((v, idx) => h.items[idx] = JSBIUtils.toInt8(H[idx]));
 }
 
 export function fe25519_tobytes (s: Uint8Array, h: FE25519)
@@ -223,8 +180,56 @@ export function fe25519_tobytes (s: Uint8Array, h: FE25519)
     s[29] = t.items[9] >> 2;
     s[30] = t.items[9] >> 10;
     s[31] = t.items[9] >> 18;
+}
 
-    return s;
+export function fe25519_frombytes (h: FE25519, s: Uint8Array)
+{
+    let H: Array<JSBI> = [];
+    let Carry: Array<JSBI> = [];
+
+    for (let idx = 0; idx < 10; idx++)
+        H.push(JSBI.BigInt(0));
+
+    for (let idx = 0; idx < 10; idx++)
+        Carry.push(JSBI.BigInt(0))
+
+    H[0] = ED25519Utils.load_4(s, 0);
+    H[1] = JSBI.leftShift(ED25519Utils.load_3(s, 4), JSBI.BigInt(6));
+    H[2] = JSBI.leftShift(ED25519Utils.load_3(s, 7), JSBI.BigInt(5));
+    H[3] = JSBI.leftShift(ED25519Utils.load_3(s, 10), JSBI.BigInt(3));
+    H[4] = JSBI.leftShift(ED25519Utils.load_3(s, 13), JSBI.BigInt(2));
+    H[5] = ED25519Utils.load_4(s, 16);
+    H[6] = JSBI.leftShift(ED25519Utils.load_3(s, 20), JSBI.BigInt(7));
+    H[7] = JSBI.leftShift(ED25519Utils.load_3(s, 23), JSBI.BigInt(5));
+    H[8] = JSBI.leftShift(ED25519Utils.load_3(s, 26), JSBI.BigInt(4));
+    H[9] = JSBI.leftShift(JSBI.bitwiseAnd(ED25519Utils.load_3(s, 29), JSBI.BigInt(8388607)), JSBI.BigInt(2));
+
+    let f1 = (i: number) => {
+        let j = (i+1) % FE25519.WIDTH;
+        Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
+        H[j] = JSBI.add(H[j], JSBI.multiply(Carry[i], JSBI.BigInt(19)));
+        H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
+    }
+    f1(9);
+
+    let f2 = (i: number) => {
+        let j = (i+1) % FE25519.WIDTH;
+        Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
+        H[j] = JSBI.add(H[j], Carry[i]);
+        H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
+    }
+
+    f2(1);
+    f2(3);
+    f2(5);
+    f2(7);
+    f2(0);
+    f2(2);
+    f2(4);
+    f2(6);
+    f2(8);
+
+    H.forEach((v, idx) => h.items[idx] = JSBIUtils.toInt8(H[idx]));
 }
 
 /**
@@ -290,7 +295,8 @@ export function fe25519_sub (h: FE25519, f: FE25519, g: FE25519)
  **/
 export function fe25519_neg (h: FE25519, f: FE25519)
 {
-    f.items.forEach((mf, i) => h.items[i] = -mf);
+    for (let idx = 0; idx < FE25519.WIDTH; idx++)
+        h.items[idx] = - f.items[idx];
 }
 
 /**
@@ -299,10 +305,18 @@ export function fe25519_neg (h: FE25519, f: FE25519)
  */
 export function fe25519_cmov (f: FE25519, g: FE25519, b: number)
 {
-    let mask = (b == 0) ? 0x00000000 : 0xFFFFFFFF;
-    let x = g.items.map((mg,i) => f.items[i] ^ mg);
-    x.forEach((mx, i) => x[i] = mx & mask);
-    x.forEach((mx, i) => f.items[i] ^= mx);
+    let mask = -b;
+    let x = new FE25519();
+    let i: number;
+
+    for (i = 0; i < FE25519.WIDTH; i++)
+        x.items[i] = f.items[i] ^ g.items[i];
+
+    for (i = 0; i < FE25519.WIDTH; i++)
+        x.items[i] &= mask;
+
+    for (i = 0; i < FE25519.WIDTH; i++)
+        f.items[i] ^= x.items[i];
 }
 
 /**
@@ -310,7 +324,8 @@ export function fe25519_cmov (f: FE25519, g: FE25519, b: number)
  **/
 export function fe25519_copy (h: FE25519, f: FE25519)
 {
-    f.items.forEach((mf, i) => h.items[i] = mf);
+    for (let i = 0; i < FE25519.WIDTH; i++)
+        h.items[i] = f.items[i];
 }
 
 /**
@@ -853,7 +868,8 @@ export function fe25519_sq2 (h: FE25519, f: FE25519)
         H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
     }
 
-    H.forEach((m, i) => H[i] = JSBI.add(m, m));
+    for (let i = 0; i < FE25519.WIDTH; i++)
+        H[i] = JSBI.add(H[i], H[i]);
 
     func25(0);
     func25(4);
@@ -972,46 +988,46 @@ export function fe25519_invert (out: FE25519, z: FE25519)
     fe25519_sq(t0, z);
     fe25519_sq(t1, t0);
     fe25519_sq(t1, t1);
-    fe25519_mul(t1, z, t1)
+    fe25519_mul(t1, z, t1);
     fe25519_mul(t0, t0, t1);
     fe25519_sq(t2, t0);
     fe25519_mul(t1, t1, t2);
     fe25519_sq(t2, t1);
-    for (i = 1; i < 5; ++i)
+    for (i = 1; i < 5; ++i) {
         fe25519_sq(t2, t2);
-
+    }
     fe25519_mul(t1, t2, t1);
     fe25519_sq(t2, t1);
-    for (i = 1; i < 10; ++i)
+    for (i = 1; i < 10; ++i) {
         fe25519_sq(t2, t2);
-
+    }
     fe25519_mul(t2, t2, t1);
     fe25519_sq(t3, t2);
-    for (i = 1; i < 20; ++i)
+    for (i = 1; i < 20; ++i) {
         fe25519_sq(t3, t3);
-
+    }
     fe25519_mul(t2, t3, t2);
-    for (i = 1; i < 11; ++i)
+    for (i = 1; i < 11; ++i) {
         fe25519_sq(t2, t2);
-
+    }
     fe25519_mul(t1, t2, t1);
     fe25519_sq(t2, t1);
-    for (i = 1; i < 50; ++i)
+    for (i = 1; i < 50; ++i) {
         fe25519_sq(t2, t2);
-
+    }
     fe25519_mul(t2, t2, t1);
     fe25519_sq(t3, t2);
-    for (i = 1; i < 100; ++i)
+    for (i = 1; i < 100; ++i) {
         fe25519_sq(t3, t3);
-
+    }
     fe25519_mul(t2, t3, t2);
-    for (i = 1; i < 51; ++i)
+    for (i = 1; i < 51; ++i) {
         fe25519_sq(t2, t2);
-
+    }
     fe25519_mul(t1, t2, t1);
-    for (i = 1; i < 6; ++i)
+    for (i = 1; i < 6; ++i) {
         fe25519_sq(t1, t1);
-
+    }
     fe25519_mul(out, t1, t0);
 }
 
@@ -1073,10 +1089,11 @@ export function fe25519_pow22523 (out: FE25519, z: FE25519)
 
 export function fe25519_cneg (h: FE25519, f: FE25519, b: number)
 {
-    let neg_f = new FE25519();
-    fe25519_neg(neg_f, f);
+    let negf = new FE25519();
+
+    fe25519_neg(negf, f);
     fe25519_copy(h, f);
-    fe25519_cmov(h, neg_f, b);
+    fe25519_cmov(h, negf, b);
 }
 
 export function fe25519_abs (h: FE25519, f: FE25519)
@@ -1384,7 +1401,6 @@ export function ge25519_clear_cofactor (p3: GE25519_P3)
 
 export function ge25519_elligator2 (x: FE25519, y: FE25519, r: FE25519): number
 {
-    let e = new FE25519();
     let gx1 = new FE25519();
     let rr2 = new FE25519();
     let x2 = new FE25519();
@@ -1393,7 +1409,7 @@ export function ge25519_elligator2 (x: FE25519, y: FE25519, r: FE25519): number
     let notsquare: number;
 
     fe25519_sq2(rr2, r);
-    rr2.items[0]++;
+    rr2.items[0] = rr2.items[0] + 1;
     fe25519_invert(rr2, rr2);
     fe25519_mul32(x, rr2, FE25519.A_32);
     fe25519_neg(x, x); /* x=x1 */
@@ -1415,9 +1431,9 @@ export function ge25519_elligator2 (x: FE25519, y: FE25519, r: FE25519): number
 
     /* y = sqrt(gx1) or sqrt(gx2) with gx2 = gx1 * (A+x1) / -x1 */
     /* but it is about as fast to just recompute from the curve equation. */
-    if (ge25519_xmont_to_ymont(y, x) != 0) {
-        throw new Error("An error occurred")
-    }
+    //if (ge25519_xmont_to_ymont(y, x) != 0) {
+    //    throw new Error("An error occurred")
+    //}
 
     return notsquare;
 }
@@ -1427,6 +1443,7 @@ export function ge25519_from_uniform (s: Uint8Array, r: Uint8Array)
     let p3 = new GE25519_P3();
     let x = new FE25519();
     let y = new FE25519();
+    let negxed = new FE25519();
     let r_fe = new FE25519();
     let x_sign: number;
 
@@ -1441,9 +1458,8 @@ export function ge25519_from_uniform (s: Uint8Array, r: Uint8Array)
     ge25519_elligator2(x, y, r_fe);
 
     ge25519_mont_to_ed(p3.X, p3.Y, x, y);
-    let neg_xed = new FE25519();
-    fe25519_neg(p3.X, neg_xed);
-    fe25519_cmov(p3.X, neg_xed, fe25519_isnegative(p3.X) ^ x_sign);
+    fe25519_neg(negxed, p3.X);
+    fe25519_cmov(p3.X, negxed, fe25519_isnegative(p3.X) ^ x_sign);
 
     fe25519_1(p3.Z);
     fe25519_mul(p3.T, p3.X, p3.Y);

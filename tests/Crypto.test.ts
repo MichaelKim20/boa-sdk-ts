@@ -720,6 +720,29 @@ describe ('Crypto', () =>
         assert.deepStrictEqual(sum, sdk.JSBI.BigInt(3));
     });
 
+    it ('Test of Uint8Array', () =>
+    {
+        let x0 = 0;
+        let x1 = 1;
+        let x2 = 2;
+        let x3 = 3;
+
+        let b = Buffer.alloc(4);
+        b.writeInt32LE(-x0);
+        console.log(b.toString("hex"));
+
+        b = Buffer.alloc(4);
+        b.writeInt32LE(-x1);
+        console.log(b.toString("hex"));
+
+        b = Buffer.alloc(4);
+        b.writeInt32LE(-x2);
+        console.log(b.toString("hex"));
+
+        b = Buffer.alloc(4);
+        b.writeInt32LE(-x3);
+        console.log(b.toString("hex"));
+    });
 
     it ('Make Sample Random Data', () =>
     {
