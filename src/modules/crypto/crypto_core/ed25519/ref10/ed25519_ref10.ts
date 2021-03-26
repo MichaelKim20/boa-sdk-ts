@@ -187,10 +187,10 @@ export function fe25519_frombytes (h: FE25519, s: Uint8Array)
     let H: Array<JSBI> = [];
     let Carry: Array<JSBI> = [];
 
-    for (let idx = 0; idx < 10; idx++)
+    for (let idx = 0; idx < FE25519.WIDTH; idx++)
         H.push(JSBI.BigInt(0));
 
-    for (let idx = 0; idx < 10; idx++)
+    for (let idx = 0; idx < FE25519.WIDTH; idx++)
         Carry.push(JSBI.BigInt(0))
 
     H[0] = ED25519Utils.load_4(s, 0);
@@ -204,30 +204,38 @@ export function fe25519_frombytes (h: FE25519, s: Uint8Array)
     H[8] = JSBI.leftShift(ED25519Utils.load_3(s, 26), JSBI.BigInt(4));
     H[9] = JSBI.leftShift(JSBI.bitwiseAnd(ED25519Utils.load_3(s, 29), JSBI.BigInt(8388607)), JSBI.BigInt(2));
 
-    let f1 = (i: number) => {
+    let func24_19 = (i: number) => {
         let j = (i+1) % FE25519.WIDTH;
         Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
         H[j] = JSBI.add(H[j], JSBI.multiply(Carry[i], JSBI.BigInt(19)));
         H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
     }
-    f1(9);
 
-    let f2 = (i: number) => {
+    let func24 = (i: number) => {
         let j = (i+1) % FE25519.WIDTH;
         Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 24)), JSBI.BigInt(25));
         H[j] = JSBI.add(H[j], Carry[i]);
         H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 25)));
     }
 
-    f2(1);
-    f2(3);
-    f2(5);
-    f2(7);
-    f2(0);
-    f2(2);
-    f2(4);
-    f2(6);
-    f2(8);
+    let func25 = (i: number) => {
+        let j = (i+1) % FE25519.WIDTH;
+        Carry[i] = JSBI.signedRightShift(JSBI.add(H[i], JSBI.BigInt(1 << 25)), JSBI.BigInt(26));
+        H[j] = JSBI.add(H[j], Carry[i]);
+        H[i] = JSBI.subtract(H[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 26)));
+    }
+
+    func24_19(9);
+    func24(1);
+    func24(3);
+    func24(5);
+    func24(7);
+
+    func25(0);
+    func25(2);
+    func25(4);
+    func25(6);
+    func25(8);
 
     H.forEach((v, idx) => h.items[idx] = JSBIUtils.toInt8(H[idx]));
 }
