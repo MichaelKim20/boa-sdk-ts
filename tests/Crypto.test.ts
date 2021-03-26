@@ -787,11 +787,38 @@ describe ('Crypto', () =>
         console.log(two);
         console.log(sq_neg_one);
 
-        let dmo = new sdk.FE25519();
-        sdk.fe25519_sub(dmo, sdk.FE25519.ed25519_d, one)
+    });
 
-        let sqdmo = new sdk.FE25519();
-        sdk.fe25519_sq(sqdmo, dmo)
-        console.log(sqdmo);
+    it ('Test ed25519_sqdmone', () =>
+    {
+        let one = new sdk.FE25519();
+        let mone = new sdk.FE25519();
+        let dmone = new sdk.FE25519();
+        let sqdmone = new sdk.FE25519();
+        let temp = new sdk.FE25519();
+        sdk.fe25519_1(one);
+        sdk.fe25519_neg(mone, one);
+        sdk.fe25519_sub(dmone, sdk.FE25519.ed25519_d, one);
+        sdk.fe25519_sq(sqdmone, dmone);
+        assert.deepStrictEqual(sqdmone, sdk.FE25519.ed25519_sqdmone);
+
+        sdk.fe25519_mul(sqdmone, dmone, dmone);
+        assert.deepStrictEqual(sqdmone, sdk.FE25519.ed25519_sqdmone);
+
+        sdk.fe25519_mul(temp, sdk.FE25519.fe25519_sqrtm1, sdk.FE25519.fe25519_sqrtm1);
+        assert.deepStrictEqual(temp, mone);
+
+        sdk.fe25519_mul32(temp, sdk.FE25519.ed25519_d, 2);
+        assert.deepStrictEqual(temp, sdk.FE25519.ed25519_d2);
+
+        sdk.fe25519_sqrt(temp, mone);
+        assert.deepStrictEqual(temp, sdk.FE25519.fe25519_sqrtm1);
+
+        let temp1 = new sdk.FE25519();
+        let temp2 = new sdk.FE25519();
+        sdk.fe25519_sq(temp1, sdk.FE25519.ed25519_d);
+        sdk.fe25519_mul32(temp1, temp1, 2);
+        sdk.fe25519_sq2(temp2, sdk.FE25519.ed25519_d);
+        assert.deepStrictEqual(temp1, temp2);
     })
 });

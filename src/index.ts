@@ -72,8 +72,16 @@ export {
     fe25519_1,
     fe25519_add,
     fe25519_sub,
+    fe25519_mul,
+    fe25519_mul32,
     fe25519_sq,
-    fe25519_neg
+    fe25519_sq2,
+    fe25519_neg,
+    fe25519_abs,
+    fe25519_invert,
+    fe25519_pow22523,
+    fe25519_sqrt,
+    fe25519_notsquare
 } from './modules/crypto/crypto_core/ed25519/ref10/ed25519_ref10';
 
 export {
