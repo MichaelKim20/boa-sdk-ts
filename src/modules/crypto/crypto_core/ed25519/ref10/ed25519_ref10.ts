@@ -102,45 +102,81 @@ export class GE25519_Cached
 
 export function fe25519_reduce (h: FE25519, f: FE25519)
 {
-    let H = f.items.map(m => m);
-    let Q: number;
-    let Carry = new Int32Array(FE25519.WIDTH);
+    let h0 = f.items[0];
+    let h1 = f.items[1];
+    let h2 = f.items[2];
+    let h3 = f.items[3];
+    let h4 = f.items[4];
+    let h5 = f.items[5];
+    let h6 = f.items[6];
+    let h7 = f.items[7];
+    let h8 = f.items[8];
+    let h9 = f.items[9];
 
-    Q = (19 * H[9] + (1 << 24)) >> 25;
-    Q = (H[0] + Q) >> 26;
-    Q = (H[1] + Q) >> 25;
-    Q = (H[2] + Q) >> 26;
-    Q = (H[3] + Q) >> 25;
-    Q = (H[4] + Q) >> 26;
-    Q = (H[5] + Q) >> 25;
-    Q = (H[6] + Q) >> 26;
-    Q = (H[7] + Q) >> 25;
-    Q = (H[8] + Q) >> 26;
-    Q = (H[9] + Q) >> 25;
+    let q;
+    let carry0, carry1, carry2, carry3, carry4, carry5, carry6, carry7, carry8, carry9;
+
+    q = (19 * h9 + (1 << 24)) >> 25;
+    q = (h0 + q) >> 26;
+    q = (h1 + q) >> 25;
+    q = (h2 + q) >> 26;
+    q = (h3 + q) >> 25;
+    q = (h4 + q) >> 26;
+    q = (h5 + q) >> 25;
+    q = (h6 + q) >> 26;
+    q = (h7 + q) >> 25;
+    q = (h8 + q) >> 26;
+    q = (h9 + q) >> 25;
 
     /* Goal: Output h-(2^255-19)q, which is between 0 and 2^255-20. */
-    H[0] += 19 * Q;
+    h0 += 19 * q;
     /* Goal: Output h-2^255 q, which is between 0 and 2^255-20. */
 
-    for (let idx = 0; idx < 8; idx += 2)
-    {
-        Carry[idx] = H[idx] >> 26;
-        H[idx+1] += Carry[idx];
-        H[idx] -= Carry[idx] * (1 << 26);
+    carry0 = h0 >> 26;
+    h1 += carry0;
+    h0 -= carry0 * (1 << 26);
 
-        Carry[idx+1] = H[idx+1] >> 25;
-        H[idx+2] += Carry[idx+1];
-        H[idx+1] -= Carry[idx+1] * (1 << 25);
-    }
+    carry1 = h1 >> 25;
+    h2 += carry1;
+    h1 -= carry1 * (1 << 25);
 
-    Carry[8] = H[8] >> 26;
-    H[9] += Carry[8];
-    H[8] -= Carry[8] * (1 << 26);
+    carry2 = h2 >> 26;
+    h3 += carry2;
+    h2 -= carry2 * (1 << 26);
+    carry3 = h3 >> 25;
+    h4 += carry3;
+    h3 -= carry3 * (1 << 25);
 
-    Carry[9] = H[9] >> 25;
-    H[9] -= Carry[9] * (1 << 25);
+    carry4 = h4 >> 26;
+    h5 += carry4;
+    h4 -= carry4 * (1 << 26);
+    carry5 = h5 >> 25;
+    h6 += carry5;
+    h5 -= carry5 * (1 << 25);
 
-    H.forEach((v, idx) => h.items[idx] = H[idx]);
+    carry6 = h6 >> 26;
+    h7 += carry6;
+    h6 -= carry6 * (1 << 26);
+    carry7 = h7 >> 25;
+    h8 += carry7;
+    h7 -= carry7 * (1 << 25);
+
+    carry8 = h8 >> 26;
+    h9 += carry8;
+    h8 -= carry8 * (1 << 26);
+    carry9 = h9 >> 25;
+    h9 -= carry9 * (1 << 25);
+
+    h.items[0] = h0;
+    h.items[1] = h1;
+    h.items[2] = h2;
+    h.items[3] = h3;
+    h.items[4] = h4;
+    h.items[5] = h5;
+    h.items[6] = h6;
+    h.items[7] = h7;
+    h.items[8] = h8;
+    h.items[9] = h9;
 }
 
 export function fe25519_tobytes (s: Uint8Array, h: FE25519)
@@ -237,7 +273,7 @@ export function fe25519_frombytes (h: FE25519, s: Uint8Array)
     func25(6);
     func25(8);
 
-    H.forEach((v, idx) => h.items[idx] = JSBIUtils.toInt8(H[idx]));
+    H.forEach((v, idx) => h.items[idx] = JSBIUtils.toInt32(H[idx]));
 }
 
 /**
