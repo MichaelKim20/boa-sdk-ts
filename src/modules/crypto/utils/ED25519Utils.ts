@@ -10,19 +10,19 @@ export class ED25519Utils
 
     public static load_3 (s: Uint8Array, offset: number): JSBI
     {
-        return JSBI.BigInt(
-            s[offset] +
-            s[++offset] * 2 ** 8 +
-            s[++offset] * 2 ** 16);
+        let result = JSBI.BigInt(s[offset]);
+        result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(8)));
+        result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(16)));
+        return result;
     }
 
     public static load_4 (s: Uint8Array, offset: number): JSBI
     {
-        return JSBI.BigInt(
-            s[offset] +
-            s[++offset] * 2 ** 8 +
-            s[++offset] * 2 ** 16 +
-            s[++offset] * 2 ** 24);
+        let result = JSBI.BigInt(s[offset]);
+        result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(8)));
+        result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(16)));
+        result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(24)));
+        return result;
     }
 
     public static sodium_is_zero (n: Uint8Array, len: number): number
