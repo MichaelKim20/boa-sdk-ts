@@ -65,6 +65,16 @@ export {
     GE25519_P1P1,
     GE25519_PreComp,
     GE25519_Cached,
+    fe25519_sqrtm1,
+    ed25519_sqrtam2,
+    ed25519_d,
+    ed25519_d2,
+    ed25519_A_32,
+    ed25519_A,
+    ed25519_sqrtadm1,
+    ed25519_invsqrtamd,
+    ed25519_onemsqd,
+    ed25519_sqdmone,
     fe25519_reduce,
     fe25519_tobytes,
     fe25519_frombytes,
@@ -87,9 +97,14 @@ export {
 export {
     crypto_core_ed25519_scalar_reduce,
     crypto_core_ed25519_random,
-    crypto_core_ed25519_from_uniform
+    crypto_core_ed25519_from_uniform,
+    crypto_core_ed25519_add,
+    crypto_core_ed25519_sub,
+    crypto_core_ed25519_is_valid_point
 } from './modules/crypto/crypto_core/ed25519/core_ed25519';
+
 export { crypto_sign_ed25519_sk_to_curve25519 } from './modules/crypto/crypto_sign/ed25519/keypair';
+
 export { ED25519Utils } from './modules/crypto/utils/ED25519Utils';
 export { JSBIUtils } from './modules/crypto/utils/JSBIUtils';
 export { randombytes_buf } from './modules/crypto/utils/random';

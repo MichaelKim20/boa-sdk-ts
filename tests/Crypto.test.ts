@@ -480,154 +480,204 @@ describe ('Crypto', () =>
 
     let sample_random = [
         {
-            random: 'd2ff19567cc66105ce550112c84750f23c94c36fba7d9d95f1311e5fe1e34f86'
+            random: '199d91ac71d6ae893ba9e9d267e9291fa3067f3d3099f3401f006a220ae245f2',
+            crypto_core_ed25519_from_uniform: 'f297b423c6aed3b20cc75cd08d85d00a839de1b8baa0c4a2793df0c0edfe5105'
         },
         {
-            random: 'df6a4ad6b420a240aef0e0d7a592eb9ea7f3ee3e16d1d9b5ae130cf9151356e9'
+            random: '2de4c5e0794f015d9847da16ed0f546c03820a1dcf8f8014e6cb6e62a9f6e7aa',
+            crypto_core_ed25519_from_uniform: 'e1a33d6667d4f0a942308ddccbac0d5f11190e0f973215b301f58c79e19555e6'
         },
         {
-            random: 'c9eead97c360cbeae8f3dbceaad35672050838f3b40dad34349bb5a94570d192'
+            random: '9fd6bdf35c3310fc2b82c38df74cb0d0a9a4e638bd0bf6f81e02467eaaac70f5',
+            crypto_core_ed25519_from_uniform: '242d196c487d25c157b35bc27e50e0f4a02e164820b4af18af53acb8e3ea43fc'
         },
         {
-            random: 'f0084a74658529855116c9e0a4f830ba3267e0d5ff4a879b39e281b85c1ad2aa'
+            random: '82d28d1e5df4d6aa616fa4edb5ce9749e3b884a76bc029a163bd076fdcc2dc2c',
+            crypto_core_ed25519_from_uniform: '94d62d5a3b1831a988efc46a66138dfe62ef81ec1b8b6e069127ad80bb92014a'
         },
         {
-            random: '76c178bdecebae2d68bc6e5265c13de712545543d96a510e4a3c5428ec2a1482'
+            random: 'ff28d03d9a912de49e42baba9b48deaba1b4feaa8ac4aef9f253c8be3b4128ae',
+            crypto_core_ed25519_from_uniform: '9c338ec44535371882fb2ca97f5a6edeaa35f98a054b2b06f72dfdd138b69215'
         },
         {
-            random: 'a6b3a94e60a052d85735f98d00f56ef8e92b850f8492bc2bc9b47e2c01525f25'
+            random: '81b0fdd48397484e7584cf4822313a265f1501c991add6035e907a3f4acd26c9',
+            crypto_core_ed25519_from_uniform: '0ed590f1445abfef08864b950e5abb4d3250fb01dae4d139f2d1859810a6ba9a'
         },
         {
-            random: '35800c9d96a83e831d2c9192987ad9680bd86e122589eacbd2009becf2a8d3e0'
+            random: 'f9a38460bfea952c45e5353bb02e3cf018292aedfa432b2905ee9215a38cd478',
+            crypto_core_ed25519_from_uniform: '20f01c26b75cb961469d6e87b5a94ff778247e16c5f59a02f1662c53c051a6ce'
         },
         {
-            random: 'e84adcc3d7201c29ced3da4eacb865bfcebe522beb08b83d60c14fb764802f7e'
+            random: '5bb00fc040c527106bd8a5349cc09034b96c64cdafc2feec0e70d5843fb850e8',
+            crypto_core_ed25519_from_uniform: '53b89a65e2124900a4b6a955f897399330a631139ecb998fd64ad0eb9ab76883'
         },
         {
-            random: '30b713cc9f72b4b370d115b9745b7c65bc6d0fffc89e5b2c446c41a9303049ec'
+            random: '93efa741137fd501094f5198f4b5ae34d882cdb6d559ef9d27a4d1ecd87898f4',
+            crypto_core_ed25519_from_uniform: 'df75209edfcfe45c22303b648d2767ccdc3e9590aaded3b6f2055f5d4b45d29c'
         },
         {
-            random: '2fd1d126c99f5c785400cc689a082bba6f871b7d8df3d3afa820fcf778eb74a3'
+            random: 'fd7a498cf5b99ba16326f9ed4cd5a37e25df966cb99a19251749b743483dd00f',
+            crypto_core_ed25519_from_uniform: '2e91601fcc1ca956910c3539858333847dc46c61c194a7bceafddbc39a2653d7'
         },
         {
-            random: 'fda59e4dab4c466bb6d8b807dd6e9a3da941dfa0f435803cc03a141b1d5588fd'
+            random: 'f1296fc4f9dca64f5c240b2faaf041b6e5d35f2218be53ba24f11d88af089b0a',
+            crypto_core_ed25519_from_uniform: '8ee709f360d4e30ffc457776a12106d888fe261a00879b7933ad137108380e57'
         },
         {
-            random: '54eb3cd621b63fc752dfe1af358907f07b2b21ddc97d24c577cae1b58ddd6350'
+            random: '32fad6a487756db944bb4b2d6cce458bb7fe2bf6abd520f68ad30d40c0fe9cc1',
+            crypto_core_ed25519_from_uniform: 'd4d4857bbcb7046bd6d5d82cbfe8a69b5bb2d750c77e323f0a250e015dc7b00c'
         },
         {
-            random: '95346fc646da1550fc69777a39fc45131fe08f5ec94c041eeadc7a2805b940f8'
+            random: 'c8ade406c4d30cf66f0759ccb8204f085ec94c708add0e6e5b7a47cc89b8add9',
+            crypto_core_ed25519_from_uniform: 'b1b928bfc5706451a47a6eb8e3704feadaed3259844c4b1a76b45f35757d2f0e'
         },
         {
-            random: '237c76c39d16c97cdfb695aa1ccbb295fa265b6c456c2db94fc45afbfb12b229'
+            random: '50383b69c4a4fe1b067080c74a3100654a8caadb1b56954649b639fe02c040a0',
+            crypto_core_ed25519_from_uniform: '456717aebfcafbd1d21003e2c9d408bf120fe6be92c3325a70ee4ec393db1972'
         },
         {
-            random: '6620e76b60c3928481dc7175df3c75f5a7d05b200aade5b231c27f6078b3fd77'
+            random: '330e406d24f13120fed6c9d2321a9804b25abeedfed48a4a15289ec66540c71e',
+            crypto_core_ed25519_from_uniform: '53061a333ff97b65c29090e94105e100d7068ca11228ebbe2576d229b8bc201e'
         },
         {
-            random: '43eeeafb970319ddaf2ff20be3e4f7e5050b3c467aca2be13b30131e9ebc474e'
+            random: '9b8e8190d6485d79e704187861a4a55cb213364bbe3baee13ec66057dc9b24af',
+            crypto_core_ed25519_from_uniform: '54e76e72d1cefeea5872d6d6aa80aca158f299c8ece8e505d221140b3a2f87d3'
         },
         {
-            random: '2895c2f015934ea4c358dbd607bd331ad9ac32946bd69cf2e34e6b571337470c'
+            random: '37812d234e6d0be659746a695c2cd424f190f63c6e87c8de9cd03f8cacdd5c0c',
+            crypto_core_ed25519_from_uniform: '6707e1e38e6f1826a0d2117abbc5b662f04e82ac6c25c58bd6650893760c1670'
         },
         {
-            random: '1c2b0df25c150daa97cf8ae69be839a9b0990bd1da06dfc4e33b7a5d556166f3'
+            random: '6ca9ccffaacb2e769f48ebd0447c51ab4bb51164bf94c03781fcaaf8e79bf9c0',
+            crypto_core_ed25519_from_uniform: '1e225628ed90260e303a32f8439c584456f4c24f99eb86f00c1521b9f3788751'
         },
         {
-            random: '202011c9b118d2b929dfef949bff0df92723ed1d6bfd1136810a62feecdbcabf'
+            random: '9fb55ba1ecd8b55a6d41cfd56aca9622b30616dbb60a8e32beadb282ef982a0e',
+            crypto_core_ed25519_from_uniform: '6c0a4fe2b9260bea6773652217ac97313c3d757f08cde0ec2769639e560acd3e'
         },
         {
-            random: '55811dc82f8c77ca6f38f267f4b2e95fe8cf3d5071219fe93631d367cbfc17c7'
+            random: '036ebe58ec805f9de9afff2369fb4457c13a5b636608caf97b8ebafe5097c54e',
+            crypto_core_ed25519_from_uniform: '962d96405fdf082c2423ded384cd6ea99011e39174cd642d3c1077fe7a4a1833'
         },
         {
-            random: 'c1b0e0de4b5cdda6339c4147f5cec2ffb571788bb5696646ca3001119385bd29'
+            random: 'ff56507478f7175b1019d1242240f51b3ed14e498f5fca09a04444cdee35ac11',
+            crypto_core_ed25519_from_uniform: 'f128cfaa03ee60eef6149c47198e95683b5689ee7a0fd0d19a6084e1e64222be'
         },
         {
-            random: '705f8af67c898e08f04159fa58c9a2d6e072e04e3f639ac18d7b8475d8b3c2b8'
+            random: '327477a86073ff10576185ed0c04859c4f27abd0c509d2b96b7257c037dae49a',
+            crypto_core_ed25519_from_uniform: 'e174bc4e0c84bad20f1b69c602ff2bb8ca3f244eb6088a4578e2720b72711967'
         },
         {
-            random: 'd20cfc6712cfc8897e5cc9cbcea7189cca239b378d39fed4be2d3603fbf68d2c'
+            random: '7880d58534d717867cd0bbb00831925d0d27a90b7158d6572c34b0b99aa44d3e',
+            crypto_core_ed25519_from_uniform: 'e12399ff270f2b1d69b2957bdf9ab7a149a04def485e96e1bde887f181027547'
         },
         {
-            random: 'e55201002d8ed82ebd464b7cf8470553d13ba8294eef0361e7a9e668eb8ba1f1'
+            random: '1e2e13213617fe97ea935d2341c7092a8693e08098b305c89b05696cb971213e',
+            crypto_core_ed25519_from_uniform: 'b35a291acfe2f75d6495af2699ad7220642352ea06110411377268db6078a4d9'
         },
         {
-            random: '8bf3295ac7ef0c70bf225d5cbf3d7d139383a453d270ce1260d4c611d91ffe48'
+            random: 'd402e7ea1e0f2d1b3ed4458a7046e70ae44f47e2469536e2cfdd79e58bdf04de',
+            crypto_core_ed25519_from_uniform: 'b16b12e32671267bc8b1d7a23ddf53d32ed371f24326265838bd2ae57aa92f4b'
         },
         {
-            random: '44674ef637609feea1ce7c3c89a6e9fd966fdf9b11121ff268619b79e1b4d2da'
+            random: '663fe9d6802d8bb89a54816da3cff1fece392254c0c8008ebc79811bf5dac750',
+            crypto_core_ed25519_from_uniform: 'f4dc7952ce218dbde2132d296e9e5bdb9f6ba751ce6168eb4da3be0894bde51c'
         },
         {
-            random: '09e138099c7fa194c6b0b88de00e4f7a56b0de63da97914f47d07ac8c73bdca5'
+            random: 'c4a504abb07e5f8b917c1bfe14fd7657bd62f34a6e163f97775757cde4dda553',
+            crypto_core_ed25519_from_uniform: '900b3d5dfd581cca54c5ce900bdcdf6a633ccc91e8b39e99b3db344341ee94cd'
         },
         {
-            random: 'f9b51f66306770852d3d4475f59bbb2388676f987111a5c540325af24a02a38c'
+            random: 'fb245f14fa8137163f8334ca6df505cd12dc1b12c7435acb62dac34bc5aa01db',
+            crypto_core_ed25519_from_uniform: '91f2c91d03476276b06b2d954c510eb0ebf60e593173e1d41ebaf4c4bfab2cec'
         },
         {
-            random: 'bfee24e9018789674a045047824b2ae1dba1b0729b0c70a4c98ed76df7c38b32'
+            random: '527d0c8468a6e167317c49d56c6f3a96f2e92d4d8c39855d2ea77820b34443bc',
+            crypto_core_ed25519_from_uniform: 'fbc305301e2677557ed6d0849449b6eee08d0c24c80edd09e1a3ceb7ae30dc6a'
         },
         {
-            random: '8920b73837967faaa3e00f1fefadd767ef3cd3f351dc0073a8ce0456b4171b37'
+            random: '34cf10419ad1618a2a6d6bb82d5ad99b27dd7a213f4b7050893ac327473ae499',
+            crypto_core_ed25519_from_uniform: '4ece5945e8044bd9f308c67beb9f771354068f048566db1f8d1c3ba4667c95bc'
         },
         {
-            random: '3bd9a36db7c27d8d08d458cfd7cdffe6fdfa813e4f0b050e75019ef04b6f0beb'
+            random: '0eb9c6d29b2e85a0b17d7b29bffe3745e56b905e021408497b837dc93922e7aa',
+            crypto_core_ed25519_from_uniform: 'c56bbb48b8db7c30d11a6810978e6b0e30df73789c7b0520c2c918738bf8086d'
         },
         {
-            random: 'e78294d5f39e860fdad2a4467fd337ff6f6eba1230c8de25636f18c5b6dedecb'
+            random: 'a89e02a54cecca4c05203c970b22b851df4a84181de2b001167e4a008977d21d',
+            crypto_core_ed25519_from_uniform: 'c97fabf38cbb2301b3c35d97b169711ef61eb7099828bb1afca309758dae42b6'
         },
         {
-            random: '01e318f9e1130d90e12cad95319d86210f385d8441fd2f37aed8b810650385c2'
+            random: 'ca5a3b30e3de631a5cd22917e2dd82964abaacfe6feca02f0d9361de46b7e6b8',
+            crypto_core_ed25519_from_uniform: '0a9958a445343159921fa47ac55f1bec0b284ef3262190319700467cf71b1249'
         },
         {
-            random: '952194460b6a35e6c7aba7669640db400a8d28ddc39da827eb198c69cd30ac23'
+            random: '086dc32d9173ef591abfe359015a4030112fdbfaadfa9c40efdc877221506a67',
+            crypto_core_ed25519_from_uniform: 'a4ec0e68305dba406218f3a390db6a767fb396465dfa56c0191c843e3f45e9d8'
         },
         {
-            random: 'dede1444241322c2182859d96abab820ea864b33f50b8345520a82cac6023e71'
+            random: 'fa672fda12e763a358e8cd0cc140e2a5f0614044b58f1e9d1ea4fd549b4ce4fc',
+            crypto_core_ed25519_from_uniform: '8b2949ac1daa9254487feff29445cd306e04df6aea63ba5fab50ecce088c8db3'
         },
         {
-            random: '36050867488614f4c0759824e2be3f1462c41dc037e3241a4b99dba96ebf234e'
+            random: '56f511ffecdf55787f82ca70b5eb90495b38d16d8f0bed445f1110759d8b7634',
+            crypto_core_ed25519_from_uniform: '4a6a2d0be266179999f54040f1a75a390c232dc82c9370686c4ff3ca68ff6ba8'
         },
         {
-            random: '94e7539ed5cff3ed1620290ecaf0f7eb7cc81edb54c0c16fedd2c32948f84e34'
+            random: 'b1c004274a012b9f4f3128764d8fb0e60a9554fd5eeef8cb960a4bab19558634',
+            crypto_core_ed25519_from_uniform: '36f15b16b17f19a5f2acb2a1bfff00544e09c0a97fcbfd2a68a673a92137b804'
         },
         {
-            random: '9da0c8922013eaf0d9b8faa441c0e42ca37adcc02e879aa2deab467852293ee1'
+            random: 'ed06b6c5720ebb515db98e2a8e9fe279eb984a9c8f1c5ad201ca6ddba993c99c',
+            crypto_core_ed25519_from_uniform: '3c76b7751924e575b13faba21f5d4a428b998f87f8fff5a88fd372e1b19eb22b'
         },
         {
-            random: 'a06ec798af844cdc0494c92f10efbe3ea9153e075311e350d9bfd6cc4785ee1c'
+            random: '974a1c48f9a258f67f1f4d6a2a02ef6533fb560e7c941a678930be559c894b68',
+            crypto_core_ed25519_from_uniform: 'cbe5ecd8cb56d80dcebdb117979cd083fb7c6efdd9a01ce2cb99de6ba0a3a373'
         },
         {
-            random: '546854210116a81993dbb5c0ba7c9f533be7594ef73382a776ff41fcac9544ee'
+            random: 'bc368741274c10e2436fdc18140a4390b94c0a337f4d74058e108760e5f9a8bd',
+            crypto_core_ed25519_from_uniform: '80209d5f361dd693918122495057cef53515488f93adb9180a363d55eeefa7bf'
         },
         {
-            random: '747bbfcef851edf18d126f4773db9e5603c2d181fddd946e15ce5bc4c97c6419'
+            random: '08f9194cd4cb4237ddb64d0911d64fa9921bd82dfdf44e0491b319bf3bc3ec2a',
+            crypto_core_ed25519_from_uniform: '78b29d36e7929de9299df5ab953cc24cc8c4359a212964499d2f51cbca0017bf'
         },
         {
-            random: '7b9c6b117dfacf958e91ce55c8ecdb5a8a05733ca9b1368a0d627ae3837c7dbb'
+            random: 'd7a1d771436459712e94ca4c7c6dc1c7f53a4124052d9507588c094028895492',
+            crypto_core_ed25519_from_uniform: 'b8b354775753af532c135e0609192b939d484bb923f80955dc4ad3e70562c892'
         },
         {
-            random: 'c6914414dd5c509726e9486074599b199b3b5bf50b07efc7818a65628fe60568'
+            random: '3c2cd33f37ba1ed32f6cc011aded4ea2df32b73184e340a25276c7022d96579d',
+            crypto_core_ed25519_from_uniform: '526f4f6427b0a96de61aae3246d00412da98cd2cd59edbeea965d71491c6f0db'
         },
         {
-            random: 'ebf21643d660cdcc480927299ac15b5d731c9b0b34e3a36a93f9f9d1e0131287'
+            random: '1ab561511725aa9559ac3b18f8fb8d2d483b601dc00578c8e00771cb8600b718',
+            crypto_core_ed25519_from_uniform: 'af2c98d3fa15413b7e00e20e59b3b6a24ea1fcb139aa632fb7d9243e6f856226'
         },
         {
-            random: '319f4408e7f595ec25cf09089c67b0928ab21e094060cb825e4394b7c1dd9f4d'
+            random: '909d1a3e87d9fb7f414738cc5d734197906eff64f2c89f86ec85250166652c75',
+            crypto_core_ed25519_from_uniform: 'e622a76921ec9cfa6c5e518bc6635f2741e0c9de3890df778613ca55931764ef'
         },
         {
-            random: 'e60dda3f8f51770f3ccffd4b279f31fc04bcea448dc4085c118978908d72508c'
+            random: '0115ebacd76aa0592b47074391d6382c3e109c607f9a2bf5f4928a8a108de0e8',
+            crypto_core_ed25519_from_uniform: '0e9c5cf729387fde7744be150e0b167c31d5ceb4640193b7e6ef1b24915e5051'
         },
         {
-            random: '031baf348ddfcb7751df47c490107dc33d3d667c7657fa7836eb217ed6391881'
+            random: '93a983d7d54c02d1cd08bf46ebb184c6c5ba4cf6606db767fb6696ef66c1d121',
+            crypto_core_ed25519_from_uniform: '9250aa1b5b392a515dd076e2a754290743e6b3dbbf48557b2277413c45e17e99'
         },
         {
-            random: '804bd022072e8e89d80ef2dd71f835b22b81a94a04499d22730aeb1d9317cd39'
+            random: '18febb81781ccfe50ac5a77a3d438e1afbc8315fdfae56a26d4b688cda793149',
+            crypto_core_ed25519_from_uniform: '9d9680a93d51a857a3e4ad398f21e0bd87d369d10b3c00c74f86948f9beff44d'
         },
         {
-            random: '6aa76c2fab061652f68195f0d1109688bd285a4b2b1e091e2175cb00fd530ecf'
+            random: '7b9afa6131bfb900730f695f59be541c87f8d61f3b836ccc7497876d916fe82f',
+            crypto_core_ed25519_from_uniform: '54221d1b62b81666b8768c2e47c4cbd926b8bfaa9b42cf131aad26d9df761073'
         },
         {
-            random: 'a3409fc126a49491a901a6a2a21e599421d611ac98e0c537e1d4901203ba9b37'
+            random: '010b246562a81f4bd2e0f2ccc10fa911adfb94bd802f7d7bd2988a91e03ab601',
+            crypto_core_ed25519_from_uniform: '961fdcdcec2d66dbede3fa3062a84e490162cd48b3315440804b7f94dbecd4d5'
         }
     ];
 
@@ -748,10 +798,11 @@ describe ('Crypto', () =>
         let values:Array<any> = [];
         for (let i = 0; i < 50; i++)
         {
-            let r = sdk.randombytes_buf(sdk.ED25519Utils.crypto_core_ed25519_UNIFORMBYTES);
+            let r = Buffer.from(sdk.randombytes_buf(sdk.ED25519Utils.crypto_core_ed25519_UNIFORMBYTES))
             values.push(
                 {
-                    random: Buffer.from(r).toString("hex"),
+                    random: r.toString("hex"),
+                    crypto_core_ed25519_from_uniform: Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_from_uniform(r)).toString("hex")
                 }
             );
         }
@@ -761,21 +812,20 @@ describe ('Crypto', () =>
     it ('Test FE25519 1', () =>
     {
         let bytes = new Uint8Array(32);
+        let source = new sdk.FE25519([-10913610, 13857413, -15372611, 6949391,   114729, -8787816, -6275908, -3247719, -18696448, -12055116]);
         let temp = new sdk.FE25519();
-
-        sdk.fe25519_tobytes(bytes, sdk.FE25519.ed25519_d);
+        sdk.fe25519_tobytes(bytes, source);
         sdk.fe25519_frombytes(temp, bytes);
-
-        assert.deepStrictEqual(temp, sdk.FE25519.ed25519_d);
+        assert.deepStrictEqual(temp, source);
     });
 
     it ('Test crypto_core_ed25519_from_uniform', () =>
     {
         sample_random.forEach((elem) => {
             let random = Buffer.from(sample_random[0].random, "hex");
-            let r1 = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_from_uniform(random));
-            let r2 = Buffer.from(sdk.crypto_core_ed25519_from_uniform(random));
-            assert.deepStrictEqual(r1, r2);
+            let res = Buffer.from(sdk.crypto_core_ed25519_from_uniform(random));
+            let expected = Buffer.from(sample_random[0].crypto_core_ed25519_from_uniform, "hex");
+            assert.deepStrictEqual(res, expected);
         });
     });
 
@@ -788,27 +838,27 @@ describe ('Crypto', () =>
         let temp = new sdk.FE25519();
         sdk.fe25519_1(one);
         sdk.fe25519_neg(mone, one);
-        sdk.fe25519_sub(dmone, sdk.FE25519.ed25519_d, one);
+        sdk.fe25519_sub(dmone, sdk.ed25519_d, one);
         sdk.fe25519_sq(sqdmone, dmone);
-        assert.deepStrictEqual(sqdmone, sdk.FE25519.ed25519_sqdmone);
+        assert.deepStrictEqual(sqdmone, sdk.ed25519_sqdmone);
 
         sdk.fe25519_mul(sqdmone, dmone, dmone);
-        assert.deepStrictEqual(sqdmone, sdk.FE25519.ed25519_sqdmone);
+        assert.deepStrictEqual(sqdmone, sdk.ed25519_sqdmone);
 
-        sdk.fe25519_mul(temp, sdk.FE25519.fe25519_sqrtm1, sdk.FE25519.fe25519_sqrtm1);
+        sdk.fe25519_mul(temp, sdk.fe25519_sqrtm1, sdk.fe25519_sqrtm1);
         assert.deepStrictEqual(temp, mone);
 
-        sdk.fe25519_mul32(temp, sdk.FE25519.ed25519_d, 2);
-        assert.deepStrictEqual(temp, sdk.FE25519.ed25519_d2);
+        sdk.fe25519_mul32(temp, sdk.ed25519_d, 2);
+        assert.deepStrictEqual(temp, sdk.ed25519_d2);
 
         sdk.fe25519_sqrt(temp, mone);
-        assert.deepStrictEqual(temp, sdk.FE25519.fe25519_sqrtm1);
+        assert.deepStrictEqual(temp, sdk.fe25519_sqrtm1);
 
         let temp1 = new sdk.FE25519();
         let temp2 = new sdk.FE25519();
-        sdk.fe25519_sq(temp1, sdk.FE25519.ed25519_d);
+        sdk.fe25519_sq(temp1, sdk.ed25519_d);
         sdk.fe25519_mul32(temp1, temp1, 2);
-        sdk.fe25519_sq2(temp2, sdk.FE25519.ed25519_d);
+        sdk.fe25519_sq2(temp2, sdk.ed25519_d);
         assert.deepStrictEqual(temp1, temp2);
     })
 });
