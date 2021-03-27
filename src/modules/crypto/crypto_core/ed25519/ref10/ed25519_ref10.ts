@@ -5,46 +5,6 @@ export class FE25519
 {
     public static WIDTH = 10;
 
-    /* sqrt(-1) */
-    public static fe25519_sqrtm1 =
-        new FE25519([-32595792, -7943725,  9377950,  3500415, 12389472, -272473, -25146209, -2005654, 326686, 11406482]);
-
-    /* sqrt(-486664) */
-    public static ed25519_sqrtam2 =
-        new FE25519([-12222970, -8312128, -11511410, 9067497, -15300785, -241793, 25456130, 14121551, -12187136, 3972024]);
-
-    /* 37095705934669439343138083508754565189542113879843219016388785533085940283555 */
-    public static ed25519_d =
-        new FE25519([-10913610, 13857413, -15372611, 6949391,   114729, -8787816, -6275908, -3247719, -18696448, -12055116]);
-
-    /* 2 * d =
-    * 16295367250680780974490674513165176452449235426866156013048779062215315747161
-    */
-    public static ed25519_d2 =
-        new FE25519([-21827239, -5839606,  -30745221, 13898782, 229458, 15978800, -12551817, -6495438, 29715968, 9444199]);
-
-    public static ed25519_A_32 = 486662;
-
-    /* A = 486662 */
-    public static ed25519_A =
-        new FE25519([FE25519.ed25519_A_32, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-
-    /* sqrt(ad - 1) with a = -1 (mod p) */
-    public static ed25519_sqrtadm1 =
-        new FE25519([24849947, -153582, -23613485, 6347715, -21072328, -667138, -25271143, -15367704, -870347, 14525639]);
-
-    /* 1 / sqrt(a - d) */
-    public static ed25519_invsqrtamd =
-        new FE25519([6111485, 4156064, -27798727, 12243468, -25904040, 120897, 20826367, -7060776, 6093568, -1986012]);
-
-    /* 1 - d ^ 2 */
-    public static ed25519_onemsqd =
-        new FE25519([6275446, -16617371, -22938544, -3773710, 11667077, 7397348, -27922721, 1766195, -24433858, 672203]);
-
-    /* (d - 1) ^ 2 */
-    public static ed25519_sqdmone =
-        new FE25519([15551795, -11097455, -13425098, -10125071, -11896535, 10178284, -26634327, 4729244, -5282110, -10116402]);
-
     public items: Int32Array;
 
     constructor (values?: Array<number> | Int32Array | FE25519)
@@ -61,6 +21,46 @@ export class FE25519
         }
     }
 }
+
+/* sqrt(-1) */
+export const fe25519_sqrtm1 =
+    new FE25519([-32595792, -7943725,  9377950,  3500415, 12389472, -272473, -25146209, -2005654, 326686, 11406482]);
+
+/* sqrt(-486664) */
+export const ed25519_sqrtam2 =
+    new FE25519([-12222970, -8312128, -11511410, 9067497, -15300785, -241793, 25456130, 14121551, -12187136, 3972024]);
+
+/* 37095705934669439343138083508754565189542113879843219016388785533085940283555 */
+export const ed25519_d =
+    new FE25519([-10913610, 13857413, -15372611, 6949391,   114729, -8787816, -6275908, -3247719, -18696448, -12055116]);
+
+/* 2 * d =
+* 16295367250680780974490674513165176452449235426866156013048779062215315747161
+*/
+export const ed25519_d2 =
+    new FE25519([-21827239, -5839606,  -30745221, 13898782, 229458, 15978800, -12551817, -6495438, 29715968, 9444199]);
+
+export const ed25519_A_32 = 486662;
+
+/* A = 486662 */
+export const ed25519_A =
+    new FE25519([ed25519_A_32, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
+/* sqrt(ad - 1) with a = -1 (mod p) */
+export const ed25519_sqrtadm1 =
+    new FE25519([24849947, -153582, -23613485, 6347715, -21072328, -667138, -25271143, -15367704, -870347, 14525639]);
+
+/* 1 / sqrt(a - d) */
+export const ed25519_invsqrtamd =
+    new FE25519([6111485, 4156064, -27798727, 12243468, -25904040, 120897, 20826367, -7060776, 6093568, -1986012]);
+
+/* 1 - d ^ 2 */
+export const ed25519_onemsqd =
+    new FE25519([6275446, -16617371, -22938544, -3773710, 11667077, 7397348, -27922721, 1766195, -24433858, 672203]);
+
+/* (d - 1) ^ 2 */
+export const ed25519_sqdmone =
+    new FE25519([15551795, -11097455, -13425098, -10125071, -11896535, 10178284, -26634327, 4729244, -5282110, -10116402]);
 
 export class GE25519_P2
 {
@@ -1178,7 +1178,7 @@ export function fe25519_unchecked_sqrt (x: FE25519, x2: FE25519)
 
     fe25519_pow22523(e, x2);
     fe25519_mul(p_root, e, x2);
-    fe25519_mul(m_root, p_root, FE25519.fe25519_sqrtm1);
+    fe25519_mul(m_root, p_root, fe25519_sqrtm1);
     fe25519_sq(m_root2, m_root);
     fe25519_sub(e, x2, m_root2);
     fe25519_copy(x, p_root);
@@ -1198,7 +1198,7 @@ export function fe25519_sqrt (x: FE25519, x2: FE25519): number
     return fe25519_iszero(check) - 1;
 }
 
-export function fe25519_notsquare(x: FE25519): number
+export function fe25519_notsquare (x: FE25519): number
 {
     let _10 = new FE25519();
     let _11 = new FE25519();
@@ -1243,7 +1243,7 @@ export function fe25519_notsquare(x: FE25519): number
     return s[1] & 1;
 }
 
-export function ge25519_add_cached(r: GE25519_P1P1, p: GE25519_P3, q: GE25519_Cached)
+export function ge25519_add_cached (r: GE25519_P1P1, p: GE25519_P3, q: GE25519_Cached)
 {
     let t0 = new FE25519();
 
@@ -1260,9 +1260,21 @@ export function ge25519_add_cached(r: GE25519_P1P1, p: GE25519_P3, q: GE25519_Ca
     fe25519_sub(r.T, t0, r.T);
 }
 
-export function slide_vartime (r: Int8Array, a: Uint8Array)
+export function ge25519_sub_cached(r: GE25519_P1P1, p: GE25519_P3, q: GE25519_Cached)
 {
+    let t0 = new FE25519();
 
+    fe25519_add(r.X, p.Y, p.X);
+    fe25519_sub(r.Y, p.Y, p.X);
+    fe25519_mul(r.Z, r.X, q.YminusX);
+    fe25519_mul(r.Y, r.Y, q.YplusX);
+    fe25519_mul(r.T, q.T2d, p.T);
+    fe25519_mul(r.X, p.Z, q.Z);
+    fe25519_add(t0, r.X, r.X);
+    fe25519_sub(r.X, r.Z, r.Y);
+    fe25519_add(r.Y, r.Z, r.Y);
+    fe25519_sub(r.Z, t0, r.T);
+    fe25519_add(r.T, t0, r.T);
 }
 
 export function ge25519_frombytes (h: GE25519_P3, s: Uint8Array)
@@ -1281,7 +1293,7 @@ export function ge25519_frombytes (h: GE25519_P3, s: Uint8Array)
     fe25519_frombytes(h.Y, s);
     fe25519_1(h.Z);
     fe25519_sq(u, h.Y);
-    fe25519_mul(v, u, FE25519.ed25519_d);
+    fe25519_mul(v, u, ed25519_d);
     fe25519_sub(u, u, h.Z); /* u = y^2-1 */
     fe25519_add(v, v, h.Z); /* v = dy^2+1 */
 
@@ -1301,7 +1313,7 @@ export function ge25519_frombytes (h: GE25519_P3, s: Uint8Array)
     fe25519_add(p_root_check, vxx, u); /* vx^2+u */
     has_m_root = fe25519_iszero(m_root_check);
     has_p_root = fe25519_iszero(p_root_check);
-    fe25519_mul(x_sqrtm1, h.X, FE25519.fe25519_sqrtm1); /* x*sqrt(-1) */
+    fe25519_mul(x_sqrtm1, h.X, fe25519_sqrtm1); /* x*sqrt(-1) */
     fe25519_cmov(h.X, x_sqrtm1, 1 - has_m_root);
 
     fe25519_neg(negx, h.X);
@@ -1326,7 +1338,7 @@ export function ge25519_mont_to_ed (xed: FE25519, yed: FE25519, x: FE25519, y: F
     /* xed = sqrt(-A-2)*x/y */
     fe25519_mul(x_plus_one_y_inv, x_plus_one, y);
     fe25519_invert(x_plus_one_y_inv, x_plus_one_y_inv); /* 1/((x+1)*y) */
-    fe25519_mul(xed, x, FE25519.ed25519_sqrtam2);
+    fe25519_mul(xed, x, ed25519_sqrtam2);
     fe25519_mul(xed, xed, x_plus_one_y_inv);            /* sqrt(-A-2)*x/((x+1)*y) */
     fe25519_mul(xed, xed, x_plus_one);
 
@@ -1343,7 +1355,7 @@ export function ge25519_xmont_to_ymont (y: FE25519, /* const */ x: FE25519): num
 
     fe25519_sq(x2, x);
     fe25519_mul(x3, x, x2);
-    fe25519_mul32(x2, x2, FE25519.ed25519_A_32);
+    fe25519_mul32(x2, x2, ed25519_A_32);
     fe25519_add(y, x3, x);
     fe25519_add(y, y, x2);
 
@@ -1395,36 +1407,12 @@ export function ge25519_p3_0 (h: GE25519_P3)
     fe25519_0(h.T);
 }
 
-export function ge25519_cached_0 (h: GE25519_Cached)
-{
-    fe25519_1(h.YplusX);
-    fe25519_1(h.YminusX);
-    fe25519_1(h.Z);
-    fe25519_0(h.T2d);
-}
-
 export function ge25519_p3_to_cached (r: GE25519_Cached, p: GE25519_P3)
 {
     fe25519_add(r.YplusX, p.Y, p.X);
     fe25519_sub(r.YminusX, p.Y, p.X);
     fe25519_copy(r.Z, p.Z);
-    fe25519_mul(r.T2d, p.T, FE25519.ed25519_d2);
-}
-
-export function ge25519_p3_to_precomp (pi: GE25519_PreComp, p: GE25519_P3)
-{
-    let recip = new FE25519();
-    let x = new FE25519();
-    let y = new FE25519();
-    let xy = new FE25519();
-
-    fe25519_invert(recip, p.Z);
-    fe25519_mul(x, p.X, recip);
-    fe25519_mul(y, p.Y, recip);
-    fe25519_add(pi.yplusx, y, x);
-    fe25519_sub(pi.yminusx, y, x);
-    fe25519_mul(xy, x, y);
-    fe25519_mul(pi.xy2d, xy, FE25519.ed25519_d2);
+    fe25519_mul(r.T2d, p.T, ed25519_d2);
 }
 
 export function ge25519_p3_to_p2 (r: GE25519_P2, p: GE25519_P3)
@@ -1479,12 +1467,12 @@ export function ge25519_elligator2 (x: FE25519, y: FE25519, r: FE25519): number
     fe25519_sq2(rr2, r);
     rr2.items[0] = rr2.items[0] + 1;
     fe25519_invert(rr2, rr2);
-    fe25519_mul32(x, rr2, FE25519.ed25519_A_32);
+    fe25519_mul32(x, rr2, ed25519_A_32);
     fe25519_neg(x, x); /* x=x1 */
 
     fe25519_sq(x2, x);
     fe25519_mul(x3, x, x2);
-    fe25519_mul32(x2, x2, FE25519.ed25519_A_32); /* x2 = A*x1^2 */
+    fe25519_mul32(x2, x2, ed25519_A_32); /* x2 = A*x1^2 */
     fe25519_add(gx1, x3, x);
     fe25519_add(gx1, gx1, x2); /* gx1 = x1^3 + A*x1^2 + x1 */
 
@@ -1494,7 +1482,7 @@ export function ge25519_elligator2 (x: FE25519, y: FE25519, r: FE25519): number
     fe25519_neg(negx, x);
     fe25519_cmov(x, negx, notsquare);
     fe25519_0(x2);
-    fe25519_cmov(x2, FE25519.ed25519_A, notsquare);
+    fe25519_cmov(x2, ed25519_A, notsquare);
     fe25519_sub(x, x, x2);
 
     /* y = sqrt(gx1) or sqrt(gx2) with gx2 = gx1 * (A+x1) / -x1 */
@@ -1534,6 +1522,229 @@ export function ge25519_from_uniform (s: Uint8Array, r: Uint8Array)
 
     ge25519_clear_cofactor(p3);
     ge25519_p3_tobytes(s, p3);
+}
+
+/* r = 2p */
+export function ge25519_p3p3_dbl (r: GE25519_P3, p: GE25519_P3)
+{
+    let p1p1 = new GE25519_P1P1();
+
+    ge25519_p3_dbl(p1p1, p);
+    ge25519_p1p1_to_p3(r, p1p1);
+}
+
+/* r = p+q */
+export function ge25519_p3_add (r: GE25519_P3, p: GE25519_P3, q: GE25519_P3)
+{
+    let q_cached = new GE25519_Cached();
+    let p1p1 = new GE25519_P1P1();
+
+    ge25519_p3_to_cached(q_cached, q);
+    ge25519_add_cached(p1p1, p, q_cached);
+    ge25519_p1p1_to_p3(r, p1p1);
+}
+
+/* r = r*(2^n)+q */
+export function ge25519_p3_dbladd (r: GE25519_P3, n: number, q: GE25519_P3)
+{
+    let p2 = new GE25519_P3();
+    let p1p1 = new GE25519_P1P1() ;
+    let i: number;
+
+    ge25519_p3_to_p2(p2, r);
+    for (i = 0; i < n; i++) {
+        ge25519_p2_dbl(p1p1, p2);
+        ge25519_p1p1_to_p2(p2, p1p1);
+    }
+    ge25519_p1p1_to_p3(r, p1p1);
+    ge25519_p3_add(r, r, q);
+}
+
+/* multiply by the order of the main subgroup l = 2^252+27742317777372353535851937790883648493 */
+export function ge25519_mul_l (r: GE25519_P3, p: GE25519_P3)
+{
+    let _10 = new GE25519_P3();
+    let _11 = new GE25519_P3();
+    let _100 = new GE25519_P3();
+    let _110 = new GE25519_P3();
+    let _1000 = new GE25519_P3();
+    let _1011 = new GE25519_P3();
+    let _10000 = new GE25519_P3();
+    let _100000 = new GE25519_P3();
+    let _100110 = new GE25519_P3();
+    let _1000000 = new GE25519_P3();
+    let _1010000 = new GE25519_P3();
+    let _1010011 = new GE25519_P3();
+    let _1100011 = new GE25519_P3();
+    let _1100111 = new GE25519_P3();
+    let _1101011 = new GE25519_P3();
+    let _10010011 = new GE25519_P3();
+    let _10010111 = new GE25519_P3();
+    let _10111101 = new GE25519_P3();
+    let _11010011 = new GE25519_P3();
+    let _11100111 = new GE25519_P3();
+    let _11101101 = new GE25519_P3();
+    let _11110101 = new GE25519_P3();
+
+    ge25519_p3p3_dbl(_10, p);
+    ge25519_p3_add(_11, p, _10);
+    ge25519_p3_add(_100, p, _11);
+    ge25519_p3_add(_110, _10, _100);
+    ge25519_p3_add(_1000, _10, _110);
+    ge25519_p3_add(_1011, _11, _1000);
+    ge25519_p3p3_dbl(_10000, _1000);
+    ge25519_p3p3_dbl(_100000, _10000);
+    ge25519_p3_add(_100110, _110, _100000);
+    ge25519_p3p3_dbl(_1000000, _100000);
+    ge25519_p3_add(_1010000, _10000, _1000000);
+    ge25519_p3_add(_1010011, _11, _1010000);
+    ge25519_p3_add(_1100011, _10000, _1010011);
+    ge25519_p3_add(_1100111, _100, _1100011);
+    ge25519_p3_add(_1101011, _100, _1100111);
+    ge25519_p3_add(_10010011, _1000000, _1010011);
+    ge25519_p3_add(_10010111, _100, _10010011);
+    ge25519_p3_add(_10111101, _100110, _10010111);
+    ge25519_p3_add(_11010011, _1000000, _10010011);
+    ge25519_p3_add(_11100111, _1010000, _10010111);
+    ge25519_p3_add(_11101101, _110, _11100111);
+    ge25519_p3_add(_11110101, _1000, _11101101);
+
+    ge25519_p3_add(r, _1011, _11110101);
+    ge25519_p3_dbladd(r, 126, _1010011);
+    ge25519_p3_dbladd(r, 9, _10);
+    ge25519_p3_add(r, r, _11110101);
+    ge25519_p3_dbladd(r, 7, _1100111);
+    ge25519_p3_dbladd(r, 9, _11110101);
+    ge25519_p3_dbladd(r, 11, _10111101);
+    ge25519_p3_dbladd(r, 8, _11100111);
+    ge25519_p3_dbladd(r, 9, _1101011);
+    ge25519_p3_dbladd(r, 6, _1011);
+    ge25519_p3_dbladd(r, 14, _10010011);
+    ge25519_p3_dbladd(r, 10, _1100011);
+    ge25519_p3_dbladd(r, 9, _10010111);
+    ge25519_p3_dbladd(r, 10, _11110101);
+    ge25519_p3_dbladd(r, 8, _11010011);
+    ge25519_p3_dbladd(r, 8, _11101101);
+}
+
+export function ge25519_is_on_curve (p: GE25519_P3): number
+{
+    let x2 = new FE25519();
+    let y2 = new FE25519();
+    let z2 = new FE25519();
+    let z4 = new FE25519();
+    let t0 = new FE25519();
+    let t1 = new FE25519();
+
+    fe25519_sq(x2, p.X);
+    fe25519_sq(y2, p.Y);
+    fe25519_sq(z2, p.Z);
+    fe25519_sub(t0, y2, x2);
+    fe25519_mul(t0, t0, z2);
+
+    fe25519_mul(t1, x2, y2);
+    fe25519_mul(t1, t1, ed25519_d);
+    fe25519_sq(z4, z2);
+    fe25519_add(t1, t1, z4);
+    fe25519_sub(t0, t0, t1);
+
+    return fe25519_iszero(t0);
+}
+
+export function ge25519_is_on_main_subgroup (p: GE25519_P3): number
+{
+    let pl = new GE25519_P3();
+
+    ge25519_mul_l(pl, p);
+
+    return fe25519_iszero(pl.X);
+}
+
+export function ge25519_is_canonical (s: Uint8Array): number
+{
+    let c: number;
+    let d: number;
+    let i: number;
+    let s0: number = s[0];
+    let s31: number = s[31];
+
+    c = ((s31 & 0x7f) ^ 0x7f) & 0xff;
+    for (i = 30; i > 0; i--) {
+        c = (c | (s[i] ^ 0xff)) & 0xff;
+    }
+    c = ((c) - 1) >> 8;
+    d = ((0xed - 1 - s0) >> 8) & 0xff;
+
+    return 1 - (c & d & 1);
+}
+
+export function ge25519_has_small_order (s: Uint8Array): number
+{
+    let blocklist: Array<Uint8Array> = [
+
+        /* 0 (order 4) */
+        new Uint8Array([
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ]),
+
+        /* 1 (order 1) */
+        new Uint8Array([
+            0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ]),
+
+        /* 2707385501144840649318225287225658788936804267575313519463743609750303402022
+           (order 8) */
+        new Uint8Array([
+            0x26, 0xe8, 0x95, 0x8f, 0xc2, 0xb2, 0x27, 0xb0, 0x45, 0xc3, 0xf4,
+            0x89, 0xf2, 0xef, 0x98, 0xf0, 0xd5, 0xdf, 0xac, 0x05, 0xd3, 0xc6,
+            0x33, 0x39, 0xb1, 0x38, 0x02, 0x88, 0x6d, 0x53, 0xfc, 0x05 ]),
+
+        /* 55188659117513257062467267217118295137698188065244968500265048394206261417927
+           (order 8) */
+        new Uint8Array([
+            0xc7, 0x17, 0x6a, 0x70, 0x3d, 0x4d, 0xd8, 0x4f, 0xba, 0x3c, 0x0b,
+            0x76, 0x0d, 0x10, 0x67, 0x0f, 0x2a, 0x20, 0x53, 0xfa, 0x2c, 0x39,
+            0xcc, 0xc6, 0x4e, 0xc7, 0xfd, 0x77, 0x92, 0xac, 0x03, 0x7a ]),
+
+        /* p-1 (order 2) */
+        new Uint8Array([
+            0xec, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f ]),
+
+        /* p (=0, order 4) */
+        new Uint8Array([
+            0xed, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f ]),
+
+        /* p+1 (=1, order 1) */
+        new Uint8Array([
+            0xee, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f ])
+    ];
+
+    let c = new Uint8Array([0, 0, 0, 0, 0, 0, 0]);
+    let k: number;
+    let i: number, j : number;
+
+    for (j = 0; j < 31; j++) {
+        for (i = 0; i < 7; i++) {
+            c[i] |= s[j] ^ blocklist[i][j];
+        }
+    }
+
+    for (i = 0; i < 7; i++) {
+        c[i] |= (s[j] & 0x7f) ^ blocklist[i][j];
+    }
+    k = 0;
+    for (i = 0; i < 7; i++) {
+        k |= (c[i] - 1);
+    }
+    return ((k >> 8) & 1);
 }
 
 export function sc25519_reduce (s: Uint8Array)
