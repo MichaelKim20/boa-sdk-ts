@@ -23,4 +23,12 @@ export class JSBIUtils
             return JSBI.add(sum, n)
         }, JSBI.BigInt(0));
     }
+
+    public static SumMultiply (values: Array<JSBI>): JSBI
+    {
+        let Sum = JSBI.BigInt(0);
+        for (let i = 0; i < values.length; i+=2)
+            Sum = JSBI.add(Sum, JSBI.multiply(values[i], values[i+1]));
+        return Sum;
+    }
 }

@@ -100,6 +100,23 @@ export class GE25519_Cached
     public T2d: FE25519 = new FE25519();
 }
 
+function load_3 (s: Uint8Array, offset: number): JSBI
+{
+    let result = JSBI.BigInt(s[offset]);
+    result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(8)));
+    result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(16)));
+    return result;
+}
+
+function load_4 (s: Uint8Array, offset: number): JSBI
+{
+    let result = JSBI.BigInt(s[offset]);
+    result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(8)));
+    result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(16)));
+    result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(24)));
+    return result;
+}
+
 export function fe25519_reduce (h: FE25519, f: FE25519)
 {
     let h0 = f.items[0];
@@ -229,16 +246,16 @@ export function fe25519_frombytes (h: FE25519, s: Uint8Array)
     for (let idx = 0; idx < FE25519.WIDTH; idx++)
         Carry.push(JSBI.BigInt(0))
 
-    H[0] = ED25519Utils.load_4(s, 0);
-    H[1] = JSBI.leftShift(ED25519Utils.load_3(s, 4), JSBI.BigInt(6));
-    H[2] = JSBI.leftShift(ED25519Utils.load_3(s, 7), JSBI.BigInt(5));
-    H[3] = JSBI.leftShift(ED25519Utils.load_3(s, 10), JSBI.BigInt(3));
-    H[4] = JSBI.leftShift(ED25519Utils.load_3(s, 13), JSBI.BigInt(2));
-    H[5] = ED25519Utils.load_4(s, 16);
-    H[6] = JSBI.leftShift(ED25519Utils.load_3(s, 20), JSBI.BigInt(7));
-    H[7] = JSBI.leftShift(ED25519Utils.load_3(s, 23), JSBI.BigInt(5));
-    H[8] = JSBI.leftShift(ED25519Utils.load_3(s, 26), JSBI.BigInt(4));
-    H[9] = JSBI.leftShift(JSBI.bitwiseAnd(ED25519Utils.load_3(s, 29), JSBI.BigInt(8388607)), JSBI.BigInt(2));
+    H[0] = load_4(s, 0);
+    H[1] = JSBI.leftShift(load_3(s, 4), JSBI.BigInt(6));
+    H[2] = JSBI.leftShift(load_3(s, 7), JSBI.BigInt(5));
+    H[3] = JSBI.leftShift(load_3(s, 10), JSBI.BigInt(3));
+    H[4] = JSBI.leftShift(load_3(s, 13), JSBI.BigInt(2));
+    H[5] = load_4(s, 16);
+    H[6] = JSBI.leftShift(load_3(s, 20), JSBI.BigInt(7));
+    H[7] = JSBI.leftShift(load_3(s, 23), JSBI.BigInt(5));
+    H[8] = JSBI.leftShift(load_3(s, 26), JSBI.BigInt(4));
+    H[9] = JSBI.leftShift(JSBI.bitwiseAnd(load_3(s, 29), JSBI.BigInt(8388607)), JSBI.BigInt(2));
 
     let func24_19 = (i: number) => {
         let j = (i+1) % FE25519.WIDTH;
@@ -1680,7 +1697,7 @@ export function ge25519_is_canonical (s: Uint8Array): number
 
 export function ge25519_has_small_order (s: Uint8Array): number
 {
-    let blocklist: Array<Uint8Array> = [
+    let block_list: Array<Uint8Array> = [
 
         /* 0 (order 4) */
         new Uint8Array([
@@ -1733,12 +1750,12 @@ export function ge25519_has_small_order (s: Uint8Array): number
 
     for (j = 0; j < 31; j++) {
         for (i = 0; i < 7; i++) {
-            c[i] |= s[j] ^ blocklist[i][j];
+            c[i] |= s[j] ^ block_list[i][j];
         }
     }
 
     for (i = 0; i < 7; i++) {
-        c[i] |= (s[j] & 0x7f) ^ blocklist[i][j];
+        c[i] |= (s[j] & 0x7f) ^ block_list[i][j];
     }
     k = 0;
     for (i = 0; i < 7; i++) {
@@ -1747,6 +1764,1039 @@ export function ge25519_has_small_order (s: Uint8Array): number
     return ((k >> 8) & 1);
 }
 
+/*
+ Input:
+ a[0]+256*a[1]+...+256^31*a[31] = a
+ b[0]+256*b[1]+...+256^31*b[31] = b
+ *
+ Output:
+ s[0]+256*s[1]+...+256^31*s[31] = (ab) mod l
+ where l = 2^252 + 27742317777372353535851937790883648493.
+ */
+export function sc25519_mul (s: Uint8Array, a: Uint8Array, b: Uint8Array)
+{
+    let a0  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), load_3(a, 0));
+    let a1  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a,  2), JSBI.BigInt(5)));
+    let a2  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(a,  5), JSBI.BigInt(2)));
+    let a3  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a,  5), JSBI.BigInt(7)));
+    let a4  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a, 10), JSBI.BigInt(4)));
+    let a5  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(a, 13), JSBI.BigInt(1)));
+    let a6  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a, 15), JSBI.BigInt(6)));
+    let a7  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(a, 18), JSBI.BigInt(3)));
+    let a8  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), load_3(a, 21));
+    let a9  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a, 23), JSBI.BigInt(5)));
+    let a10 = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(a, 26), JSBI.BigInt(2)));
+    let a11 = JSBI.signedRightShift(load_4(a,28), JSBI.BigInt(7));
+
+    let b0  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), load_3(b, 0));
+    let b1  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b,  2), JSBI.BigInt(5)));
+    let b2  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(b,  5), JSBI.BigInt(2)));
+    let b3  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b,  5), JSBI.BigInt(7)));
+    let b4  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b, 10), JSBI.BigInt(4)));
+    let b5  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(b, 13), JSBI.BigInt(1)));
+    let b6  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b, 15), JSBI.BigInt(6)));
+    let b7  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(b, 18), JSBI.BigInt(3)));
+    let b8  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), load_3(b, 21));
+    let b9  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b, 23), JSBI.BigInt(5)));
+    let b10 = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(b, 26), JSBI.BigInt(2)));
+    let b11 = JSBI.signedRightShift(load_4(b,28), JSBI.BigInt(7));
+
+    let carry0;
+    let carry1;
+    let carry2;
+    let carry3;
+    let carry4;
+    let carry5;
+    let carry6;
+    let carry7;
+    let carry8;
+    let carry9;
+    let carry10;
+    let carry11;
+    let carry12;
+    let carry13;
+    let carry14;
+    let carry15;
+    let carry16;
+    let carry17;
+    let carry18;
+    let carry19;
+    let carry20;
+    let carry21;
+    let carry22;
+
+    let s0  = JSBIUtils.SumMultiply([a0, b0]);
+    let s1  = JSBIUtils.SumMultiply([a0, b1, a1, b0]);
+    let s2  = JSBIUtils.SumMultiply([a0, b2, a1, b1, a2, b0]);
+    let s3  = JSBIUtils.SumMultiply([a0, b3, a1, b2, a2, b1, a3, b0]);
+    let s4  = JSBIUtils.SumMultiply([a0, b4, a1, b3, a2, b2, a3, b1, a4, b0]);
+    let s5  = JSBIUtils.SumMultiply([a0, b5, a1, b4, a2, b3, a3, b2, a4, b1, a5, b0]);
+    let s6  = JSBIUtils.SumMultiply([a0, b6, a1, b5, a2, b4, a3, b3, a4, b2, a5, b1, a6, b0]);
+    let s7  = JSBIUtils.SumMultiply([a0, b7, a1, b6, a2, b5, a3, b4, a4, b3, a5, b2, a6, b1, a7, b0]);
+    let s8  = JSBIUtils.SumMultiply([a0, b8, a1, b7, a2, b6, a3, b5, a4, b4, a5, b3, a6, b2, a7, b1, a8, b0]);
+    let s9  = JSBIUtils.SumMultiply([a0, b9, a1, b8, a2, b7, a3, b6, a4, b5, a5, b4, a6, b3, a7, b2, a8, b1, a9, b0]);
+    let s10 = JSBIUtils.SumMultiply([a0, b10, a1, b9, a2, b8, a3, b7, a4, b6, a5, b5, a6, b4, a7, b3, a8, b2, a9, b1, a10, b0]);
+    let s11 = JSBIUtils.SumMultiply([a0, b11, a1, b10, a2, b9, a3, b8, a4, b7, a5, b6, a6, b5, a7, b4, a8, b3, a9, b2, a10, b1, a11, b0]);
+    let s12 = JSBIUtils.SumMultiply([a1, b11, a2, b10, a3, b9, a4, b8, a5, b7, a6, b6, a7, b5, a8, b4, a9, b3, a10, b2, a11, b1]);
+    let s13 = JSBIUtils.SumMultiply([a2, b11, a3, b10, a4, b9, a5, b8, a6, b7, a7, b6, a8, b5, a9, b4, a10, b3, a11, b2]);
+    let s14 = JSBIUtils.SumMultiply([a3, b11, a4, b10, a5, b9, a6, b8, a7, b7, a8, b6, a9, b5, a10, b4, a11, b3]);
+    let s15 = JSBIUtils.SumMultiply([a4, b11, a5, b10, a6, b9, a7, b8, a8, b7, a9, b6, a10, b5, a11, b4]);
+    let s16 = JSBIUtils.SumMultiply([a5, b11, a6, b10, a7, b9, a8, b8, a9, b7, a10, b6, a11, b5]);
+    let s17 = JSBIUtils.SumMultiply([a6, b11, a7, b10, a8, b9, a9, b8, a10, b7, a11, b6]);
+    let s18 = JSBIUtils.SumMultiply([a7, b11, a8, b10, a9, b9, a10, b8, a11, b7]);
+    let s19 = JSBIUtils.SumMultiply([a8, b11, a9, b10, a10, b9, a11, b8]);
+    let s20 = JSBIUtils.SumMultiply([a9, b11, a10, b10, a11, b9]);
+    let s21 = JSBIUtils.SumMultiply([a10, b11, a11, b10]);
+    let s22 = JSBIUtils.SumMultiply([a11, b11]);
+    let s23 = JSBI.BigInt(0);
+
+    carry0 = (s0 + (let) (1L << 20)) >> 21;
+    s1 += carry0;
+    s0 -= carry0 * ((ulet) 1L << 21);
+
+    carry2 = (s2 + (let) (1L << 20)) >> 21;
+    s3 += carry2;
+    s2 -= carry2 * ((ulet) 1L << 21);
+
+    carry4 = (s4 + (let) (1L << 20)) >> 21;
+    s5 += carry4;
+    s4 -= carry4 * ((ulet) 1L << 21);
+
+    carry6 = (s6 + (let) (1L << 20)) >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry8 = (s8 + (let) (1L << 20)) >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry10 = (s10 + (let) (1L << 20)) >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+    carry12 = (s12 + (let) (1L << 20)) >> 21;
+    s13 += carry12;
+    s12 -= carry12 * ((ulet) 1L << 21);
+    carry14 = (s14 + (let) (1L << 20)) >> 21;
+    s15 += carry14;
+    s14 -= carry14 * ((ulet) 1L << 21);
+    carry16 = (s16 + (let) (1L << 20)) >> 21;
+    s17 += carry16;
+    s16 -= carry16 * ((ulet) 1L << 21);
+    carry18 = (s18 + (let) (1L << 20)) >> 21;
+    s19 += carry18;
+    s18 -= carry18 * ((ulet) 1L << 21);
+    carry20 = (s20 + (let) (1L << 20)) >> 21;
+    s21 += carry20;
+    s20 -= carry20 * ((ulet) 1L << 21);
+    carry22 = (s22 + (let) (1L << 20)) >> 21;
+    s23 += carry22;
+    s22 -= carry22 * ((ulet) 1L << 21);
+
+    carry1 = (s1 + (let) (1L << 20)) >> 21;
+    s2 += carry1;
+    s1 -= carry1 * ((ulet) 1L << 21);
+    carry3 = (s3 + (let) (1L << 20)) >> 21;
+    s4 += carry3;
+    s3 -= carry3 * ((ulet) 1L << 21);
+    carry5 = (s5 + (let) (1L << 20)) >> 21;
+    s6 += carry5;
+    s5 -= carry5 * ((ulet) 1L << 21);
+    carry7 = (s7 + (let) (1L << 20)) >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry9 = (s9 + (let) (1L << 20)) >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry11 = (s11 + (let) (1L << 20)) >> 21;
+    s12 += carry11;
+    s11 -= carry11 * ((ulet) 1L << 21);
+    carry13 = (s13 + (let) (1L << 20)) >> 21;
+    s14 += carry13;
+    s13 -= carry13 * ((ulet) 1L << 21);
+    carry15 = (s15 + (let) (1L << 20)) >> 21;
+    s16 += carry15;
+    s15 -= carry15 * ((ulet) 1L << 21);
+    carry17 = (s17 + (let) (1L << 20)) >> 21;
+    s18 += carry17;
+    s17 -= carry17 * ((ulet) 1L << 21);
+    carry19 = (s19 + (let) (1L << 20)) >> 21;
+    s20 += carry19;
+    s19 -= carry19 * ((ulet) 1L << 21);
+    carry21 = (s21 + (let) (1L << 20)) >> 21;
+    s22 += carry21;
+    s21 -= carry21 * ((ulet) 1L << 21);
+
+    s11 += s23 * 666643;
+    s12 += s23 * 470296;
+    s13 += s23 * 654183;
+    s14 -= s23 * 997805;
+    s15 += s23 * 136657;
+    s16 -= s23 * 683901;
+
+    s10 += s22 * 666643;
+    s11 += s22 * 470296;
+    s12 += s22 * 654183;
+    s13 -= s22 * 997805;
+    s14 += s22 * 136657;
+    s15 -= s22 * 683901;
+
+    s9 += s21 * 666643;
+    s10 += s21 * 470296;
+    s11 += s21 * 654183;
+    s12 -= s21 * 997805;
+    s13 += s21 * 136657;
+    s14 -= s21 * 683901;
+
+    s8 += s20 * 666643;
+    s9 += s20 * 470296;
+    s10 += s20 * 654183;
+    s11 -= s20 * 997805;
+    s12 += s20 * 136657;
+    s13 -= s20 * 683901;
+
+    s7 += s19 * 666643;
+    s8 += s19 * 470296;
+    s9 += s19 * 654183;
+    s10 -= s19 * 997805;
+    s11 += s19 * 136657;
+    s12 -= s19 * 683901;
+
+    s6 += s18 * 666643;
+    s7 += s18 * 470296;
+    s8 += s18 * 654183;
+    s9 -= s18 * 997805;
+    s10 += s18 * 136657;
+    s11 -= s18 * 683901;
+
+    carry6 = (s6 + (let) (1L << 20)) >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry8 = (s8 + (let) (1L << 20)) >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry10 = (s10 + (let) (1L << 20)) >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+    carry12 = (s12 + (let) (1L << 20)) >> 21;
+    s13 += carry12;
+    s12 -= carry12 * ((ulet) 1L << 21);
+    carry14 = (s14 + (let) (1L << 20)) >> 21;
+    s15 += carry14;
+    s14 -= carry14 * ((ulet) 1L << 21);
+    carry16 = (s16 + (let) (1L << 20)) >> 21;
+    s17 += carry16;
+    s16 -= carry16 * ((ulet) 1L << 21);
+
+    carry7 = (s7 + (let) (1L << 20)) >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry9 = (s9 + (let) (1L << 20)) >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry11 = (s11 + (let) (1L << 20)) >> 21;
+    s12 += carry11;
+    s11 -= carry11 * ((ulet) 1L << 21);
+    carry13 = (s13 + (let) (1L << 20)) >> 21;
+    s14 += carry13;
+    s13 -= carry13 * ((ulet) 1L << 21);
+    carry15 = (s15 + (let) (1L << 20)) >> 21;
+    s16 += carry15;
+    s15 -= carry15 * ((ulet) 1L << 21);
+
+    s5 += s17 * 666643;
+    s6 += s17 * 470296;
+    s7 += s17 * 654183;
+    s8 -= s17 * 997805;
+    s9 += s17 * 136657;
+    s10 -= s17 * 683901;
+
+    s4 += s16 * 666643;
+    s5 += s16 * 470296;
+    s6 += s16 * 654183;
+    s7 -= s16 * 997805;
+    s8 += s16 * 136657;
+    s9 -= s16 * 683901;
+
+    s3 += s15 * 666643;
+    s4 += s15 * 470296;
+    s5 += s15 * 654183;
+    s6 -= s15 * 997805;
+    s7 += s15 * 136657;
+    s8 -= s15 * 683901;
+
+    s2 += s14 * 666643;
+    s3 += s14 * 470296;
+    s4 += s14 * 654183;
+    s5 -= s14 * 997805;
+    s6 += s14 * 136657;
+    s7 -= s14 * 683901;
+
+    s1 += s13 * 666643;
+    s2 += s13 * 470296;
+    s3 += s13 * 654183;
+    s4 -= s13 * 997805;
+    s5 += s13 * 136657;
+    s6 -= s13 * 683901;
+
+    s0 += s12 * 666643;
+    s1 += s12 * 470296;
+    s2 += s12 * 654183;
+    s3 -= s12 * 997805;
+    s4 += s12 * 136657;
+    s5 -= s12 * 683901;
+    s12 = 0;
+
+    carry0 = (s0 + (let) (1L << 20)) >> 21;
+    s1 += carry0;
+    s0 -= carry0 * ((ulet) 1L << 21);
+    carry2 = (s2 + (let) (1L << 20)) >> 21;
+    s3 += carry2;
+    s2 -= carry2 * ((ulet) 1L << 21);
+    carry4 = (s4 + (let) (1L << 20)) >> 21;
+    s5 += carry4;
+    s4 -= carry4 * ((ulet) 1L << 21);
+    carry6 = (s6 + (let) (1L << 20)) >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry8 = (s8 + (let) (1L << 20)) >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry10 = (s10 + (let) (1L << 20)) >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+
+    carry1 = (s1 + (let) (1L << 20)) >> 21;
+    s2 += carry1;
+    s1 -= carry1 * ((ulet) 1L << 21);
+    carry3 = (s3 + (let) (1L << 20)) >> 21;
+    s4 += carry3;
+    s3 -= carry3 * ((ulet) 1L << 21);
+    carry5 = (s5 + (let) (1L << 20)) >> 21;
+    s6 += carry5;
+    s5 -= carry5 * ((ulet) 1L << 21);
+    carry7 = (s7 + (let) (1L << 20)) >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry9 = (s9 + (let) (1L << 20)) >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry11 = (s11 + (let) (1L << 20)) >> 21;
+    s12 += carry11;
+    s11 -= carry11 * ((ulet) 1L << 21);
+
+    s0 += s12 * 666643;
+    s1 += s12 * 470296;
+    s2 += s12 * 654183;
+    s3 -= s12 * 997805;
+    s4 += s12 * 136657;
+    s5 -= s12 * 683901;
+    s12 = 0;
+
+    carry0 = s0 >> 21;
+    s1 += carry0;
+    s0 -= carry0 * ((ulet) 1L << 21);
+    carry1 = s1 >> 21;
+    s2 += carry1;
+    s1 -= carry1 * ((ulet) 1L << 21);
+    carry2 = s2 >> 21;
+    s3 += carry2;
+    s2 -= carry2 * ((ulet) 1L << 21);
+    carry3 = s3 >> 21;
+    s4 += carry3;
+    s3 -= carry3 * ((ulet) 1L << 21);
+    carry4 = s4 >> 21;
+    s5 += carry4;
+    s4 -= carry4 * ((ulet) 1L << 21);
+    carry5 = s5 >> 21;
+    s6 += carry5;
+    s5 -= carry5 * ((ulet) 1L << 21);
+    carry6 = s6 >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry7 = s7 >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry8 = s8 >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry9 = s9 >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry10 = s10 >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+    carry11 = s11 >> 21;
+    s12 += carry11;
+    s11 -= carry11 * ((ulet) 1L << 21);
+
+    s0 += s12 * 666643;
+    s1 += s12 * 470296;
+    s2 += s12 * 654183;
+    s3 -= s12 * 997805;
+    s4 += s12 * 136657;
+    s5 -= s12 * 683901;
+
+    carry0 = s0 >> 21;
+    s1 += carry0;
+    s0 -= carry0 * ((ulet) 1L << 21);
+    carry1 = s1 >> 21;
+    s2 += carry1;
+    s1 -= carry1 * ((ulet) 1L << 21);
+    carry2 = s2 >> 21;
+    s3 += carry2;
+    s2 -= carry2 * ((ulet) 1L << 21);
+    carry3 = s3 >> 21;
+    s4 += carry3;
+    s3 -= carry3 * ((ulet) 1L << 21);
+    carry4 = s4 >> 21;
+    s5 += carry4;
+    s4 -= carry4 * ((ulet) 1L << 21);
+    carry5 = s5 >> 21;
+    s6 += carry5;
+    s5 -= carry5 * ((ulet) 1L << 21);
+    carry6 = s6 >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry7 = s7 >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry8 = s8 >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry9 = s9 >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry10 = s10 >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+
+    s[0]  = s0 >> 0;
+    s[1]  = s0 >> 8;
+    s[2]  = (s0 >> 16) | (s1 * ((ulet) 1 << 5));
+    s[3]  = s1 >> 3;
+    s[4]  = s1 >> 11;
+    s[5]  = (s1 >> 19) | (s2 * ((ulet) 1 << 2));
+    s[6]  = s2 >> 6;
+    s[7]  = (s2 >> 14) | (s3 * ((ulet) 1 << 7));
+    s[8]  = s3 >> 1;
+    s[9]  = s3 >> 9;
+    s[10] = (s3 >> 17) | (s4 * ((ulet) 1 << 4));
+    s[11] = s4 >> 4;
+    s[12] = s4 >> 12;
+    s[13] = (s4 >> 20) | (s5 * ((ulet) 1 << 1));
+    s[14] = s5 >> 7;
+    s[15] = (s5 >> 15) | (s6 * ((ulet) 1 << 6));
+    s[16] = s6 >> 2;
+    s[17] = s6 >> 10;
+    s[18] = (s6 >> 18) | (s7 * ((ulet) 1 << 3));
+    s[19] = s7 >> 5;
+    s[20] = s7 >> 13;
+    s[21] = s8 >> 0;
+    s[22] = s8 >> 8;
+    s[23] = (s8 >> 16) | (s9 * ((ulet) 1 << 5));
+    s[24] = s9 >> 3;
+    s[25] = s9 >> 11;
+    s[26] = (s9 >> 19) | (s10 * ((ulet) 1 << 2));
+    s[27] = s10 >> 6;
+    s[28] = (s10 >> 14) | (s11 * ((ulet) 1 << 7));
+    s[29] = s11 >> 1;
+    s[30] = s11 >> 9;
+    s[31] = s11 >> 17;
+}
+
+/*
+ Input:
+ a[0]+256*a[1]+...+256^31*a[31] = a
+ b[0]+256*b[1]+...+256^31*b[31] = b
+ c[0]+256*c[1]+...+256^31*c[31] = c
+ *
+ Output:
+ s[0]+256*s[1]+...+256^31*s[31] = (ab+c) mod l
+ where l = 2^252 + 27742317777372353535851937790883648493.
+ */
+export function sc25519_muladd (s: Uint8Array, a: Uint8Array, b: Uint8Array, c: Uint8Array)
+{
+    let a0  = 2097151 & load_3(a, 0);
+    let a1  = 2097151 & (load_4(a, 2) >> 5);
+    let a2  = 2097151 & (load_3(a, 5) >> 2);
+    let a3  = 2097151 & (load_4(a, 7) >> 7);
+    let a4  = 2097151 & (load_4(a, 10) >> 4);
+    let a5  = 2097151 & (load_3(a, 13) >> 1);
+    let a6  = 2097151 & (load_4(a, 15) >> 6);
+    let a7  = 2097151 & (load_3(a, 18) >> 3);
+    let a8  = 2097151 & load_3(a, 21);
+    let a9  = 2097151 & (load_4(a, 23) >> 5);
+    let a10 = 2097151 & (load_3(a, 26) >> 2);
+    let a11 = (load_4(a, 28) >> 7);
+
+    let b0  = 2097151 & load_3(b, 0);
+    let b1  = 2097151 & (load_4(b, 2) >> 5);
+    let b2  = 2097151 & (load_3(b, 5) >> 2);
+    let b3  = 2097151 & (load_4(b, 7) >> 7);
+    let b4  = 2097151 & (load_4(b, 10) >> 4);
+    let b5  = 2097151 & (load_3(b, 13) >> 1);
+    let b6  = 2097151 & (load_4(b, 15) >> 6);
+    let b7  = 2097151 & (load_3(b, 18) >> 3);
+    let b8  = 2097151 & load_3(b, 21);
+    let b9  = 2097151 & (load_4(b, 23) >> 5);
+    let b10 = 2097151 & (load_3(b, 26) >> 2);
+    let b11 = (load_4(b, 28) >> 7);
+
+    let c0  = 2097151 & load_3(c, 0);
+    let c1  = 2097151 & (load_4(c, 2) >> 5);
+    let c2  = 2097151 & (load_3(c, 5) >> 2);
+    let c3  = 2097151 & (load_4(c, 7) >> 7);
+    let c4  = 2097151 & (load_4(c, 10) >> 4);
+    let c5  = 2097151 & (load_3(c, 13) >> 1);
+    let c6  = 2097151 & (load_4(c, 15) >> 6);
+    let c7  = 2097151 & (load_3(c, 18) >> 3);
+    let c8  = 2097151 & load_3(c, 21);
+    let c9  = 2097151 & (load_4(c, 23) >> 5);
+    let c10 = 2097151 & (load_3(c, 26) >> 2);
+    let c11 = (load_4(c, 28) >> 7);
+
+    let s0;
+    let s1;
+    let s2;
+    let s3;
+    let s4;
+    let s5;
+    let s6;
+    let s7;
+    let s8;
+    let s9;
+    let s10;
+    let s11;
+    let s12;
+    let s13;
+    let s14;
+    let s15;
+    let s16;
+    let s17;
+    let s18;
+    let s19;
+    let s20;
+    let s21;
+    let s22;
+    let s23;
+
+    let carry0;
+    let carry1;
+    let carry2;
+    let carry3;
+    let carry4;
+    let carry5;
+    let carry6;
+    let carry7;
+    let carry8;
+    let carry9;
+    let carry10;
+    let carry11;
+    let carry12;
+    let carry13;
+    let carry14;
+    let carry15;
+    let carry16;
+    let carry17;
+    let carry18;
+    let carry19;
+    let carry20;
+    let carry21;
+    let carry22;
+
+    s0 = c0 + a0 * b0;
+    s1 = c1 + a0 * b1 + a1 * b0;
+    s2 = c2 + a0 * b2 + a1 * b1 + a2 * b0;
+    s3 = c3 + a0 * b3 + a1 * b2 + a2 * b1 + a3 * b0;
+    s4 = c4 + a0 * b4 + a1 * b3 + a2 * b2 + a3 * b1 + a4 * b0;
+    s5 = c5 + a0 * b5 + a1 * b4 + a2 * b3 + a3 * b2 + a4 * b1 + a5 * b0;
+    s6 = c6 + a0 * b6 + a1 * b5 + a2 * b4 + a3 * b3 + a4 * b2 + a5 * b1 +
+        a6 * b0;
+    s7 = c7 + a0 * b7 + a1 * b6 + a2 * b5 + a3 * b4 + a4 * b3 + a5 * b2 +
+        a6 * b1 + a7 * b0;
+    s8 = c8 + a0 * b8 + a1 * b7 + a2 * b6 + a3 * b5 + a4 * b4 + a5 * b3 +
+        a6 * b2 + a7 * b1 + a8 * b0;
+    s9 = c9 + a0 * b9 + a1 * b8 + a2 * b7 + a3 * b6 + a4 * b5 + a5 * b4 +
+        a6 * b3 + a7 * b2 + a8 * b1 + a9 * b0;
+    s10 = c10 + a0 * b10 + a1 * b9 + a2 * b8 + a3 * b7 + a4 * b6 + a5 * b5 +
+        a6 * b4 + a7 * b3 + a8 * b2 + a9 * b1 + a10 * b0;
+    s11 = c11 + a0 * b11 + a1 * b10 + a2 * b9 + a3 * b8 + a4 * b7 + a5 * b6 +
+        a6 * b5 + a7 * b4 + a8 * b3 + a9 * b2 + a10 * b1 + a11 * b0;
+    s12 = a1 * b11 + a2 * b10 + a3 * b9 + a4 * b8 + a5 * b7 + a6 * b6 +
+        a7 * b5 + a8 * b4 + a9 * b3 + a10 * b2 + a11 * b1;
+    s13 = a2 * b11 + a3 * b10 + a4 * b9 + a5 * b8 + a6 * b7 + a7 * b6 +
+        a8 * b5 + a9 * b4 + a10 * b3 + a11 * b2;
+    s14 = a3 * b11 + a4 * b10 + a5 * b9 + a6 * b8 + a7 * b7 + a8 * b6 +
+        a9 * b5 + a10 * b4 + a11 * b3;
+    s15 = a4 * b11 + a5 * b10 + a6 * b9 + a7 * b8 + a8 * b7 + a9 * b6 +
+        a10 * b5 + a11 * b4;
+    s16 =
+        a5 * b11 + a6 * b10 + a7 * b9 + a8 * b8 + a9 * b7 + a10 * b6 + a11 * b5;
+    s17 = a6 * b11 + a7 * b10 + a8 * b9 + a9 * b8 + a10 * b7 + a11 * b6;
+    s18 = a7 * b11 + a8 * b10 + a9 * b9 + a10 * b8 + a11 * b7;
+    s19 = a8 * b11 + a9 * b10 + a10 * b9 + a11 * b8;
+    s20 = a9 * b11 + a10 * b10 + a11 * b9;
+    s21 = a10 * b11 + a11 * b10;
+    s22 = a11 * b11;
+    s23 = 0;
+
+    carry0 = (s0 + (let) (1L << 20)) >> 21;
+    s1 += carry0;
+    s0 -= carry0 * ((ulet) 1L << 21);
+    carry2 = (s2 + (let) (1L << 20)) >> 21;
+    s3 += carry2;
+    s2 -= carry2 * ((ulet) 1L << 21);
+    carry4 = (s4 + (let) (1L << 20)) >> 21;
+    s5 += carry4;
+    s4 -= carry4 * ((ulet) 1L << 21);
+    carry6 = (s6 + (let) (1L << 20)) >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry8 = (s8 + (let) (1L << 20)) >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry10 = (s10 + (let) (1L << 20)) >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+    carry12 = (s12 + (let) (1L << 20)) >> 21;
+    s13 += carry12;
+    s12 -= carry12 * ((ulet) 1L << 21);
+    carry14 = (s14 + (let) (1L << 20)) >> 21;
+    s15 += carry14;
+    s14 -= carry14 * ((ulet) 1L << 21);
+    carry16 = (s16 + (let) (1L << 20)) >> 21;
+    s17 += carry16;
+    s16 -= carry16 * ((ulet) 1L << 21);
+    carry18 = (s18 + (let) (1L << 20)) >> 21;
+    s19 += carry18;
+    s18 -= carry18 * ((ulet) 1L << 21);
+    carry20 = (s20 + (let) (1L << 20)) >> 21;
+    s21 += carry20;
+    s20 -= carry20 * ((ulet) 1L << 21);
+    carry22 = (s22 + (let) (1L << 20)) >> 21;
+    s23 += carry22;
+    s22 -= carry22 * ((ulet) 1L << 21);
+
+    carry1 = (s1 + (let) (1L << 20)) >> 21;
+    s2 += carry1;
+    s1 -= carry1 * ((ulet) 1L << 21);
+    carry3 = (s3 + (let) (1L << 20)) >> 21;
+    s4 += carry3;
+    s3 -= carry3 * ((ulet) 1L << 21);
+    carry5 = (s5 + (let) (1L << 20)) >> 21;
+    s6 += carry5;
+    s5 -= carry5 * ((ulet) 1L << 21);
+    carry7 = (s7 + (let) (1L << 20)) >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry9 = (s9 + (let) (1L << 20)) >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry11 = (s11 + (let) (1L << 20)) >> 21;
+    s12 += carry11;
+    s11 -= carry11 * ((ulet) 1L << 21);
+    carry13 = (s13 + (let) (1L << 20)) >> 21;
+    s14 += carry13;
+    s13 -= carry13 * ((ulet) 1L << 21);
+    carry15 = (s15 + (let) (1L << 20)) >> 21;
+    s16 += carry15;
+    s15 -= carry15 * ((ulet) 1L << 21);
+    carry17 = (s17 + (let) (1L << 20)) >> 21;
+    s18 += carry17;
+    s17 -= carry17 * ((ulet) 1L << 21);
+    carry19 = (s19 + (let) (1L << 20)) >> 21;
+    s20 += carry19;
+    s19 -= carry19 * ((ulet) 1L << 21);
+    carry21 = (s21 + (let) (1L << 20)) >> 21;
+    s22 += carry21;
+    s21 -= carry21 * ((ulet) 1L << 21);
+
+    s11 += s23 * 666643;
+    s12 += s23 * 470296;
+    s13 += s23 * 654183;
+    s14 -= s23 * 997805;
+    s15 += s23 * 136657;
+    s16 -= s23 * 683901;
+
+    s10 += s22 * 666643;
+    s11 += s22 * 470296;
+    s12 += s22 * 654183;
+    s13 -= s22 * 997805;
+    s14 += s22 * 136657;
+    s15 -= s22 * 683901;
+
+    s9 += s21 * 666643;
+    s10 += s21 * 470296;
+    s11 += s21 * 654183;
+    s12 -= s21 * 997805;
+    s13 += s21 * 136657;
+    s14 -= s21 * 683901;
+
+    s8 += s20 * 666643;
+    s9 += s20 * 470296;
+    s10 += s20 * 654183;
+    s11 -= s20 * 997805;
+    s12 += s20 * 136657;
+    s13 -= s20 * 683901;
+
+    s7 += s19 * 666643;
+    s8 += s19 * 470296;
+    s9 += s19 * 654183;
+    s10 -= s19 * 997805;
+    s11 += s19 * 136657;
+    s12 -= s19 * 683901;
+
+    s6 += s18 * 666643;
+    s7 += s18 * 470296;
+    s8 += s18 * 654183;
+    s9 -= s18 * 997805;
+    s10 += s18 * 136657;
+    s11 -= s18 * 683901;
+
+    carry6 = (s6 + (let) (1L << 20)) >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry8 = (s8 + (let) (1L << 20)) >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry10 = (s10 + (let) (1L << 20)) >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+    carry12 = (s12 + (let) (1L << 20)) >> 21;
+    s13 += carry12;
+    s12 -= carry12 * ((ulet) 1L << 21);
+    carry14 = (s14 + (let) (1L << 20)) >> 21;
+    s15 += carry14;
+    s14 -= carry14 * ((ulet) 1L << 21);
+    carry16 = (s16 + (let) (1L << 20)) >> 21;
+    s17 += carry16;
+    s16 -= carry16 * ((ulet) 1L << 21);
+
+    carry7 = (s7 + (let) (1L << 20)) >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry9 = (s9 + (let) (1L << 20)) >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry11 = (s11 + (let) (1L << 20)) >> 21;
+    s12 += carry11;
+    s11 -= carry11 * ((ulet) 1L << 21);
+    carry13 = (s13 + (let) (1L << 20)) >> 21;
+    s14 += carry13;
+    s13 -= carry13 * ((ulet) 1L << 21);
+    carry15 = (s15 + (let) (1L << 20)) >> 21;
+    s16 += carry15;
+    s15 -= carry15 * ((ulet) 1L << 21);
+
+    s5 += s17 * 666643;
+    s6 += s17 * 470296;
+    s7 += s17 * 654183;
+    s8 -= s17 * 997805;
+    s9 += s17 * 136657;
+    s10 -= s17 * 683901;
+
+    s4 += s16 * 666643;
+    s5 += s16 * 470296;
+    s6 += s16 * 654183;
+    s7 -= s16 * 997805;
+    s8 += s16 * 136657;
+    s9 -= s16 * 683901;
+
+    s3 += s15 * 666643;
+    s4 += s15 * 470296;
+    s5 += s15 * 654183;
+    s6 -= s15 * 997805;
+    s7 += s15 * 136657;
+    s8 -= s15 * 683901;
+
+    s2 += s14 * 666643;
+    s3 += s14 * 470296;
+    s4 += s14 * 654183;
+    s5 -= s14 * 997805;
+    s6 += s14 * 136657;
+    s7 -= s14 * 683901;
+
+    s1 += s13 * 666643;
+    s2 += s13 * 470296;
+    s3 += s13 * 654183;
+    s4 -= s13 * 997805;
+    s5 += s13 * 136657;
+    s6 -= s13 * 683901;
+
+    s0 += s12 * 666643;
+    s1 += s12 * 470296;
+    s2 += s12 * 654183;
+    s3 -= s12 * 997805;
+    s4 += s12 * 136657;
+    s5 -= s12 * 683901;
+    s12 = 0;
+
+    carry0 = (s0 + (let) (1L << 20)) >> 21;
+    s1 += carry0;
+    s0 -= carry0 * ((ulet) 1L << 21);
+    carry2 = (s2 + (let) (1L << 20)) >> 21;
+    s3 += carry2;
+    s2 -= carry2 * ((ulet) 1L << 21);
+    carry4 = (s4 + (let) (1L << 20)) >> 21;
+    s5 += carry4;
+    s4 -= carry4 * ((ulet) 1L << 21);
+    carry6 = (s6 + (let) (1L << 20)) >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry8 = (s8 + (let) (1L << 20)) >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry10 = (s10 + (let) (1L << 20)) >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+
+    carry1 = (s1 + (let) (1L << 20)) >> 21;
+    s2 += carry1;
+    s1 -= carry1 * ((ulet) 1L << 21);
+    carry3 = (s3 + (let) (1L << 20)) >> 21;
+    s4 += carry3;
+    s3 -= carry3 * ((ulet) 1L << 21);
+    carry5 = (s5 + (let) (1L << 20)) >> 21;
+    s6 += carry5;
+    s5 -= carry5 * ((ulet) 1L << 21);
+    carry7 = (s7 + (let) (1L << 20)) >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry9 = (s9 + (let) (1L << 20)) >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry11 = (s11 + (let) (1L << 20)) >> 21;
+    s12 += carry11;
+    s11 -= carry11 * ((ulet) 1L << 21);
+
+    s0 += s12 * 666643;
+    s1 += s12 * 470296;
+    s2 += s12 * 654183;
+    s3 -= s12 * 997805;
+    s4 += s12 * 136657;
+    s5 -= s12 * 683901;
+    s12 = 0;
+
+    carry0 = s0 >> 21;
+    s1 += carry0;
+    s0 -= carry0 * ((ulet) 1L << 21);
+    carry1 = s1 >> 21;
+    s2 += carry1;
+    s1 -= carry1 * ((ulet) 1L << 21);
+    carry2 = s2 >> 21;
+    s3 += carry2;
+    s2 -= carry2 * ((ulet) 1L << 21);
+    carry3 = s3 >> 21;
+    s4 += carry3;
+    s3 -= carry3 * ((ulet) 1L << 21);
+    carry4 = s4 >> 21;
+    s5 += carry4;
+    s4 -= carry4 * ((ulet) 1L << 21);
+    carry5 = s5 >> 21;
+    s6 += carry5;
+    s5 -= carry5 * ((ulet) 1L << 21);
+    carry6 = s6 >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry7 = s7 >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry8 = s8 >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry9 = s9 >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry10 = s10 >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+    carry11 = s11 >> 21;
+    s12 += carry11;
+    s11 -= carry11 * ((ulet) 1L << 21);
+
+    s0 += s12 * 666643;
+    s1 += s12 * 470296;
+    s2 += s12 * 654183;
+    s3 -= s12 * 997805;
+    s4 += s12 * 136657;
+    s5 -= s12 * 683901;
+
+    carry0 = s0 >> 21;
+    s1 += carry0;
+    s0 -= carry0 * ((ulet) 1L << 21);
+    carry1 = s1 >> 21;
+    s2 += carry1;
+    s1 -= carry1 * ((ulet) 1L << 21);
+    carry2 = s2 >> 21;
+    s3 += carry2;
+    s2 -= carry2 * ((ulet) 1L << 21);
+    carry3 = s3 >> 21;
+    s4 += carry3;
+    s3 -= carry3 * ((ulet) 1L << 21);
+    carry4 = s4 >> 21;
+    s5 += carry4;
+    s4 -= carry4 * ((ulet) 1L << 21);
+    carry5 = s5 >> 21;
+    s6 += carry5;
+    s5 -= carry5 * ((ulet) 1L << 21);
+    carry6 = s6 >> 21;
+    s7 += carry6;
+    s6 -= carry6 * ((ulet) 1L << 21);
+    carry7 = s7 >> 21;
+    s8 += carry7;
+    s7 -= carry7 * ((ulet) 1L << 21);
+    carry8 = s8 >> 21;
+    s9 += carry8;
+    s8 -= carry8 * ((ulet) 1L << 21);
+    carry9 = s9 >> 21;
+    s10 += carry9;
+    s9 -= carry9 * ((ulet) 1L << 21);
+    carry10 = s10 >> 21;
+    s11 += carry10;
+    s10 -= carry10 * ((ulet) 1L << 21);
+
+    s[0]  = s0 >> 0;
+    s[1]  = s0 >> 8;
+    s[2]  = (s0 >> 16) | (s1 * ((ulet) 1 << 5));
+    s[3]  = s1 >> 3;
+    s[4]  = s1 >> 11;
+    s[5]  = (s1 >> 19) | (s2 * ((ulet) 1 << 2));
+    s[6]  = s2 >> 6;
+    s[7]  = (s2 >> 14) | (s3 * ((ulet) 1 << 7));
+    s[8]  = s3 >> 1;
+    s[9]  = s3 >> 9;
+    s[10] = (s3 >> 17) | (s4 * ((ulet) 1 << 4));
+    s[11] = s4 >> 4;
+    s[12] = s4 >> 12;
+    s[13] = (s4 >> 20) | (s5 * ((ulet) 1 << 1));
+    s[14] = s5 >> 7;
+    s[15] = (s5 >> 15) | (s6 * ((ulet) 1 << 6));
+    s[16] = s6 >> 2;
+    s[17] = s6 >> 10;
+    s[18] = (s6 >> 18) | (s7 * ((ulet) 1 << 3));
+    s[19] = s7 >> 5;
+    s[20] = s7 >> 13;
+    s[21] = s8 >> 0;
+    s[22] = s8 >> 8;
+    s[23] = (s8 >> 16) | (s9 * ((ulet) 1 << 5));
+    s[24] = s9 >> 3;
+    s[25] = s9 >> 11;
+    s[26] = (s9 >> 19) | (s10 * ((ulet) 1 << 2));
+    s[27] = s10 >> 6;
+    s[28] = (s10 >> 14) | (s11 * ((ulet) 1 << 7));
+    s[29] = s11 >> 1;
+    s[30] = s11 >> 9;
+    s[31] = s11 >> 17;
+}
+
+/*
+ Input:
+ a[0]+256*a[1]+...+256^31*a[31] = a
+ *
+ Output:
+ s[0]+256*s[1]+...+256^31*s[31] = a^2 mod l
+ where l = 2^252 + 27742317777372353535851937790883648493.
+ */
+export function sc25519_sq (s: Uint8Array, a: Uint8Array, )
+{
+    sc25519_mul(s, a, a);
+}
+
+/*
+ Input:
+ s[0]+256*a[1]+...+256^31*a[31] = a
+ n
+ *
+ Output:
+ s[0]+256*s[1]+...+256^31*s[31] = x * s^(s^n) mod l
+ where l = 2^252 + 27742317777372353535851937790883648493.
+ Overwrites s in place.
+ */
+export function sc25519_sqmul (s: Uint8Array, n: number, a: Uint8Array)
+{
+    let i: number;
+
+    for (i = 0; i < n; i++) {
+        sc25519_sq(s, s);
+    }
+    sc25519_mul(s, s, a);
+}
+
+export function sc25519_invert (recip: Uint8Array, s: Uint8Array)
+{
+    let _10 = new Uint8Array(32);
+    let _100 = new Uint8Array(32);
+    let _1000 = new Uint8Array(32);
+    let _10000 = new Uint8Array(32);
+    let _100000 = new Uint8Array(32);
+    let _1000000 = new Uint8Array(32);
+    let _10010011 = new Uint8Array(32);
+    let _10010111 = new Uint8Array(32);
+    let _100110 = new Uint8Array(32);
+    let _1010 = new Uint8Array(32);
+    let _1010000 = new Uint8Array(32);
+    let _1010011 = new Uint8Array(32);
+    let _1011 = new Uint8Array(32);
+    let _10110 = new Uint8Array(32);
+    let _10111101 = new Uint8Array(32);
+    let _11 = new Uint8Array(32);
+    let _1100011 = new Uint8Array(32);
+    let _1100111 = new Uint8Array(32);
+    let _11010011 = new Uint8Array(32);
+    let _1101011 = new Uint8Array(32);
+    let _11100111 = new Uint8Array(32);
+    let _11101011 = new Uint8Array(32);
+    let _11110101 = new Uint8Array(32);
+
+    sc25519_sq(_10, s);
+    sc25519_mul(_11, s, _10);
+    sc25519_mul(_100, s, _11);
+    sc25519_sq(_1000, _100);
+    sc25519_mul(_1010, _10, _1000);
+    sc25519_mul(_1011, s, _1010);
+    sc25519_sq(_10000, _1000);
+    sc25519_sq(_10110, _1011);
+    sc25519_mul(_100000, _1010, _10110);
+    sc25519_mul(_100110, _10000, _10110);
+    sc25519_sq(_1000000, _100000);
+    sc25519_mul(_1010000, _10000, _1000000);
+    sc25519_mul(_1010011, _11, _1010000);
+    sc25519_mul(_1100011, _10000, _1010011);
+    sc25519_mul(_1100111, _100, _1100011);
+    sc25519_mul(_1101011, _100, _1100111);
+    sc25519_mul(_10010011, _1000000, _1010011);
+    sc25519_mul(_10010111, _100, _10010011);
+    sc25519_mul(_10111101, _100110, _10010111);
+    sc25519_mul(_11010011, _10110, _10111101);
+    sc25519_mul(_11100111, _1010000, _10010111);
+    sc25519_mul(_11101011, _100, _11100111);
+    sc25519_mul(_11110101, _1010, _11101011);
+
+    sc25519_mul(recip, _1011, _11110101);
+    sc25519_sqmul(recip, 126, _1010011);
+    sc25519_sqmul(recip, 9, _10);
+    sc25519_mul(recip, recip, _11110101);
+    sc25519_sqmul(recip, 7, _1100111);
+    sc25519_sqmul(recip, 9, _11110101);
+    sc25519_sqmul(recip, 11, _10111101);
+    sc25519_sqmul(recip, 8, _11100111);
+    sc25519_sqmul(recip, 9, _1101011);
+    sc25519_sqmul(recip, 6, _1011);
+    sc25519_sqmul(recip, 14, _10010011);
+    sc25519_sqmul(recip, 10, _1100011);
+    sc25519_sqmul(recip, 9, _10010111);
+    sc25519_sqmul(recip, 10, _11110101);
+    sc25519_sqmul(recip, 8, _11010011);
+    sc25519_sqmul(recip, 8, _11101011);
+}
+
+/*
+ Input:
+ s[0]+256*s[1]+...+256^63*s[63] = s
+ *
+ Output:
+ s[0]+256*s[1]+...+256^31*s[31] = s mod l
+ where l = 2^252 + 27742317777372353535851937790883648493.
+ Overwrites s in place.
+ */
 export function sc25519_reduce (s: Uint8Array)
 {
     if (s.length != ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES)
@@ -1762,30 +2812,30 @@ export function sc25519_reduce (s: Uint8Array)
         Carry.push(JSBI.BigInt(0))
 
     let N2097151 = JSBI.BigInt(2097151)
-    S[0]  = JSBI.bitwiseAnd(N2097151, ED25519Utils.load_3(s, 0));
-    S[1]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 2), JSBI.BigInt(5)));
-    S[2]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_3(s, 5), JSBI.BigInt(2)));
-    S[3]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 7), JSBI.BigInt(7)));
-    S[4]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 10), JSBI.BigInt(4)));
-    S[5]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_3(s, 13), JSBI.BigInt(1)));
-    S[6]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 15), JSBI.BigInt(6)));
-    S[7]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_3(s, 18), JSBI.BigInt(3)));
-    S[8]  = JSBI.bitwiseAnd(N2097151, ED25519Utils.load_3(s, 21));
-    S[9]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 23), JSBI.BigInt(5)));
-    S[10] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_3(s, 26), JSBI.BigInt(2)));
-    S[11] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 28), JSBI.BigInt(7)));
-    S[12] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 31), JSBI.BigInt(4)));
-    S[13] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_3(s, 34), JSBI.BigInt(1)));
-    S[14] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 36), JSBI.BigInt(6)));
-    S[15] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_3(s, 39), JSBI.BigInt(3)));
-    S[16] = JSBI.bitwiseAnd(N2097151, ED25519Utils.load_3(s, 42));
-    S[17] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 44), JSBI.BigInt(5)));
-    S[18] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_3(s, 47), JSBI.BigInt(2)));
-    S[19] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 49), JSBI.BigInt(7)));
-    S[20] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 52), JSBI.BigInt(4)));
-    S[21] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_3(s, 55), JSBI.BigInt(1)));
-    S[22] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(ED25519Utils.load_4(s, 57), JSBI.BigInt(6)));
-    S[23] = JSBI.signedRightShift(ED25519Utils.load_4(s, 60), JSBI.BigInt(3));
+    S[0]  = JSBI.bitwiseAnd(N2097151, load_3(s, 0));
+    S[1]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 2), JSBI.BigInt(5)));
+    S[2]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(s, 5), JSBI.BigInt(2)));
+    S[3]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 7), JSBI.BigInt(7)));
+    S[4]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 10), JSBI.BigInt(4)));
+    S[5]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(s, 13), JSBI.BigInt(1)));
+    S[6]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 15), JSBI.BigInt(6)));
+    S[7]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(s, 18), JSBI.BigInt(3)));
+    S[8]  = JSBI.bitwiseAnd(N2097151, load_3(s, 21));
+    S[9]  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 23), JSBI.BigInt(5)));
+    S[10] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(s, 26), JSBI.BigInt(2)));
+    S[11] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 28), JSBI.BigInt(7)));
+    S[12] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 31), JSBI.BigInt(4)));
+    S[13] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(s, 34), JSBI.BigInt(1)));
+    S[14] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 36), JSBI.BigInt(6)));
+    S[15] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(s, 39), JSBI.BigInt(3)));
+    S[16] = JSBI.bitwiseAnd(N2097151, load_3(s, 42));
+    S[17] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 44), JSBI.BigInt(5)));
+    S[18] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(s, 47), JSBI.BigInt(2)));
+    S[19] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 49), JSBI.BigInt(7)));
+    S[20] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 52), JSBI.BigInt(4)));
+    S[21] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(s, 55), JSBI.BigInt(1)));
+    S[22] = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(s, 57), JSBI.BigInt(6)));
+    S[23] = JSBI.signedRightShift(load_4(s, 60), JSBI.BigInt(3));
 
     let f1 = (i: number, j: number) =>
     {
@@ -1915,4 +2965,25 @@ export function sc25519_reduce (s: Uint8Array)
     s[29] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(1)));
     s[30] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(9)));
     s[31] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(17)));
+}
+
+export function sc25519_is_canonical (s: Uint8Array): number
+{
+    /* 2^252+27742317777372353535851937790883648493 */
+    let L = [
+        0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7,
+        0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10
+    ];
+    let c = 0;
+    let n = 1;
+    let i = 32;
+
+    do {
+        i--;
+        c = (c | ((s[i] - L[i]) >> 8) & n) & 0xff;
+        n = (n & ((s[i] ^ L[i]) - 1) >> 8) & 0xff;
+    } while (i != 0);
+
+    return (c != 0) ? 1 : 0;
 }
