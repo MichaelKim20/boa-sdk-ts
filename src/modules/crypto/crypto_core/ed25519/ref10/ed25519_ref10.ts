@@ -1944,7 +1944,6 @@ export function sc25519_mul (s: Uint8Array, a: Uint8Array, b: Uint8Array)
     func2(10);
     func2(11);
 
-
     func23(0, S[12]);
 
     func2(0);
@@ -1961,33 +1960,33 @@ export function sc25519_mul (s: Uint8Array, a: Uint8Array, b: Uint8Array)
 
     s[0]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[0], JSBI.BigInt(0)));
     s[1]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[0], JSBI.BigInt(8)));
-    s[2]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[0], JSBI.BigInt(16)), JSBI.multiply(S[1], JSBI.BigInt(1 << 5)));
+    s[2]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[0], JSBI.BigInt(16)), JSBI.multiply(S[1], JSBI.BigInt(1 << 5))));
     s[3]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[1], JSBI.BigInt(3)));
     s[4]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[1], JSBI.BigInt(11)));
-    s[5]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[1], JSBI.BigInt(19)), JSBI.multiply(S[2], JSBI.BigInt(1 << 2)));
+    s[5]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[1], JSBI.BigInt(19)), JSBI.multiply(S[2], JSBI.BigInt(1 << 2))));
     s[6]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[2], JSBI.BigInt(6)));
-    s[7]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[2], JSBI.BigInt(14)), JSBI.multiply(S[3], JSBI.BigInt(1 << 7)));
+    s[7]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[2], JSBI.BigInt(14)), JSBI.multiply(S[3], JSBI.BigInt(1 << 7))));
     s[8]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[3], JSBI.BigInt(1)));
     s[9]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[3], JSBI.BigInt(9)));
-    s[10] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[3], JSBI.BigInt(17)), JSBI.multiply(S[4], JSBI.BigInt(1 << 4)));
+    s[10] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[3], JSBI.BigInt(17)), JSBI.multiply(S[4], JSBI.BigInt(1 << 4))));
     s[11] = JSBIUtils.toInt8(JSBI.signedRightShift(S[4], JSBI.BigInt(4)));
     s[12] = JSBIUtils.toInt8(JSBI.signedRightShift(S[4], JSBI.BigInt(12)));
-    s[13] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[4], JSBI.BigInt(20)), JSBI.multiply(S[5], JSBI.BigInt(1 << 1)));
+    s[13] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[4], JSBI.BigInt(20)), JSBI.multiply(S[5], JSBI.BigInt(1 << 1))));
     s[14] = JSBIUtils.toInt8(JSBI.signedRightShift(S[5], JSBI.BigInt(7)));
-    s[15] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[5], JSBI.BigInt(15)), JSBI.multiply(S[6], JSBI.BigInt(1 << 6)));
+    s[15] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[5], JSBI.BigInt(15)), JSBI.multiply(S[6], JSBI.BigInt(1 << 6))));
     s[16] = JSBIUtils.toInt8(JSBI.signedRightShift(S[6], JSBI.BigInt(2)));
     s[17] = JSBIUtils.toInt8(JSBI.signedRightShift(S[6], JSBI.BigInt(10)));
-    s[18] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[6], JSBI.BigInt(18)), JSBI.multiply(S[7], JSBI.BigInt(1 << 3)));
+    s[18] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[6], JSBI.BigInt(18)), JSBI.multiply(S[7], JSBI.BigInt(1 << 3))));
     s[19] = JSBIUtils.toInt8(JSBI.signedRightShift(S[7], JSBI.BigInt(5)));
     s[20] = JSBIUtils.toInt8(JSBI.signedRightShift(S[7], JSBI.BigInt(13)));
     s[21] = JSBIUtils.toInt8(JSBI.signedRightShift(S[8], JSBI.BigInt(0)));
     s[22] = JSBIUtils.toInt8(JSBI.signedRightShift(S[8], JSBI.BigInt(8)));
-    s[23] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[8], JSBI.BigInt(16)), JSBI.multiply(S[9], JSBI.BigInt(1 << 5)));
+    s[23] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[8], JSBI.BigInt(16)), JSBI.multiply(S[9], JSBI.BigInt(1 << 5))));
     s[24] = JSBIUtils.toInt8(JSBI.signedRightShift(S[9], JSBI.BigInt(3)));
     s[25] = JSBIUtils.toInt8(JSBI.signedRightShift(S[9], JSBI.BigInt(11)));
-    s[26] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[9], JSBI.BigInt(19)), JSBI.multiply(S[10], JSBI.BigInt(1 << 2)));
+    s[26] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[9], JSBI.BigInt(19)), JSBI.multiply(S[10], JSBI.BigInt(1 << 2))));
     s[27] = JSBIUtils.toInt8(JSBI.signedRightShift(S[10], JSBI.BigInt(6)));
-    s[28] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[10], JSBI.BigInt(14)), JSBI.multiply(S[11], JSBI.BigInt(1 << 7)));
+    s[28] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[10], JSBI.BigInt(14)), JSBI.multiply(S[11], JSBI.BigInt(1 << 7))));
     s[29] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(1)));
     s[30] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(9)));
     s[31] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(17)));
@@ -2762,11 +2761,11 @@ export function sc25519_reduce (s: Uint8Array)
 export function sc25519_is_canonical (s: Uint8Array): number
 {
     /* 2^252+27742317777372353535851937790883648493 */
-    let L = [
+    let L = Uint8Array.from([
         0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7,
         0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10
-    ];
+    ]);
     let c = 0;
     let n = 1;
     let i = 32;
