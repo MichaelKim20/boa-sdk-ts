@@ -17,59 +17,58 @@ import * as assert from 'assert';
 
 describe ('Crypto', () =>
 {
-    let seeds: Array<string> =
-        [
-            "SCSRW54L4EXJYTQIQYCJD4YLBMDALRBMHSSSZR4VW5PSBZZ2YII2RRQN",
-            "SCU5ULJPL72SCEWSF7W4UBG2ZKP3NAZF4XBLTICACPJMFMIRZOKAICPM",
-            "SBQSOIZ6CUOZI5RUKAGBQJ32LI3WWXYO2GLYIXLWWZGX5Y3TW45NBRKO",
-            "SAK5CDK243IOTSESCOYVQITMCFQHMKVU75OFVJ5MIRR7Z2FNHTN5MV2P",
-            "SB3XDHT7PMSUYEL34FXF4X3BTKMSNPUKKVYADEYF36LKMGIJBLBQRSH3",
-            "SC76SLQCYGM6ULQH3RFTIEOM6MAMHEWLMFJ4EYRMO672ZRFFWIRHP2MJ",
-            "SA7DBIL3APKZ3SUPILROUICS5OD54IFYQXQQ6UHA3L7E5FPIXXSKK4BQ",
-            "SBTAQ3LWMSL6PQJFZGJQOCSS5HL7ZDJW6DJRL7NYJONVBNFRBXYXQJ4C",
-            "SC4GSAMNE542MK4S4JCYWR6IUZ3W7QSOZLWIZZ52RST4DWN2OIZWZFZU",
-            "SAXSVOLPN2GTNPS7LAFJIXEPW74VX4ZGQY3STOWKX4BOSZ3IZY6VLMSQ",
-            "SCSFBLXNP5SKL3JT2TFPGXQ7TQQWQKTY5EPPBL37CS4YXHVS2FXFM6GN",
-            "SDYSEVNAPWT4NBY6JXMIHQDIAPRU6YYQ4EFPMSQGMHZERF5YIKJPYDI2",
-            "SCORINRDXFB5KLD5CB3C5JRQZUMNJFRIV4ZVGGTX453DIEQW27I2BPDD",
-            "SASEN4HJRP7JJ7IAL32IA5THQN4BUHRUIR7TXW2BXKHIILF4ZQBGIZSL",
-            "SDDZBZC42NY5OCWDJRNTLLDEKM37KOS4TNTU3LNJUTX55H4E7L5HWVUD",
-            "SDVK3TKVJLE324I5JYKZK62YU6ADXKCLKDKTHRJIED5FL32WMAFDPDXZ",
-            "SBMBCVEURXBM4N7JJP4BSL6LC6PRX3AT647YMMCZRLUMUW52M3M2H4ZU",
-            "SAYWI3GEWZCLSO6G4RRK3ND3NNV4LUS6VB7QNR4ECL5LW2XPPS27XIDA",
-            "SD2URECCMTKTM46NV5TTM27RUPWH7XKMMDEQCKOBOHILVWEKA3Y3E2ZE",
-            "SDIRSDJSAK3JTDJY7UGEFWLDGEXTDFRUVCVWYVHL2LIFMULF4AOD7VZA",
-            "SAIZFGFSPJFCQFSHPM5ZBRJBDKMZ72YMU2EODYD6NPQ54P57W6BL6E2V",
-            "SALSWH2XGRTUJUCR3TKSWTJNVFCSZMRR3CWSLL3H3PNDPNFQFL3AUVJV",
-            "SB5D7OCURKL7VZKPXE7EOZ2ZWABPN6XC56NOSOBM343EM6PTAALV5O75",
-            "SB5QZLA7WXBXMZFZMVXWD66UK5KRSHVA7XKJOEVV5SNGC2VK37KOFKQO",
-            "SB4IN5LEK4UJGA75TGZ7TTBLH2BXGWV5FJGKIURIJO3NQ2MPNCTBPHGB",
-            "SDA5KWHUAJNAWM6ECJQF3OWRQCRYISG2F7AHUQB4YFMNRJG7V5MDSE3J",
-            "SDFVLJUY2Q5XL7R677G56YI5S5RYBHRMEX6HWDMHPWZ4FDKXRL44X4IC",
-            "SDH3LLR2DPXUBU5XGKAPA6QZZVRQGO73DEPT4P4OUFQLFQKONF6FAVKL",
-            "SAYPDMBC66MKXM6LOZVYLR24SOOZ5EAW46K4G6YEJWUD3VYAXXYXQVX4",
-            "SCFFWEHX5GJPK5TJ4LOTSWZZDDPKO32ZLVEANOYJ5RWGLI3MVOOCP765",
-            "SALGUF6ZHLGQHACGWUCX5STWXNVORRTZHSTGRUG4GX3KPBVNWMTVK4RM",
-            "SAO4Q2CAXTDPSWLX33RCSFSNG5GQHZWKR23T2TPACLLRSSPITGUFNRXR",
-            "SCRPASKIEKQYS2TLZHONXKHJLPDSTC662XYDEZIYQQ42QJKZPKSMMTAF",
-            "SAUEER5H4YDNDW77BZUJXECFQVL7FDOHOOX6Y54C2DF7NLDX7BO2HFSW",
-            "SA3S5U4VDISFQTJ7FSJEFOT6KBOZDJBVAIZYKXKPP77W6VZYADAJRVIE",
-            "SCD6CDNBHGLKC766NFFODFAJMPRRDYZKLYCGWVVVPT6RRWJH5O4SLLL2",
-            "SCIW7HYAS7VK46LR5TT3PA7QJL7DYOFI5VRRKOLY2NG3QKL3POA4SBLG",
-            "SDYG6UD7EVANXLV6DAEBPL5IKTIV2UANVDSU6ITRMDZ67EPX2FZGH5VW",
-            "SADWQZ7AFIBGSCPHIU5OQK2YWFJHU4SX34WTQRRSFGFCFYLFEZI472Z6",
-            "SDLA2SMEEQKJRDQ7JNU2L636XDQ3YOEBY6T62NHBJAJUEYTDTPOI3IS2",
-            "SBKM2AHZ2542UUEPZSXPTWRAUCCE5232Z7HSIW5WLNNDFX2JBGDLGSHV",
-            "SCZV4EEURNKALPLVQZINL7PUTT64OF6SSZV3XA5JMNHXYOZSCIDUEIIH",
-            "SACNJOUC7OO57UG6FKXMCZJ5YS2ULC7PXADRWKLUPBGFQQATFMMMCBAM",
-            "SCUG5QDJH2VAPVFYD7FW76V55QKRY7WCRIG4ADFP4K3QE5XOVVZI7KBP",
-            "SCH7QJQYVNZPJVYSQPWRXZFIFZJDRH7NK7JJSLZQPRT6TW3OS6OUUJON",
-            "SAAQUSIXL6PUN5ZYTEOVK2RBCEJAFMPEWQLW4LHKQWABSZUN65JRDWEY",
-            "SCSTYMHTW7J34VVZPWGB4LXC6EWHXAG7MP6OR3TR2XOX63SRGOPRXCJL",
-            "SBHNXEAFFX2CVQ6Z2YB4VG57C7LCTMQDF3AKDTGJX6QVH5YQIAAI5QNH",
-            "SA3PNXGV4KYDIAWHHPFFPBG6FJ5LQH3GO7MPY7K2B56DPFUL46BF57BH",
-            "SD6OV7WPHX5OLQ5XA2N7HLAGN7VUVNV72IIIUHENSCP6IYPKDYMNKMAX",
-        ];
+    let seeds: Array<string> = [
+        "SCSRW54L4EXJYTQIQYCJD4YLBMDALRBMHSSSZR4VW5PSBZZ2YII2RRQN",
+        "SCU5ULJPL72SCEWSF7W4UBG2ZKP3NAZF4XBLTICACPJMFMIRZOKAICPM",
+        "SBQSOIZ6CUOZI5RUKAGBQJ32LI3WWXYO2GLYIXLWWZGX5Y3TW45NBRKO",
+        "SAK5CDK243IOTSESCOYVQITMCFQHMKVU75OFVJ5MIRR7Z2FNHTN5MV2P",
+        "SB3XDHT7PMSUYEL34FXF4X3BTKMSNPUKKVYADEYF36LKMGIJBLBQRSH3",
+        "SC76SLQCYGM6ULQH3RFTIEOM6MAMHEWLMFJ4EYRMO672ZRFFWIRHP2MJ",
+        "SA7DBIL3APKZ3SUPILROUICS5OD54IFYQXQQ6UHA3L7E5FPIXXSKK4BQ",
+        "SBTAQ3LWMSL6PQJFZGJQOCSS5HL7ZDJW6DJRL7NYJONVBNFRBXYXQJ4C",
+        "SC4GSAMNE542MK4S4JCYWR6IUZ3W7QSOZLWIZZ52RST4DWN2OIZWZFZU",
+        "SAXSVOLPN2GTNPS7LAFJIXEPW74VX4ZGQY3STOWKX4BOSZ3IZY6VLMSQ",
+        "SCSFBLXNP5SKL3JT2TFPGXQ7TQQWQKTY5EPPBL37CS4YXHVS2FXFM6GN",
+        "SDYSEVNAPWT4NBY6JXMIHQDIAPRU6YYQ4EFPMSQGMHZERF5YIKJPYDI2",
+        "SCORINRDXFB5KLD5CB3C5JRQZUMNJFRIV4ZVGGTX453DIEQW27I2BPDD",
+        "SASEN4HJRP7JJ7IAL32IA5THQN4BUHRUIR7TXW2BXKHIILF4ZQBGIZSL",
+        "SDDZBZC42NY5OCWDJRNTLLDEKM37KOS4TNTU3LNJUTX55H4E7L5HWVUD",
+        "SDVK3TKVJLE324I5JYKZK62YU6ADXKCLKDKTHRJIED5FL32WMAFDPDXZ",
+        "SBMBCVEURXBM4N7JJP4BSL6LC6PRX3AT647YMMCZRLUMUW52M3M2H4ZU",
+        "SAYWI3GEWZCLSO6G4RRK3ND3NNV4LUS6VB7QNR4ECL5LW2XPPS27XIDA",
+        "SD2URECCMTKTM46NV5TTM27RUPWH7XKMMDEQCKOBOHILVWEKA3Y3E2ZE",
+        "SDIRSDJSAK3JTDJY7UGEFWLDGEXTDFRUVCVWYVHL2LIFMULF4AOD7VZA",
+        "SAIZFGFSPJFCQFSHPM5ZBRJBDKMZ72YMU2EODYD6NPQ54P57W6BL6E2V",
+        "SALSWH2XGRTUJUCR3TKSWTJNVFCSZMRR3CWSLL3H3PNDPNFQFL3AUVJV",
+        "SB5D7OCURKL7VZKPXE7EOZ2ZWABPN6XC56NOSOBM343EM6PTAALV5O75",
+        "SB5QZLA7WXBXMZFZMVXWD66UK5KRSHVA7XKJOEVV5SNGC2VK37KOFKQO",
+        "SB4IN5LEK4UJGA75TGZ7TTBLH2BXGWV5FJGKIURIJO3NQ2MPNCTBPHGB",
+        "SDA5KWHUAJNAWM6ECJQF3OWRQCRYISG2F7AHUQB4YFMNRJG7V5MDSE3J",
+        "SDFVLJUY2Q5XL7R677G56YI5S5RYBHRMEX6HWDMHPWZ4FDKXRL44X4IC",
+        "SDH3LLR2DPXUBU5XGKAPA6QZZVRQGO73DEPT4P4OUFQLFQKONF6FAVKL",
+        "SAYPDMBC66MKXM6LOZVYLR24SOOZ5EAW46K4G6YEJWUD3VYAXXYXQVX4",
+        "SCFFWEHX5GJPK5TJ4LOTSWZZDDPKO32ZLVEANOYJ5RWGLI3MVOOCP765",
+        "SALGUF6ZHLGQHACGWUCX5STWXNVORRTZHSTGRUG4GX3KPBVNWMTVK4RM",
+        "SAO4Q2CAXTDPSWLX33RCSFSNG5GQHZWKR23T2TPACLLRSSPITGUFNRXR",
+        "SCRPASKIEKQYS2TLZHONXKHJLPDSTC662XYDEZIYQQ42QJKZPKSMMTAF",
+        "SAUEER5H4YDNDW77BZUJXECFQVL7FDOHOOX6Y54C2DF7NLDX7BO2HFSW",
+        "SA3S5U4VDISFQTJ7FSJEFOT6KBOZDJBVAIZYKXKPP77W6VZYADAJRVIE",
+        "SCD6CDNBHGLKC766NFFODFAJMPRRDYZKLYCGWVVVPT6RRWJH5O4SLLL2",
+        "SCIW7HYAS7VK46LR5TT3PA7QJL7DYOFI5VRRKOLY2NG3QKL3POA4SBLG",
+        "SDYG6UD7EVANXLV6DAEBPL5IKTIV2UANVDSU6ITRMDZ67EPX2FZGH5VW",
+        "SADWQZ7AFIBGSCPHIU5OQK2YWFJHU4SX34WTQRRSFGFCFYLFEZI472Z6",
+        "SDLA2SMEEQKJRDQ7JNU2L636XDQ3YOEBY6T62NHBJAJUEYTDTPOI3IS2",
+        "SBKM2AHZ2542UUEPZSXPTWRAUCCE5232Z7HSIW5WLNNDFX2JBGDLGSHV",
+        "SCZV4EEURNKALPLVQZINL7PUTT64OF6SSZV3XA5JMNHXYOZSCIDUEIIH",
+        "SACNJOUC7OO57UG6FKXMCZJ5YS2ULC7PXADRWKLUPBGFQQATFMMMCBAM",
+        "SCUG5QDJH2VAPVFYD7FW76V55QKRY7WCRIG4ADFP4K3QE5XOVVZI7KBP",
+        "SCH7QJQYVNZPJVYSQPWRXZFIFZJDRH7NK7JJSLZQPRT6TW3OS6OUUJON",
+        "SAAQUSIXL6PUN5ZYTEOVK2RBCEJAFMPEWQLW4LHKQWABSZUN65JRDWEY",
+        "SCSTYMHTW7J34VVZPWGB4LXC6EWHXAG7MP6OR3TR2XOX63SRGOPRXCJL",
+        "SBHNXEAFFX2CVQ6Z2YB4VG57C7LCTMQDF3AKDTGJX6QVH5YQIAAI5QNH",
+        "SA3PNXGV4KYDIAWHHPFFPBG6FJ5LQH3GO7MPY7K2B56DPFUL46BF57BH",
+        "SD6OV7WPHX5OLQ5XA2N7HLAGN7VUVNV72IIIUHENSCP6IYPKDYMNKMAX",
+    ];
 
     let sample_for_crypto_core_ed25519_scalar_reduce = [
         {
@@ -274,8 +273,7 @@ describe ('Crypto', () =>
         },
     ];
 
-    let sample_crypto_sign_ed25519_sk_to_curve25519 =
-    [
+    let sample_crypto_sign_ed25519_sk_to_curve25519 = [
         {
             privateKey: 'a51b778be12e9c4e08860491f30b0b0605c42c3ca52cc795b75f20e73ac211a8c1ad7626170ce154129019174ac9919aecdf4833ef93774490e4a85b556fa892',
             result: 'f8a09eec8aef3baf744486bf8eac04c0261fdda44b5791b94cebb3c09ec8766f'
@@ -681,6 +679,309 @@ describe ('Crypto', () =>
         }
     ];
 
+    let sample_point_add_sub = [
+        {
+            p: '00611a85e5a2e76b9218d9c39e4a76428aa6b76a534ede3c383d2b76b96ffb90',
+            q: '2dfc24c6e9cd1ca32e985aef9d22ec0d210c50f66c7125523f8425d5a66e78fd',
+            add: 'c94541b929868d2482275797a775ed234bb6b663e68ef12668fa99483d671e41',
+            sub: '7d5a80f588b930b626a48af04a8744d1546796be1073c858e0ab3477e8877bb9'
+        },
+        {
+            p: '49d79aa40b22539ac0f61509fbb9c40ecbf00b9a4474cc283805b84ebaf46808',
+            q: '4278974dd3d90d841dd1e5fa7305d3272a8e85292aecadc6bbfbdab69821fc5f',
+            add: 'b15658b53e6047a8c6fd1333cc0449b5be816727d7efa7c2e4ccc518df22f6fd',
+            sub: '80a9050e8947b93d2e3761f527a6bd861a6ef302ec65899534f920904ea68001'
+        },
+        {
+            p: '2b79ff0e5c91582a7bcc68b93bc9ba0613fc45f41b55da0dba41ece712c85401',
+            q: '831d5890595a93ecc6dc4647715bed7dbd478cd0e0cbe9b87b676b01c4f046aa',
+            add: '94aaa3ac0023cb0056d3b236645130e345bc3992f440059c5bcd0bc587c3a88f',
+            sub: '6b234302b9f05ebe637c3a759dbcbbef468013fe786dfaab01316e35b2f30d1b'
+        },
+        {
+            p: '5796b24e837b5b5b13c6af8c8e03b0f43ac00811eb7ea28f74dd83953a5b44b3',
+            q: '13d218644ddc6af27b38cdd505d56687792c773fe987722cd6504231465b51a4',
+            add: 'd6cdc85e762a93890dece58e65badca1859437ce52365096ffe3005a37703665',
+            sub: '58f65949252db0833b0af8e5686327bacbc449da655b5a312c365c1cf51fd699'
+        },
+        {
+            p: '0da1b0165bbb05b542edd79ba34369225452b7d9c1447c27651dc5860b7bfa03',
+            q: '7427ba3a806c0ab8ce68e7769e1e84e20d3617a931c72d297e226a91e8e37fca',
+            add: 'e7cf519ea6969d3e64dd3b0535d6a84919f21820352e88ada1ecc8ac1954cd55',
+            sub: '4dabad94a65fc6bfbfbadfc3ec30d0e2621a8db714d3e3e8f4bf8f841a0b3ed1'
+        },
+        {
+            p: '37b3d98a4bef04c3d5dcba78fe36653e8e771f3be135d7aa4fffc41e67cec4f5',
+            q: 'ec1cd66c11401ce1b6edb4d24c5fa379340aec490f39f9ed9d2ce9f47744b2ad',
+            add: '2932b502a5c9247f2907945d5c64728ad81d5e15a7bda1978b8bc30a2afbc713',
+            sub: 'fcf4da240b091b2d8f5e8b323e63cacecb40d71dfda1c65e22551f0a78b0ca9d'
+        },
+        {
+            p: 'fab612d02e965deaa6615a0142d89dbab72e22481bf428034f20de3a9c72afb0',
+            q: '2e6ac0e07c1f7dc84e8a15110366d110a6855c14590f00fb0e28f54eadfa6151',
+            add: '1a7a26180c3fa22b9d875729791490799c9b0f4c4ede5050e0e97b1c97336144',
+            sub: '0a3d0b522afe0fbb6649f516375c59d038b7841ec294ab86eb96002bfb5c161d'
+        },
+        {
+            p: 'f0a3dcdb44bea23189d5a8b33150a6164db1c8175ff09d4242568c449c36b43d',
+            q: 'abcceea853f7ec419128a40faf4ca2af0a23aaae7c961d327da89e81466b6b9b',
+            add: '140e6baead21f0be13b012bebab2ab81f8310c28bb301f6d07d05cf85387dc35',
+            sub: 'd05551b4d53fa77a4c30f89a0adff3354b2745933933a699892c36988b0206ec'
+        },
+        {
+            p: 'e824bd2e58746bafa30db08b7a517786f547b73f3de172ed355fc0c3d17dacd6',
+            q: '5bd0be7c71530134fd20a95d0ec2cbcfe6a56e36564f2842fd6823b46e37ddbc',
+            add: '665c074a766b5e6aae6b718b45514e41122398a40dd1c084ca23193437319fbf',
+            sub: '1667d9647e440f9127f28e05c4c0569ea19c8bb90929d006593a81920ca7a8c2'
+        },
+        {
+            p: 'afbc26a1525dd7752334553e55afc34d08eec288bf509354923050d2d5c91854',
+            q: 'dab6926a0586b9f5d1dfe2060c427fa664bb5a33b884049562abef9ceab0f2d6',
+            add: '850bd47aedbbb4893e9f69424de4db55967b101421324eec3876d990cc1db6fa',
+            sub: '8d34626d94a2068c2c74eb57d4377a2baf78f6e46a43d9184061b87d5781c05f'
+        },
+        {
+            p: '176f929d4448c8b5fcf355d4abfa1c1983f45934a41b67d4e9a7284ca55ef9bc',
+            q: '1399cfcda6e1d24fc0380239f9df5ee454e69522efec8f0aba0e582c69d9d091',
+            add: 'ef1ecf4bc43cccde0f1c5f2d46d8eeed319f851594c99c593c9840338fcbecc2',
+            sub: '9c6aaf174013b119051abf426fc71cb995a17706664b50deff0afe5f1985f1b7'
+        },
+        {
+            p: 'ed2d32d97c83ef3d87b5859e9d708d3c608ef47e179c3cc4b8729bd56bc291ae',
+            q: '53a12626da3cbd01575dbf31d3bd9a4bba544ee46fd0468c61b74e83c769ab50',
+            add: 'cef4d7ee11eeb637a9f626a2cf9887acd1670b87e64a4dcc54ff9898a5967ef4',
+            sub: 'e870d86422057fd51775aa3fe44a6946c5edf124bfd12d384df5c234a3825773'
+        },
+        {
+            p: 'e4f875b7a16f22751716fb638a930db5c0e3c2d7dbbfa683c07aa03700ccf0c2',
+            q: 'cdf938008a976214cc7662379265e550f1f254078109c4a8c9e22d6e1389132a',
+            add: 'efc4e5f2efa6cb67edb4878a7e535b0269504e049cd5840f2242dacd03a92873',
+            sub: '76ddca74e2573f73ec25cf7d07250a25f3049d228c0e128264df5ba077990164'
+        },
+        {
+            p: 'c8089df65181015fd74304a14392d7a3b17f24786a1624679841aa732180d707',
+            q: 'c408fe113e89fef23e49ad42b39f266a079577a31a633aba5e6c57de0a675176',
+            add: '113af112ba09953bec0d5f2e50593c8a3aa18b63b29c8044f73bdcd15a69ad35',
+            sub: '61847e37813de63d36126208e5a0c733cb07f5253947bce5f6a268de86307e89'
+        },
+        {
+            p: '4c7f8b6c193a4fa4dee5f00132d2d48813a28726cff79124d256980b1b90f700',
+            q: '9308a463b65fd2d6bf7fbdfb1eef39c73abdc7ab17457f890152a9ad39b16772',
+            add: '3f2a08354747b1e7a4255a2d2ed1c73b4930ac909ac7ed42b67c4ee7a93f21a6',
+            sub: '068f391346496ee34f832ab95201d79f159185a0da8546436ada0877632bcb6a'
+        },
+        {
+            p: '72225fc549143b9a7cf9a6070edbd4133fdcfbc8becc4b8070ef5781904fb3b1',
+            q: '4b6198253de261401504138fbb643e22ada4ac0f5515109d7e98d1a0442b6663',
+            add: '06a8e06bf0f5c05a7bc0e823bf091b8de4ab3b9a5fa20282ef6fd5bdaaa5ba84',
+            sub: 'b76a896234c9033c84c7b4f52c9b51914898cfa31cd457a8fb050ae8e6b430d3'
+        },
+        {
+            p: 'cc97c4cacff122948c78f1905f4f3de464ba344974fd461544cfa2f1ee652600',
+            q: 'f2406fb90e27d2921d80217051dd2916f0d9700d9f0ecd57b6404b6220cc7d40',
+            add: '5f18b261e778d964c58df63bd4562f139e62eaa3ec2af5842d5b37075e3c2add',
+            sub: '4ea865f775b78810b06e912c8876453efae8f5cf72262e014ae9c8850b28e776'
+        },
+        {
+            p: '61447eb63ae977446c5846ba4e02657f0f7d617b0ed4333461dd53f228618246',
+            q: '97880e21b96a341df5caba858a36dfe455732cf71588abe642064ed35655b5c7',
+            add: '8908aa590852de5777c2ee9a70f5c265375a1de345d7a2dffc8a428efa23dcd4',
+            sub: '212f273f9f1a4dc0fbcecfaecca67919644445436ad12326f3d63d962ac606a4'
+        },
+        {
+            p: 'de4972615b7e34bafb26c68a6e74d1795377b7c810dda33fb9314075ffc80995',
+            q: 'e9fbc69841172086fbeff30c5e4945333343c05e01914cc6ee65541503d95557',
+            add: '7f287d505cf8e5e027bdda7ee07123b9209c0be0ade4f7e911ad6a82fee8cb21',
+            sub: '4a4861678587cc9aaa982d7d0428512e211539b1f3603848833734ac224f916b'
+        },
+        {
+            p: 'a1593473d1e1da9a24e11ee8054f30ed617ec7f2d8b824b7eafa191aa33db354',
+            q: 'e524151fa78b6c669b2dde9a721a3c35f93d1042c0a2cf6126ddb09c134ccd79',
+            add: '91ade4d666b8d355f3a3f4c54611e9f0599269bedef5f8c8b545a594a52e91ea',
+            sub: '414cb593a4ca8f0320a94afac8aeb161092dd0fccf40d02cb3f709f284681d3c'
+        },
+        {
+            p: '5a3d6eb3643d1b9d1270ae060265d90f1646f045154f91c1d37a1229615d8f24',
+            q: '610748f5160c79cb7b00a06405374bee42d32ce11cf3338b6a557fd41acdfbdc',
+            add: '23f466110cefe634866bdd88637fa116f24335616fc580c6d1e2b5ef2d6d6c77',
+            sub: '3f64a61fea5b1d58a0e137af53c27aa006848815cb8610f3ad8717f3ad0f271a'
+        },
+        {
+            p: '1149ed0b86eef79e7617aa1a0bbda38f40f2d80e116d48b10c27f1d65c98e859',
+            q: 'bb95697e830403542fa0fc1bd1aa2af3a3695d57aae86170f51d4988f3370941',
+            add: 'fb8c43ffca7433f5ca949759fc8d8a07678da885d5938e82a4e189ae5d4ffc25',
+            sub: 'c480f84900674b4fdf8655dcbaf47c6e995eb71aead10ee9e5a1c0a2c3043a54'
+        },
+        {
+            p: '2735b98144532110992512016221862ddd5d3fe4a31aab273d9a113a249f4d20',
+            q: '198c4af5f429a9d376a058b20b4ade5559501d0d90b9b4e7571d45f5e9767b95',
+            add: '255677c99f048f48e2a135d3518948998dd6d2b36875efe56c0447f2d5732349',
+            sub: 'a56718972e3a6906fe6b3fb48074b8fd21a2a75f6baf04a095caecb8d76af4d1'
+        },
+        {
+            p: '6377063a94adbd07c81b9d4ef6f6c58091dd0e77c8dd37ed2331cbd949c6a543',
+            q: 'bad55631c0e95bf9dbced90623ce84af5a6e351794a4c976b8febc8a95d781d1',
+            add: 'a6c81d73bc3146e7227ea6e6eb2fab6babd1aff64694285eb437c92013f7be62',
+            sub: '316714653aea6e9068d35239b81f85371e1d74c03446013320cb6f096d551f90'
+        },
+        {
+            p: '123dcf7895d6177ad2e11c5be8f286d22b0eb1cf260753ef3629862f562e74ac',
+            q: 'eefde26a180401ad9adf35a3725a371e10d8458535cdc13663063f16959452e6',
+            add: '723087e491aa502ea9276d08352f3c3398330aff845ed43a2d8d1861525739ef',
+            sub: '09e530775aa6aadd15c9451ee5c95ad6a2cda20673c73e508797d526edb4cbd3'
+        },
+        {
+            p: '8f47d7f45830b6c11e783d16088feb74567e760ae48900e710b3a39b49f1bdd3',
+            q: '3dac72fb6d2f8f4d8f09730566876b6bf081af245f8a29dddea2398bc4601388',
+            add: '95202061db789b48f2aa80f5c96827fbb872acab6d94d14928f6b462208395dd',
+            sub: 'd80ec47023f095371420bcffa098e4e1117e550e8df20a3d84bfdeca013de93e'
+        },
+        {
+            p: '255d6796e43623f13c7004d13370fd0b9645d206c40d6629437b61b827d4af9f',
+            q: 'a90c4be6348d822bdafe2ac7073e7fa55443e4d482992b73308dbb3d439930a9',
+            add: '13918deb6b4bfd2a000be5e2a742f457f872c3b8556385d52a9bb78b2fc0af24',
+            sub: '8a285ab6f6802a3ce86131a1a43ba41b55ab2960b9c6c807a73fddd16db4960d'
+        },
+        {
+            p: '19d473f6a05b9bd2796d1cf2f7dad9e9d43c1284a34016142d4c085103372103',
+            q: '186c76321a4ca4833bbf70e13769a05bd81811d078a403e2b3f60fb80994b9c8',
+            add: '006693e6f89d1bf40b28d4a20e5bdae2897b7e7476781c4e9e13cec387f337f1',
+            sub: '5e5f1cc9be04581e0c65fbacc72acbdb1636feb2ce158ae97eabbc5b85f0bcf6'
+        },
+        {
+            p: '0610e6ef3d56d58c49031b6c77526b29c446d66a7a19385b57afcbbd3e11ecb4',
+            q: 'cb4d9a884fc2477f4bf4446ee6e61743d9728114c2440ea3ad9b77e24ba2d17b',
+            add: '0611d39e56124823adca93d1571145ff3253e48e97b4c3c7377bca693c3e2cff',
+            sub: '6acaf8408236d5da0ac20e167b56c16d8a0100505e0d6994dde0d28100a8b272'
+        },
+        {
+            p: '395d8c974ec4eed32a14b9e7e4fdc8e5bc0f3d39f7ec491ae7bc0b7027734990',
+            q: '183912aaa59eb04bed7f3c57def952018a7ee796fa5624576cdd8a93854e6c66',
+            add: 'ecd6332966f576a9a9629fb71f369650a282620442a4b898aeb5171f7b130545',
+            sub: 'f056c988f4364ccedcd6465fa0fe087687b8fb382814dec6b3e3d56bee73cf2f'
+        },
+        {
+            p: '2b50963412105f6df3bf3310832f3b55b114476a21340c6a884dbf89c4fcee2c',
+            q: 'f94bbb12d101496383abbd911cfc86482dcc0578d2500ca1585d2a5cb0c14bf9',
+            add: 'a895e7c9a93dccc831bc0ded11143985dff1dcc3a0ae1e64c7be5f98d45dd919',
+                sub: '2b6edaf8c29a1f3d42e113c8227a403d5d9843c13dc93d858c8ef7871551c2ea'
+        },
+        {
+            p: '4ebc279f4789d872bc8adff79cd6f8097f41fadf58883b797c6fb4acc7506c93',
+            q: 'dea099a079b6fba55106e7166d62cfc6f4ee48588863647075e0a137be7b281c',
+            add: 'b74321c2deaf158b45115fadb4c499a0a81ae90c784860a73538dceb6c899871',
+            sub: '6d9728d71f4248a72502d75bbb46c35c31a70042226e405c2eff355ecc50d832'
+        },
+        {
+            p: '4582bd27a90da44122d4eaba5eddc70bd3505c07f766676c1a2aa83d160b34d3',
+            q: 'ad722e1d85c8fcb90e2c80c64c436bdaafa92f2077ab5f1796d2d38721947ff4',
+            add: '55f918ede43755957dc599fd656e36f0822d9885252561ade8a864e95afeaffd',
+            sub: '94c4f99483d80253f91cf0f5436e826e09c43653a1ad449e49e6efaa6bbf88b0'
+        },
+        {
+            p: '16fe162935e53ca507098fb92e56a28d64fc949a5c5190b34e6df9fa81755c6d',
+            q: '5c385d68b0df33f75c7877bdfdf1c9fd9373db68b456f9543fe2f21ab43112d1',
+            add: 'ab15005fcf96d1effed54bb57c19a795be58531429ee51e0412c9a7ef4b3093a',
+            sub: 'a9a5fa2ac86b19093ecd667dc354add586a531c4a5f036a3d76e6ca54abfb130'
+        },
+        {
+            p: '2064341e046785c4a2e4e04e43dea9371874a2c161bbb2c4c22f5d23553ce4fa',
+            q: 'e7a503d669809b1c124ef5329b1fd8ad475ebb386964a7129019c2feb671cf52',
+            add: 'dcdc9f3833ac5609688ee785dea0b7d99ef98d44a3b534216e042e807c497d3d',
+            sub: '18572caadf3440f38b4eb3ef41f73c07ad9e811b865ece9e69e7073966dc67ba'
+        },
+        {
+            p: '219de4882836489e38882688a338703fa6ea8ea406215a90e59f5c795823d75b',
+            q: 'f46158f2ba3481f593b3c8194eed732694c41797239d8321286577b945a9daec',
+            add: '0b15f22b2ccbdfdd62a0a15937f618c85bd97b7a5f3c070a89de928e2d6fd202',
+            sub: 'fe84cf61aa915b038a1dc3bc8e6f65a2d454bb5e3ae04b5a2d8678d5a3d0628b'
+        },
+        {
+            p: '65788b25be62944c5f6819655600968ef0ad83af48e228ddfe8f19df32c6300d',
+            q: 'be7b398f123c002f773f6da62a318c21422c411dfaa4cb54bc4eb62e856f7a3c',
+            add: '6c766daaf1c9c63d45e185c418f3f0940e3d1dceb8c4d3e08f1458b19b6f6eae',
+            sub: 'd91366625ac2901329f9698a7399df37990c13146214f80f2e448584450a4c43'
+        },
+        {
+            p: '25053dee92c9aeef4eac1a48b8c94141b6a6cacb9c09eb2ed1bef737f7f7987f',
+            q: '72a021758527956e7b9d464548998af0887c026a9680cf2c03569559f40ec5ce',
+            add: 'd2ae9b328cefd856dd5ca26ff24530c4b2d193c5fd89a06b9d649b10e3865d3b',
+            sub: 'cbedc3335e61062a19e37b0cb95cb154480faccb8faaff0951e6e8a8b3244c8a'
+        },
+        {
+            p: '252c8f1de5d0b51b50b7214315a0cedda0f3819c8b4292b785e370ec218f2f67',
+            q: 'f905cf20c76fb58de7e5a6293d816b67aed472cb56e47f7c7d83aa95fc3e5cab',
+            add: 'a7392acab8a269ec48e140eddfa74cea6e3ace7fa07427c06a67fd9b43130d8d',
+            sub: 'd63cb20c14908120e37bee8946edd476effa7bec38b6a63620f0a2a75baa2d1d'
+        },
+        {
+            p: '46032c8e0189820aba5d6e2669b59426df1e8359c6ddf37ab2d11b87dc025df6',
+            q: '151f2263b4960c43b9ed854c2f62731f02b766733a21ce2b73c389cb47e595fe',
+            add: '369b10493ba0012b4d47ecf5c8af91d02f9c87b6ba618dadbb67fc68886fd925',
+            sub: 'fde511ea0477c30ec92cce084050794b7d701379c6800802045e8b84822e42e0'
+        },
+        {
+            p: 'c0f30f333fb19c72924390d223d83dad30c1e4e14089ed8813356565b6648749',
+            q: 'cd85d8b217f5c72861fb633301eed8613bdf7e101c8028d6addece562d5b2e33',
+            add: '8833fa3f34191edcf21c658ab745f61252b56ded733f24a3cc10805b6a0faf2f',
+            sub: '4b026f377610c677483401b4376b1e65dea6b804359015eaa6fb39261539a84e'
+        },
+        {
+            p: '2784c8d2ddcb7ba8f0f7fe85b600671199f6ce25d76fb605d7214b6ad1c0fa4d',
+            q: '0b7fcde97cdbbf24cefc738514bba015b66ca765f8c4b200098eae649d89c1e9',
+            add: 'c95b2e5c832d16d1eec8ff8905e0d39e7cc2f8cbbd8fd107ae41cbcc8bf18ca2',
+            sub: 'e98738b95efe8b497604c65f23943ec6c551a45b232e900efe2307df362159c7'
+        },
+        {
+            p: '33250897e5c8ad4142d5546214a626db0308cbeb9cbde62e9f731ec7dc2cd37c',
+            q: '046ad19c946c64315516d9bfdeb7ff02c9c30ad82c90915bb3c99f4658327cbb',
+            add: 'd066875b87d6bd9116d11aaf8204daf9ad342977a6ccef601116b2ceeef0f6f1',
+            sub: '4aaa441b3f25b9c75d4d3a65054d374e84021c58382d1a769ffad908e41a329a'
+        },
+        {
+            p: 'b533b02f2e35960150d98ff6d2596ab85c35d7c2540bc723c043533e50001362',
+            q: 'a8a9dc2962ef34c0d029998d0c87141b65f2e47e27ef9a24a1bc2afc6b366707',
+            add: '89e2f3c07845ef18cc96c78ff72f0e797fa9a68de9adef0e1755405bf4854c79',
+            sub: '705c4fab3e3a67fd564c66baa7d16b50d0b38ba443b3982b2f6b363b64b15e15'
+        },
+        {
+            p: '15811fd141658bd5e55c851d5f96858416a9e4667096ba965c652628946fea52',
+            q: '1af3a1662e428673376631270588572fa5823ca29edf1446af32c7b0931d924c',
+            add: '2fa857907d6b28a8641b82cc9d2eac77104b24f50e8ede8b1a9b4a246999cac4',
+            sub: 'dc08413fdf6df35c3d7be9884355cbe5891476e7f35449e7b841586aa26209d3'
+        },
+        {
+            p: 'd7757be0b4ffa41aa4b7f79d56f20e1c41ed4e9abd26de7234419b311f0a2cc9',
+            q: '4aca0bce7d1e6985cf3f2fee6186bdef0df3fb10bb204ae7aab5ff68e4f22da4',
+            add: '050f6ac4d2c1ffdf7416f24c9bfd16cc95453ba5dc6baba0976a305edc32e719',
+            sub: 'f1976436fb124a684384260df1670ba8c5bb8a949675d0de8ba4ecd2dcd857bd'
+        },
+        {
+            p: 'b9c78f291cd9fc0dd2bee235e6386df6fdc7e5248fb7f06959289e9ea59d4db9',
+            q: 'a890f19b701cafcac5f65eaa368dabffd3657a403f6d3ceac25b1bb1dfe4b1d9',
+            add: 'a7e7d8b784c0c8f7f3218ab8bdb6ab84d588bdaf5ba0fae7cfbfa14a9e051187',
+            sub: 'e5cc68aa2c21f49be500603ceeb41a59e0ded8fe33d55d9194d324bde8d95f80'
+        },
+        {
+            p: 'a7ef39f7004b1e912c8ef3841628477750cb2fb4ed5f54ce130a29583da2088e',
+            q: '7eacf5cd6ddbe7079de72354bbcf740d6b0e624549783b45d281216cc1eb9853',
+            add: 'afa3570b017a6a45859f7e4622491ea4cdf6173f3e0f584102fb582fae271f18',
+            sub: '4e9cf2b4558395b8b6aa97f6b90134ad70d8f962bf20e33929a68976bc7fc783'
+        },
+        {
+            p: '7180c13d98860af43b2b81e20cf0ddc8700f8c5c3a1ddd86f071998a285838c4',
+            q: '47e4a28543c7325520abdacac54a81a3e5a9a885ee85ee53a9129aac5f16b354',
+            add: '78e9b7e796e9cc7103fb6fc91dc8c15185cafde522f2d4aa394d97d68a1bd89b',
+            sub: '3ab087870e6c4c3ab3519662c6d8db57d1061996620ab20a1df1ef5aef8c915a'
+        },
+        {
+            p: '79b117914508f156033bf821643b4a1b224eb859883a6badb08ea088d72d0af8',
+            q: '4fc5ef826d195a5d4fd9a36250fc8a421e8f0f14463753e586cdbeeb48da611b',
+            add: 'c7aee3526a8359a0bb7b94ae207bdb1c1eebb166f66901c8834f4ebb73026cda',
+            sub: '0df6e1545ec3713181d778c2c3be0cc8a0401bd362fee4dacc464341ab900cb2'
+        }
+    ];
+
     before('Wait for the package libsodium to finish loading', () =>
     {
         return sdk.SodiumHelper.init();
@@ -821,12 +1122,37 @@ describe ('Crypto', () =>
 
     it ('Test crypto_core_ed25519_from_uniform', () =>
     {
-        sample_random.forEach((elem) => {
-            let random = Buffer.from(sample_random[0].random, "hex");
+        sample_random.forEach((m) => {
+            let random = Buffer.from(m.random, "hex");
             let res = Buffer.from(sdk.crypto_core_ed25519_from_uniform(random));
-            let expected = Buffer.from(sample_random[0].crypto_core_ed25519_from_uniform, "hex");
+            let expected = Buffer.from(m.crypto_core_ed25519_from_uniform, "hex");
             assert.deepStrictEqual(res, expected);
         });
+    });
+
+    it ('Test crypto_core_ed25519_add and crypto_core_ed25519_sub', () =>
+    {
+        sample_point_add_sub.forEach((m) => {
+            let p = Buffer.from(m.p, "hex");
+            let q = Buffer.from(m.q, "hex");
+            let add = Buffer.from(sdk.crypto_core_ed25519_add(p, q));
+            assert.deepStrictEqual(add, Buffer.from(m.add, "hex"));
+
+            let sub = Buffer.from(sdk.crypto_core_ed25519_sub(p, q));
+            assert.deepStrictEqual(sub, Buffer.from(m.sub, "hex"));
+        });
+    });
+
+    it ('Test crypto_core_ed25519_is_valid_point', () =>
+    {
+        let valid = Buffer.from("1b511086a109b23b9d38a5c809894c44ddc4bda498575d8fd3d0b8856e6f4fab", "hex");
+        assert.ok(sdk.crypto_core_ed25519_is_valid_point(valid));
+
+        let invalid = Buffer.from("1c511086a109b23b9d38a5c809894c44ddc4bda498575d8fd3d0b8856e6f4fab", "hex");
+        assert.ok(!sdk.crypto_core_ed25519_is_valid_point(invalid));
+
+        let invalid2 = Buffer.from("0000000000000000000000000000000000000000000000000000000000000000", "hex");
+        assert.ok(!sdk.crypto_core_ed25519_is_valid_point(invalid2));
     });
 
     it ('Test ed25519_sqdmone', () =>
@@ -860,5 +1186,40 @@ describe ('Crypto', () =>
         sdk.fe25519_mul32(temp1, temp1, 2);
         sdk.fe25519_sq2(temp2, sdk.ed25519_d);
         assert.deepStrictEqual(temp1, temp2);
-    })
+    });
+
+    it ('Test 2222', () =>
+    {
+        for (let d = 0; d < 1000; d++)
+            console.log(d, 1 & (((d && 0xFF)-1) >> 8))
+    });
+});
+
+describe ('Make Sample Data', () =>
+{
+    before('Wait for the package libsodium to finish loading', () =>
+    {
+        return sdk.SodiumHelper.init();
+    });
+
+    it ('Make Sample Point Data', () =>
+    {
+        let values:Array<any> = [];
+        for (let i = 0; i < 50; i++)
+        {
+            let p = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_random());
+            let q = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_random());
+            let add = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_add(p, q));
+            let sub = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_sub(p, q));
+            values.push(
+                {
+                    p: p.toString("hex"),
+            q: q.toString("hex"),
+                    add: add.toString("hex"),
+                    sub: sub.toString("hex")
+                }
+            );
+        }
+        console.log(values);
+    });
 });

@@ -1,4 +1,3 @@
-import JSBI from "jsbi";
 
 export class ED25519Utils
 {
@@ -8,12 +7,11 @@ export class ED25519Utils
     public static crypto_core_ed25519_SCALARBYTES: number = 32;
     public static crypto_core_ed25519_NONREDUCEDSCALARBYTES: number = 64;
 
-
-    public static sodium_is_zero (n: Uint8Array, len: number): number
+    public static sodium_is_zero (n: Uint8Array, len: number): boolean
     {
         let d = 0;
         for (let i = 0; i < len; i++)
-            d |= n[i];
-        return 1 & ((d - 1) >> 8);
+            d = (d & n[i]) & 0xff;
+        return (1 & ((d - 1) >> 8)) != 0;
     }
 }
