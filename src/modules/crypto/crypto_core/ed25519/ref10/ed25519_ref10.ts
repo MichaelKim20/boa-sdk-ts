@@ -1775,30 +1775,31 @@ export function ge25519_has_small_order (s: Uint8Array): number
  */
 export function sc25519_mul (s: Uint8Array, a: Uint8Array, b: Uint8Array)
 {
-    let a0  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), load_3(a, 0));
-    let a1  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a,  2), JSBI.BigInt(5)));
-    let a2  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(a,  5), JSBI.BigInt(2)));
-    let a3  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a,  5), JSBI.BigInt(7)));
-    let a4  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a, 10), JSBI.BigInt(4)));
-    let a5  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(a, 13), JSBI.BigInt(1)));
-    let a6  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a, 15), JSBI.BigInt(6)));
-    let a7  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(a, 18), JSBI.BigInt(3)));
-    let a8  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), load_3(a, 21));
-    let a9  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(a, 23), JSBI.BigInt(5)));
-    let a10 = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(a, 26), JSBI.BigInt(2)));
+    let N2097151 = JSBI.BigInt(2097151);
+    let a0  = JSBI.bitwiseAnd(N2097151, load_3(a, 0));
+    let a1  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a,  2), JSBI.BigInt(5)));
+    let a2  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(a,  5), JSBI.BigInt(2)));
+    let a3  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a,  5), JSBI.BigInt(7)));
+    let a4  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a, 10), JSBI.BigInt(4)));
+    let a5  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(a, 13), JSBI.BigInt(1)));
+    let a6  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a, 15), JSBI.BigInt(6)));
+    let a7  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(a, 18), JSBI.BigInt(3)));
+    let a8  = JSBI.bitwiseAnd(N2097151, load_3(a, 21));
+    let a9  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a, 23), JSBI.BigInt(5)));
+    let a10 = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(a, 26), JSBI.BigInt(2)));
     let a11 = JSBI.signedRightShift(load_4(a,28), JSBI.BigInt(7));
 
-    let b0  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), load_3(b, 0));
-    let b1  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b,  2), JSBI.BigInt(5)));
-    let b2  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(b,  5), JSBI.BigInt(2)));
-    let b3  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b,  5), JSBI.BigInt(7)));
-    let b4  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b, 10), JSBI.BigInt(4)));
-    let b5  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(b, 13), JSBI.BigInt(1)));
-    let b6  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b, 15), JSBI.BigInt(6)));
-    let b7  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(b, 18), JSBI.BigInt(3)));
-    let b8  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), load_3(b, 21));
-    let b9  = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_4(b, 23), JSBI.BigInt(5)));
-    let b10 = JSBI.bitwiseAnd(JSBI.BigInt(2097151), JSBI.signedRightShift(load_3(b, 26), JSBI.BigInt(2)));
+    let b0  = JSBI.bitwiseAnd(N2097151, load_3(b, 0));
+    let b1  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b,  2), JSBI.BigInt(5)));
+    let b2  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(b,  5), JSBI.BigInt(2)));
+    let b3  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b,  7), JSBI.BigInt(7)));
+    let b4  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b, 10), JSBI.BigInt(4)));
+    let b5  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(b, 13), JSBI.BigInt(1)));
+    let b6  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b, 15), JSBI.BigInt(6)));
+    let b7  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(b, 18), JSBI.BigInt(3)));
+    let b8  = JSBI.bitwiseAnd(N2097151, load_3(b, 21));
+    let b9  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b, 23), JSBI.BigInt(5)));
+    let b10 = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(b, 26), JSBI.BigInt(2)));
     let b11 = JSBI.signedRightShift(load_4(b,28), JSBI.BigInt(7));
 
     let S: Array<JSBI> = [];
@@ -1958,7 +1959,7 @@ export function sc25519_mul (s: Uint8Array, a: Uint8Array, b: Uint8Array)
     func2(9);
     func2(10);
 
-    s[0]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[0], JSBI.BigInt(0)));
+    s[0]  = JSBIUtils.toInt8(S[0]);
     s[1]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[0], JSBI.BigInt(8)));
     s[2]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[0], JSBI.BigInt(16)), JSBI.multiply(S[1], JSBI.BigInt(1 << 5))));
     s[3]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[1], JSBI.BigInt(3)));
@@ -1979,7 +1980,7 @@ export function sc25519_mul (s: Uint8Array, a: Uint8Array, b: Uint8Array)
     s[18] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[6], JSBI.BigInt(18)), JSBI.multiply(S[7], JSBI.BigInt(1 << 3))));
     s[19] = JSBIUtils.toInt8(JSBI.signedRightShift(S[7], JSBI.BigInt(5)));
     s[20] = JSBIUtils.toInt8(JSBI.signedRightShift(S[7], JSBI.BigInt(13)));
-    s[21] = JSBIUtils.toInt8(JSBI.signedRightShift(S[8], JSBI.BigInt(0)));
+    s[21] = JSBIUtils.toInt8(S[8]);
     s[22] = JSBIUtils.toInt8(JSBI.signedRightShift(S[8], JSBI.BigInt(8)));
     s[23] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[8], JSBI.BigInt(16)), JSBI.multiply(S[9], JSBI.BigInt(1 << 5))));
     s[24] = JSBIUtils.toInt8(JSBI.signedRightShift(S[9], JSBI.BigInt(3)));
@@ -1989,7 +1990,6 @@ export function sc25519_mul (s: Uint8Array, a: Uint8Array, b: Uint8Array)
     s[28] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[10], JSBI.BigInt(14)), JSBI.multiply(S[11], JSBI.BigInt(1 << 7))));
     s[29] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(1)));
     s[30] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(9)));
-    s[31] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(17)));
     s[31] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(17)));
 }
 
@@ -2005,477 +2005,236 @@ export function sc25519_mul (s: Uint8Array, a: Uint8Array, b: Uint8Array)
  */
 export function sc25519_muladd (s: Uint8Array, a: Uint8Array, b: Uint8Array, c: Uint8Array)
 {
-    let a0  = 2097151 & load_3(a, 0);
-    let a1  = 2097151 & (load_4(a, 2) >> 5);
-    let a2  = 2097151 & (load_3(a, 5) >> 2);
-    let a3  = 2097151 & (load_4(a, 7) >> 7);
-    let a4  = 2097151 & (load_4(a, 10) >> 4);
-    let a5  = 2097151 & (load_3(a, 13) >> 1);
-    let a6  = 2097151 & (load_4(a, 15) >> 6);
-    let a7  = 2097151 & (load_3(a, 18) >> 3);
-    let a8  = 2097151 & load_3(a, 21);
-    let a9  = 2097151 & (load_4(a, 23) >> 5);
-    let a10 = 2097151 & (load_3(a, 26) >> 2);
-    let a11 = (load_4(a, 28) >> 7);
+    let N2097151 = JSBI.BigInt(2097151);
+    let a0  = JSBI.bitwiseAnd(N2097151, load_3(a, 0));
+    let a1  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a,  2), JSBI.BigInt(5)));
+    let a2  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(a,  5), JSBI.BigInt(2)));
+    let a3  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a,  5), JSBI.BigInt(7)));
+    let a4  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a, 10), JSBI.BigInt(4)));
+    let a5  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(a, 13), JSBI.BigInt(1)));
+    let a6  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a, 15), JSBI.BigInt(6)));
+    let a7  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(a, 18), JSBI.BigInt(3)));
+    let a8  = JSBI.bitwiseAnd(N2097151, load_3(a, 21));
+    let a9  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(a, 23), JSBI.BigInt(5)));
+    let a10 = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(a, 26), JSBI.BigInt(2)));
+    let a11 = JSBI.signedRightShift(load_4(a,28), JSBI.BigInt(7));
 
-    let b0  = 2097151 & load_3(b, 0);
-    let b1  = 2097151 & (load_4(b, 2) >> 5);
-    let b2  = 2097151 & (load_3(b, 5) >> 2);
-    let b3  = 2097151 & (load_4(b, 7) >> 7);
-    let b4  = 2097151 & (load_4(b, 10) >> 4);
-    let b5  = 2097151 & (load_3(b, 13) >> 1);
-    let b6  = 2097151 & (load_4(b, 15) >> 6);
-    let b7  = 2097151 & (load_3(b, 18) >> 3);
-    let b8  = 2097151 & load_3(b, 21);
-    let b9  = 2097151 & (load_4(b, 23) >> 5);
-    let b10 = 2097151 & (load_3(b, 26) >> 2);
-    let b11 = (load_4(b, 28) >> 7);
+    let b0  = JSBI.bitwiseAnd(N2097151, load_3(b, 0));
+    let b1  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b,  2), JSBI.BigInt(5)));
+    let b2  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(b,  5), JSBI.BigInt(2)));
+    let b3  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b,  7), JSBI.BigInt(7)));
+    let b4  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b, 10), JSBI.BigInt(4)));
+    let b5  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(b, 13), JSBI.BigInt(1)));
+    let b6  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b, 15), JSBI.BigInt(6)));
+    let b7  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(b, 18), JSBI.BigInt(3)));
+    let b8  = JSBI.bitwiseAnd(N2097151, load_3(b, 21));
+    let b9  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(b, 23), JSBI.BigInt(5)));
+    let b10 = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(b, 26), JSBI.BigInt(2)));
+    let b11 = JSBI.signedRightShift(load_4(b,28), JSBI.BigInt(7));
 
-    let c0  = 2097151 & load_3(c, 0);
-    let c1  = 2097151 & (load_4(c, 2) >> 5);
-    let c2  = 2097151 & (load_3(c, 5) >> 2);
-    let c3  = 2097151 & (load_4(c, 7) >> 7);
-    let c4  = 2097151 & (load_4(c, 10) >> 4);
-    let c5  = 2097151 & (load_3(c, 13) >> 1);
-    let c6  = 2097151 & (load_4(c, 15) >> 6);
-    let c7  = 2097151 & (load_3(c, 18) >> 3);
-    let c8  = 2097151 & load_3(c, 21);
-    let c9  = 2097151 & (load_4(c, 23) >> 5);
-    let c10 = 2097151 & (load_3(c, 26) >> 2);
-    let c11 = (load_4(c, 28) >> 7);
+    let c0  = JSBI.bitwiseAnd(N2097151, load_3(c, 0));
+    let c1  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(c,  2), JSBI.BigInt(5)));
+    let c2  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(c,  5), JSBI.BigInt(2)));
+    let c3  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(c,  7), JSBI.BigInt(7)));
+    let c4  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(c, 10), JSBI.BigInt(4)));
+    let c5  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(c, 13), JSBI.BigInt(1)));
+    let c6  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(c, 15), JSBI.BigInt(6)));
+    let c7  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(c, 18), JSBI.BigInt(3)));
+    let c8  = JSBI.bitwiseAnd(N2097151, load_3(c, 21));
+    let c9  = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_4(c, 23), JSBI.BigInt(5)));
+    let c10 = JSBI.bitwiseAnd(N2097151, JSBI.signedRightShift(load_3(c, 26), JSBI.BigInt(2)));
+    let c11 = JSBI.signedRightShift(load_4(c,28), JSBI.BigInt(7));
 
-    let s0;
-    let s1;
-    let s2;
-    let s3;
-    let s4;
-    let s5;
-    let s6;
-    let s7;
-    let s8;
-    let s9;
-    let s10;
-    let s11;
-    let s12;
-    let s13;
-    let s14;
-    let s15;
-    let s16;
-    let s17;
-    let s18;
-    let s19;
-    let s20;
-    let s21;
-    let s22;
-    let s23;
+    let S: Array<JSBI> = [];
+    let Carry: Array<JSBI> = [];
 
-    let carry0;
-    let carry1;
-    let carry2;
-    let carry3;
-    let carry4;
-    let carry5;
-    let carry6;
-    let carry7;
-    let carry8;
-    let carry9;
-    let carry10;
-    let carry11;
-    let carry12;
-    let carry13;
-    let carry14;
-    let carry15;
-    let carry16;
-    let carry17;
-    let carry18;
-    let carry19;
-    let carry20;
-    let carry21;
-    let carry22;
+    for (let idx = 0; idx < 23; idx++)
+        S.push(JSBI.BigInt(0));
 
-    s0 = c0 + a0 * b0;
-    s1 = c1 + a0 * b1 + a1 * b0;
-    s2 = c2 + a0 * b2 + a1 * b1 + a2 * b0;
-    s3 = c3 + a0 * b3 + a1 * b2 + a2 * b1 + a3 * b0;
-    s4 = c4 + a0 * b4 + a1 * b3 + a2 * b2 + a3 * b1 + a4 * b0;
-    s5 = c5 + a0 * b5 + a1 * b4 + a2 * b3 + a3 * b2 + a4 * b1 + a5 * b0;
-    s6 = c6 + a0 * b6 + a1 * b5 + a2 * b4 + a3 * b3 + a4 * b2 + a5 * b1 +
-        a6 * b0;
-    s7 = c7 + a0 * b7 + a1 * b6 + a2 * b5 + a3 * b4 + a4 * b3 + a5 * b2 +
-        a6 * b1 + a7 * b0;
-    s8 = c8 + a0 * b8 + a1 * b7 + a2 * b6 + a3 * b5 + a4 * b4 + a5 * b3 +
-        a6 * b2 + a7 * b1 + a8 * b0;
-    s9 = c9 + a0 * b9 + a1 * b8 + a2 * b7 + a3 * b6 + a4 * b5 + a5 * b4 +
-        a6 * b3 + a7 * b2 + a8 * b1 + a9 * b0;
-    s10 = c10 + a0 * b10 + a1 * b9 + a2 * b8 + a3 * b7 + a4 * b6 + a5 * b5 +
-        a6 * b4 + a7 * b3 + a8 * b2 + a9 * b1 + a10 * b0;
-    s11 = c11 + a0 * b11 + a1 * b10 + a2 * b9 + a3 * b8 + a4 * b7 + a5 * b6 +
-        a6 * b5 + a7 * b4 + a8 * b3 + a9 * b2 + a10 * b1 + a11 * b0;
-    s12 = a1 * b11 + a2 * b10 + a3 * b9 + a4 * b8 + a5 * b7 + a6 * b6 +
-        a7 * b5 + a8 * b4 + a9 * b3 + a10 * b2 + a11 * b1;
-    s13 = a2 * b11 + a3 * b10 + a4 * b9 + a5 * b8 + a6 * b7 + a7 * b6 +
-        a8 * b5 + a9 * b4 + a10 * b3 + a11 * b2;
-    s14 = a3 * b11 + a4 * b10 + a5 * b9 + a6 * b8 + a7 * b7 + a8 * b6 +
-        a9 * b5 + a10 * b4 + a11 * b3;
-    s15 = a4 * b11 + a5 * b10 + a6 * b9 + a7 * b8 + a8 * b7 + a9 * b6 +
-        a10 * b5 + a11 * b4;
-    s16 =
-        a5 * b11 + a6 * b10 + a7 * b9 + a8 * b8 + a9 * b7 + a10 * b6 + a11 * b5;
-    s17 = a6 * b11 + a7 * b10 + a8 * b9 + a9 * b8 + a10 * b7 + a11 * b6;
-    s18 = a7 * b11 + a8 * b10 + a9 * b9 + a10 * b8 + a11 * b7;
-    s19 = a8 * b11 + a9 * b10 + a10 * b9 + a11 * b8;
-    s20 = a9 * b11 + a10 * b10 + a11 * b9;
-    s21 = a10 * b11 + a11 * b10;
-    s22 = a11 * b11;
-    s23 = 0;
+    for (let idx = 0; idx < 22; idx++)
+        Carry.push(JSBI.BigInt(0));
 
-    carry0 = (s0 + (let) (1L << 20)) >> 21;
-    s1 += carry0;
-    s0 -= carry0 * (1L << 21);
-    carry2 = (s2 + (let) (1L << 20)) >> 21;
-    s3 += carry2;
-    s2 -= carry2 * (1L << 21);
-    carry4 = (s4 + (let) (1L << 20)) >> 21;
-    s5 += carry4;
-    s4 -= carry4 * (1L << 21);
-    carry6 = (s6 + (let) (1L << 20)) >> 21;
-    s7 += carry6;
-    s6 -= carry6 * (1L << 21);
-    carry8 = (s8 + (let) (1L << 20)) >> 21;
-    s9 += carry8;
-    s8 -= carry8 * (1L << 21);
-    carry10 = (s10 + (let) (1L << 20)) >> 21;
-    s11 += carry10;
-    s10 -= carry10 * (1L << 21);
-    carry12 = (s12 + (let) (1L << 20)) >> 21;
-    s13 += carry12;
-    s12 -= carry12 * (1L << 21);
-    carry14 = (s14 + (let) (1L << 20)) >> 21;
-    s15 += carry14;
-    s14 -= carry14 * (1L << 21);
-    carry16 = (s16 + (let) (1L << 20)) >> 21;
-    s17 += carry16;
-    s16 -= carry16 * (1L << 21);
-    carry18 = (s18 + (let) (1L << 20)) >> 21;
-    s19 += carry18;
-    s18 -= carry18 * (1L << 21);
-    carry20 = (s20 + (let) (1L << 20)) >> 21;
-    s21 += carry20;
-    s20 -= carry20 * (1L << 21);
-    carry22 = (s22 + (let) (1L << 20)) >> 21;
-    s23 += carry22;
-    s22 -= carry22 * (1L << 21);
+    let n1 = JSBI.BigInt(1);
+    S[ 0] = JSBIUtils.SumMultiply([n1, c0, a0, b0]);
+    S[ 1] = JSBIUtils.SumMultiply([n1, c1, a0, b1, a1, b0]);
+    S[ 2] = JSBIUtils.SumMultiply([n1, c2, a0, b2, a1, b1, a2, b0]);
+    S[ 3] = JSBIUtils.SumMultiply([n1, c3, a0, b3, a1, b2, a2, b1, a3, b0]);
+    S[ 4] = JSBIUtils.SumMultiply([n1, c4, a0, b4, a1, b3, a2, b2, a3, b1, a4, b0]);
+    S[ 5] = JSBIUtils.SumMultiply([n1, c5, a0, b5, a1, b4, a2, b3, a3, b2, a4, b1, a5, b0]);
+    S[ 6] = JSBIUtils.SumMultiply([n1, c6, a0, b6, a1, b5, a2, b4, a3, b3, a4, b2, a5, b1, a6, b0]);
+    S[ 7] = JSBIUtils.SumMultiply([n1, c7, a0, b7, a1, b6, a2, b5, a3, b4, a4, b3, a5, b2, a6, b1, a7, b0]);
+    S[ 8] = JSBIUtils.SumMultiply([n1, c8, a0, b8, a1, b7, a2, b6, a3, b5, a4, b4, a5, b3, a6, b2, a7, b1, a8, b0]);
+    S[ 9] = JSBIUtils.SumMultiply([n1, c9, a0, b9, a1, b8, a2, b7, a3, b6, a4, b5, a5, b4, a6, b3, a7, b2, a8, b1, a9, b0]);
+    S[10] = JSBIUtils.SumMultiply([n1, c10, a0, b10, a1, b9, a2, b8, a3, b7, a4, b6, a5, b5, a6, b4, a7, b3, a8, b2, a9, b1, a10, b0]);
+    S[11] = JSBIUtils.SumMultiply([n1, c11, a0, b11, a1, b10, a2, b9, a3, b8, a4, b7, a5, b6, a6, b5, a7, b4, a8, b3, a9, b2, a10, b1, a11, b0]);
+    S[12] = JSBIUtils.SumMultiply([a1, b11, a2, b10, a3, b9, a4, b8, a5, b7, a6, b6, a7, b5, a8, b4, a9, b3, a10, b2, a11, b1]);
+    S[13] = JSBIUtils.SumMultiply([a2, b11, a3, b10, a4, b9, a5, b8, a6, b7, a7, b6, a8, b5, a9, b4, a10, b3, a11, b2]);
+    S[14] = JSBIUtils.SumMultiply([a3, b11, a4, b10, a5, b9, a6, b8, a7, b7, a8, b6, a9, b5, a10, b4, a11, b3]);
+    S[15] = JSBIUtils.SumMultiply([a4, b11, a5, b10, a6, b9, a7, b8, a8, b7, a9, b6, a10, b5, a11, b4]);
+    S[16] = JSBIUtils.SumMultiply([a5, b11, a6, b10, a7, b9, a8, b8, a9, b7, a10, b6, a11, b5]);
+    S[17] = JSBIUtils.SumMultiply([a6, b11, a7, b10, a8, b9, a9, b8, a10, b7, a11, b6]);
+    S[18] = JSBIUtils.SumMultiply([a7, b11, a8, b10, a9, b9, a10, b8, a11, b7]);
+    S[19] = JSBIUtils.SumMultiply([a8, b11, a9, b10, a10, b9, a11, b8]);
+    S[20] = JSBIUtils.SumMultiply([a9, b11, a10, b10, a11, b9]);
+    S[21] = JSBIUtils.SumMultiply([a10, b11, a11, b10]);
+    S[22] = JSBIUtils.SumMultiply([a11, b11]);
+    S[23] = JSBI.BigInt(0);
 
-    carry1 = (s1 + (let) (1L << 20)) >> 21;
-    s2 += carry1;
-    s1 -= carry1 * (1L << 21);
-    carry3 = (s3 + (let) (1L << 20)) >> 21;
-    s4 += carry3;
-    s3 -= carry3 * (1L << 21);
-    carry5 = (s5 + (let) (1L << 20)) >> 21;
-    s6 += carry5;
-    s5 -= carry5 * (1L << 21);
-    carry7 = (s7 + (let) (1L << 20)) >> 21;
-    s8 += carry7;
-    s7 -= carry7 * (1L << 21);
-    carry9 = (s9 + (let) (1L << 20)) >> 21;
-    s10 += carry9;
-    s9 -= carry9 * (1L << 21);
-    carry11 = (s11 + (let) (1L << 20)) >> 21;
-    s12 += carry11;
-    s11 -= carry11 * (1L << 21);
-    carry13 = (s13 + (let) (1L << 20)) >> 21;
-    s14 += carry13;
-    s13 -= carry13 * (1L << 21);
-    carry15 = (s15 + (let) (1L << 20)) >> 21;
-    s16 += carry15;
-    s15 -= carry15 * (1L << 21);
-    carry17 = (s17 + (let) (1L << 20)) >> 21;
-    s18 += carry17;
-    s17 -= carry17 * (1L << 21);
-    carry19 = (s19 + (let) (1L << 20)) >> 21;
-    s20 += carry19;
-    s19 -= carry19 * (1L << 21);
-    carry21 = (s21 + (let) (1L << 20)) >> 21;
-    s22 += carry21;
-    s21 -= carry21 * (1L << 21);
+    let func20 = (i: number) =>
+    {
+        let j = i = 1;
+        Carry[i] = JSBI.signedRightShift(JSBI.add(S[i], JSBI.BigInt(1 << 20)), JSBI.BigInt(21));
+        S[j] = JSBI.add(S[j], Carry[i]);
+        S[i] = JSBI.subtract(S[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 21)));
+    }
 
-    s11 += s23 * 666643;
-    s12 += s23 * 470296;
-    s13 += s23 * 654183;
-    s14 -= s23 * 997805;
-    s15 += s23 * 136657;
-    s16 -= s23 * 683901;
+    func20(0);
+    func20(2);
+    func20(4);
+    func20(6);
+    func20(8);
+    func20(10);
 
-    s10 += s22 * 666643;
-    s11 += s22 * 470296;
-    s12 += s22 * 654183;
-    s13 -= s22 * 997805;
-    s14 += s22 * 136657;
-    s15 -= s22 * 683901;
+    func20(12);
+    func20(14);
+    func20(16);
+    func20(18);
+    func20(20);
+    func20(22);
 
-    s9 += s21 * 666643;
-    s10 += s21 * 470296;
-    s11 += s21 * 654183;
-    s12 -= s21 * 997805;
-    s13 += s21 * 136657;
-    s14 -= s21 * 683901;
+    func20(1);
+    func20(3);
+    func20(5);
+    func20(7);
+    func20(9);
+    func20(11);
+    func20(13);
+    func20(15);
+    func20(17);
+    func20(19);
+    func20(21);
 
-    s8 += s20 * 666643;
-    s9 += s20 * 470296;
-    s10 += s20 * 654183;
-    s11 -= s20 * 997805;
-    s12 += s20 * 136657;
-    s13 -= s20 * 683901;
+    let func23 = (i: number, value: JSBI) =>
+    {
+        S[i+0] = JSBI.add(S[i+0], JSBI.multiply(value, JSBI.BigInt(666643)));
+        S[i+1] = JSBI.add(S[i+1], JSBI.multiply(value, JSBI.BigInt(470296)));
+        S[i+2] = JSBI.add(S[i+2], JSBI.multiply(value, JSBI.BigInt(654183)));
+        S[i+3] = JSBI.subtract(S[i+3], JSBI.multiply(value, JSBI.BigInt(997805)));
+        S[i+4] = JSBI.add(S[i+4], JSBI.multiply(value, JSBI.BigInt(136657)));
+        S[i+5] = JSBI.subtract(S[i+5], JSBI.multiply(value, JSBI.BigInt(683901)));
+    }
 
-    s7 += s19 * 666643;
-    s8 += s19 * 470296;
-    s9 += s19 * 654183;
-    s10 -= s19 * 997805;
-    s11 += s19 * 136657;
-    s12 -= s19 * 683901;
+    func23(11, S[23]);
+    func23(10, S[22]);
+    func23( 9, S[21]);
+    func23( 8, S[20]);
+    func23( 7, S[19]);
+    func23( 6, S[18]);
 
-    s6 += s18 * 666643;
-    s7 += s18 * 470296;
-    s8 += s18 * 654183;
-    s9 -= s18 * 997805;
-    s10 += s18 * 136657;
-    s11 -= s18 * 683901;
+    func20(6);
+    func20(8);
+    func20(10);
+    func20(12);
+    func20(14);
+    func20(16);
 
-    carry6 = (s6 + (let) (1L << 20)) >> 21;
-    s7 += carry6;
-    s6 -= carry6 * (1L << 21);
-    carry8 = (s8 + (let) (1L << 20)) >> 21;
-    s9 += carry8;
-    s8 -= carry8 * (1L << 21);
-    carry10 = (s10 + (let) (1L << 20)) >> 21;
-    s11 += carry10;
-    s10 -= carry10 * (1L << 21);
-    carry12 = (s12 + (let) (1L << 20)) >> 21;
-    s13 += carry12;
-    s12 -= carry12 * (1L << 21);
-    carry14 = (s14 + (let) (1L << 20)) >> 21;
-    s15 += carry14;
-    s14 -= carry14 * (1L << 21);
-    carry16 = (s16 + (let) (1L << 20)) >> 21;
-    s17 += carry16;
-    s16 -= carry16 * (1L << 21);
+    func20(7);
+    func20(9);
+    func20(11);
+    func20(13);
+    func20(15);
 
-    carry7 = (s7 + (let) (1L << 20)) >> 21;
-    s8 += carry7;
-    s7 -= carry7 * (1L << 21);
-    carry9 = (s9 + (let) (1L << 20)) >> 21;
-    s10 += carry9;
-    s9 -= carry9 * (1L << 21);
-    carry11 = (s11 + (let) (1L << 20)) >> 21;
-    s12 += carry11;
-    s11 -= carry11 * (1L << 21);
-    carry13 = (s13 + (let) (1L << 20)) >> 21;
-    s14 += carry13;
-    s13 -= carry13 * (1L << 21);
-    carry15 = (s15 + (let) (1L << 20)) >> 21;
-    s16 += carry15;
-    s15 -= carry15 * (1L << 21);
+    func23(5, S[17]);
+    func23(4, S[16]);
+    func23(3, S[15]);
+    func23(2, S[14]);
+    func23(1, S[13]);
+    func23(0, S[12]);
+    S[12] = JSBI.BigInt(0);
 
-    s5 += s17 * 666643;
-    s6 += s17 * 470296;
-    s7 += s17 * 654183;
-    s8 -= s17 * 997805;
-    s9 += s17 * 136657;
-    s10 -= s17 * 683901;
+    func20(0);
+    func20(2);
+    func20(4);
+    func20(6);
+    func20(8);
+    func20(10);
 
-    s4 += s16 * 666643;
-    s5 += s16 * 470296;
-    s6 += s16 * 654183;
-    s7 -= s16 * 997805;
-    s8 += s16 * 136657;
-    s9 -= s16 * 683901;
+    func20(1);
+    func20(3);
+    func20(5);
+    func20(7);
+    func20(9);
+    func20(11);
 
-    s3 += s15 * 666643;
-    s4 += s15 * 470296;
-    s5 += s15 * 654183;
-    s6 -= s15 * 997805;
-    s7 += s15 * 136657;
-    s8 -= s15 * 683901;
+    func23(0, S[12]);
+    S[12] = JSBI.BigInt(0);
 
-    s2 += s14 * 666643;
-    s3 += s14 * 470296;
-    s4 += s14 * 654183;
-    s5 -= s14 * 997805;
-    s6 += s14 * 136657;
-    s7 -= s14 * 683901;
+    let func2 = (i: number) =>
+    {
+        let j = i = 1;
+        Carry[i] = JSBI.signedRightShift(S[i], JSBI.BigInt(21));
+        S[j] = JSBI.add(S[j], Carry[i]);
+        S[i] = JSBI.subtract(S[i], JSBI.multiply(Carry[i], JSBI.BigInt(1 << 21)));
+    }
+    func2(0);
+    func2(1);
+    func2(2);
+    func2(3);
+    func2(4);
+    func2(5);
+    func2(6);
+    func2(7);
+    func2(8);
+    func2(9);
+    func2(10);
+    func2(11);
 
-    s1 += s13 * 666643;
-    s2 += s13 * 470296;
-    s3 += s13 * 654183;
-    s4 -= s13 * 997805;
-    s5 += s13 * 136657;
-    s6 -= s13 * 683901;
+    func23(0, S[12]);
 
-    s0 += s12 * 666643;
-    s1 += s12 * 470296;
-    s2 += s12 * 654183;
-    s3 -= s12 * 997805;
-    s4 += s12 * 136657;
-    s5 -= s12 * 683901;
-    s12 = 0;
+    func2(0);
+    func2(1);
+    func2(2);
+    func2(3);
+    func2(4);
+    func2(5);
+    func2(6);
+    func2(7);
+    func2(8);
+    func2(9);
+    func2(10);
 
-    carry0 = (s0 + (let) (1L << 20)) >> 21;
-    s1 += carry0;
-    s0 -= carry0 * (1L << 21);
-    carry2 = (s2 + (let) (1L << 20)) >> 21;
-    s3 += carry2;
-    s2 -= carry2 * (1L << 21);
-    carry4 = (s4 + (let) (1L << 20)) >> 21;
-    s5 += carry4;
-    s4 -= carry4 * (1L << 21);
-    carry6 = (s6 + (let) (1L << 20)) >> 21;
-    s7 += carry6;
-    s6 -= carry6 * (1L << 21);
-    carry8 = (s8 + (let) (1L << 20)) >> 21;
-    s9 += carry8;
-    s8 -= carry8 * (1L << 21);
-    carry10 = (s10 + (let) (1L << 20)) >> 21;
-    s11 += carry10;
-    s10 -= carry10 * (1L << 21);
-
-    carry1 = (s1 + (let) (1L << 20)) >> 21;
-    s2 += carry1;
-    s1 -= carry1 * (1L << 21);
-    carry3 = (s3 + (let) (1L << 20)) >> 21;
-    s4 += carry3;
-    s3 -= carry3 * (1L << 21);
-    carry5 = (s5 + (let) (1L << 20)) >> 21;
-    s6 += carry5;
-    s5 -= carry5 * (1L << 21);
-    carry7 = (s7 + (let) (1L << 20)) >> 21;
-    s8 += carry7;
-    s7 -= carry7 * (1L << 21);
-    carry9 = (s9 + (let) (1L << 20)) >> 21;
-    s10 += carry9;
-    s9 -= carry9 * (1L << 21);
-    carry11 = (s11 + (let) (1L << 20)) >> 21;
-    s12 += carry11;
-    s11 -= carry11 * (1L << 21);
-
-    s0 += s12 * 666643;
-    s1 += s12 * 470296;
-    s2 += s12 * 654183;
-    s3 -= s12 * 997805;
-    s4 += s12 * 136657;
-    s5 -= s12 * 683901;
-    s12 = 0;
-
-    carry0 = s0 >> 21;
-    s1 += carry0;
-    s0 -= carry0 * (1L << 21);
-    carry1 = s1 >> 21;
-    s2 += carry1;
-    s1 -= carry1 * (1L << 21);
-    carry2 = s2 >> 21;
-    s3 += carry2;
-    s2 -= carry2 * (1L << 21);
-    carry3 = s3 >> 21;
-    s4 += carry3;
-    s3 -= carry3 * (1L << 21);
-    carry4 = s4 >> 21;
-    s5 += carry4;
-    s4 -= carry4 * (1L << 21);
-    carry5 = s5 >> 21;
-    s6 += carry5;
-    s5 -= carry5 * (1L << 21);
-    carry6 = s6 >> 21;
-    s7 += carry6;
-    s6 -= carry6 * (1L << 21);
-    carry7 = s7 >> 21;
-    s8 += carry7;
-    s7 -= carry7 * (1L << 21);
-    carry8 = s8 >> 21;
-    s9 += carry8;
-    s8 -= carry8 * (1L << 21);
-    carry9 = s9 >> 21;
-    s10 += carry9;
-    s9 -= carry9 * (1L << 21);
-    carry10 = s10 >> 21;
-    s11 += carry10;
-    s10 -= carry10 * (1L << 21);
-    carry11 = s11 >> 21;
-    s12 += carry11;
-    s11 -= carry11 * (1L << 21);
-
-    s0 += s12 * 666643;
-    s1 += s12 * 470296;
-    s2 += s12 * 654183;
-    s3 -= s12 * 997805;
-    s4 += s12 * 136657;
-    s5 -= s12 * 683901;
-
-    carry0 = s0 >> 21;
-    s1 += carry0;
-    s0 -= carry0 * (1L << 21);
-    carry1 = s1 >> 21;
-    s2 += carry1;
-    s1 -= carry1 * (1L << 21);
-    carry2 = s2 >> 21;
-    s3 += carry2;
-    s2 -= carry2 * (1L << 21);
-    carry3 = s3 >> 21;
-    s4 += carry3;
-    s3 -= carry3 * (1L << 21);
-    carry4 = s4 >> 21;
-    s5 += carry4;
-    s4 -= carry4 * (1L << 21);
-    carry5 = s5 >> 21;
-    s6 += carry5;
-    s5 -= carry5 * (1L << 21);
-    carry6 = s6 >> 21;
-    s7 += carry6;
-    s6 -= carry6 * (1L << 21);
-    carry7 = s7 >> 21;
-    s8 += carry7;
-    s7 -= carry7 * (1L << 21);
-    carry8 = s8 >> 21;
-    s9 += carry8;
-    s8 -= carry8 * (1L << 21);
-    carry9 = s9 >> 21;
-    s10 += carry9;
-    s9 -= carry9 * (1L << 21);
-    carry10 = s10 >> 21;
-    s11 += carry10;
-    s10 -= carry10 * (1L << 21);
-
-    s[0]  = s0 >> 0;
-    s[1]  = s0 >> 8;
-    s[2]  = (s0 >> 16) | (s1 * (1 << 5));
-    s[3]  = s1 >> 3;
-    s[4]  = s1 >> 11;
-    s[5]  = (s1 >> 19) | (s2 * (1 << 2));
-    s[6]  = s2 >> 6;
-    s[7]  = (s2 >> 14) | (s3 * (1 << 7));
-    s[8]  = s3 >> 1;
-    s[9]  = s3 >> 9;
-    s[10] = (s3 >> 17) | (s4 * (1 << 4));
-    s[11] = s4 >> 4;
-    s[12] = s4 >> 12;
-    s[13] = (s4 >> 20) | (s5 * (1 << 1));
-    s[14] = s5 >> 7;
-    s[15] = (s5 >> 15) | (s6 * (1 << 6));
-    s[16] = s6 >> 2;
-    s[17] = s6 >> 10;
-    s[18] = (s6 >> 18) | (s7 * (1 << 3));
-    s[19] = s7 >> 5;
-    s[20] = s7 >> 13;
-    s[21] = s8 >> 0;
-    s[22] = s8 >> 8;
-    s[23] = (s8 >> 16) | (s9 * (1 << 5));
-    s[24] = s9 >> 3;
-    s[25] = s9 >> 11;
-    s[26] = (s9 >> 19) | (s10 * (1 << 2));
-    s[27] = s10 >> 6;
-    s[28] = (s10 >> 14) | (s11 * (1 << 7));
-    s[29] = s11 >> 1;
-    s[30] = s11 >> 9;
-    s[31] = s11 >> 17;
+    s[0]  = JSBIUtils.toInt8(S[0]);
+    s[1]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[0], JSBI.BigInt(8)));
+    s[2]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[0], JSBI.BigInt(16)), JSBI.multiply(S[1], JSBI.BigInt(1 << 5))));
+    s[3]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[1], JSBI.BigInt(3)));
+    s[4]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[1], JSBI.BigInt(11)));
+    s[5]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[1], JSBI.BigInt(19)), JSBI.multiply(S[2], JSBI.BigInt(1 << 2))));
+    s[6]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[2], JSBI.BigInt(6)));
+    s[7]  = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[2], JSBI.BigInt(14)), JSBI.multiply(S[3], JSBI.BigInt(1 << 7))));
+    s[8]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[3], JSBI.BigInt(1)));
+    s[9]  = JSBIUtils.toInt8(JSBI.signedRightShift(S[3], JSBI.BigInt(9)));
+    s[10] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[3], JSBI.BigInt(17)), JSBI.multiply(S[4], JSBI.BigInt(1 << 4))));
+    s[11] = JSBIUtils.toInt8(JSBI.signedRightShift(S[4], JSBI.BigInt(4)));
+    s[12] = JSBIUtils.toInt8(JSBI.signedRightShift(S[4], JSBI.BigInt(12)));
+    s[13] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[4], JSBI.BigInt(20)), JSBI.multiply(S[5], JSBI.BigInt(1 << 1))));
+    s[14] = JSBIUtils.toInt8(JSBI.signedRightShift(S[5], JSBI.BigInt(7)));
+    s[15] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[5], JSBI.BigInt(15)), JSBI.multiply(S[6], JSBI.BigInt(1 << 6))));
+    s[16] = JSBIUtils.toInt8(JSBI.signedRightShift(S[6], JSBI.BigInt(2)));
+    s[17] = JSBIUtils.toInt8(JSBI.signedRightShift(S[6], JSBI.BigInt(10)));
+    s[18] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[6], JSBI.BigInt(18)), JSBI.multiply(S[7], JSBI.BigInt(1 << 3))));
+    s[19] = JSBIUtils.toInt8(JSBI.signedRightShift(S[7], JSBI.BigInt(5)));
+    s[20] = JSBIUtils.toInt8(JSBI.signedRightShift(S[7], JSBI.BigInt(13)));
+    s[21] = JSBIUtils.toInt8(S[8]);
+    s[22] = JSBIUtils.toInt8(JSBI.signedRightShift(S[8], JSBI.BigInt(8)));
+    s[23] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[8], JSBI.BigInt(16)), JSBI.multiply(S[9], JSBI.BigInt(1 << 5))));
+    s[24] = JSBIUtils.toInt8(JSBI.signedRightShift(S[9], JSBI.BigInt(3)));
+    s[25] = JSBIUtils.toInt8(JSBI.signedRightShift(S[9], JSBI.BigInt(11)));
+    s[26] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[9], JSBI.BigInt(19)), JSBI.multiply(S[10], JSBI.BigInt(1 << 2))));
+    s[27] = JSBIUtils.toInt8(JSBI.signedRightShift(S[10], JSBI.BigInt(6)));
+    s[28] = JSBIUtils.toInt8(JSBI.bitwiseOr(JSBI.signedRightShift(S[10], JSBI.BigInt(14)), JSBI.multiply(S[11], JSBI.BigInt(1 << 7))));
+    s[29] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(1)));
+    s[30] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(9)));
+    s[31] = JSBIUtils.toInt8(JSBI.signedRightShift(S[11], JSBI.BigInt(17)));
 }
 
 /*
@@ -2760,12 +2519,13 @@ export function sc25519_reduce (s: Uint8Array)
 
 export function sc25519_is_canonical (s: Uint8Array): number
 {
-    /* 2^252+27742317777372353535851937790883648493 */
+    /* 2^252 + 27742317777372353535851937790883648493 */
     let L = Uint8Array.from([
         0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7,
         0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10
     ]);
+
     let c = 0;
     let n = 1;
     let i = 32;
