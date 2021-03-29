@@ -111,6 +111,13 @@ export {
     crypto_core_ed25519_scalar_is_canonical
 } from './modules/crypto/crypto_core/ed25519/core_ed25519';
 
+export {
+    crypto_scalarmult_ed25519,
+    crypto_scalarmult_ed25519_base,
+    crypto_scalarmult_ed25519_base_noclamp,
+    crypto_scalarmult_ed25519_noclamp
+} from './modules/crypto/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10';
+
 export { crypto_sign_ed25519_sk_to_curve25519 } from './modules/crypto/crypto_sign/ed25519/keypair';
 
 export { ED25519Utils } from './modules/crypto/utils/ED25519Utils';
