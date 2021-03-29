@@ -14,6 +14,7 @@
 import * as sdk from '../lib';
 
 import * as assert from 'assert';
+import {Utils} from "../src";
 
 describe ('Crypto', () =>
 {
@@ -1094,22 +1095,6 @@ describe ('Crypto', () =>
         console.log(b.toString("hex"));
     });
 
-    it ('Make Sample Random Data', () =>
-    {
-        let values:Array<any> = [];
-        for (let i = 0; i < 50; i++)
-        {
-            let r = Buffer.from(sdk.randombytes_buf(sdk.ED25519Utils.crypto_core_ed25519_UNIFORMBYTES))
-            values.push(
-                {
-                    random: r.toString("hex"),
-                    crypto_core_ed25519_from_uniform: Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_from_uniform(r)).toString("hex")
-                }
-            );
-        }
-        console.log(values);
-    });
-
     it ('Test FE25519 1', () =>
     {
         let bytes = new Uint8Array(32);
@@ -1153,6 +1138,17 @@ describe ('Crypto', () =>
 
         let invalid2 = Buffer.from("0000000000000000000000000000000000000000000000000000000000000000", "hex");
         assert.ok(!sdk.crypto_core_ed25519_is_valid_point(invalid2));
+    });
+
+    it ('Test crypto_core_ed25519_scalar_random', () =>
+    {
+        let ED25519_L = Buffer.from("1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed", "hex").reverse();
+        let ZERO =      Buffer.from("0000000000000000000000000000000000000000000000000000000000000000", "hex");
+        for (let idx = 0; idx < 50; idx++)
+        {
+            let scalar = Buffer.from(sdk.crypto_core_ed25519_scalar_random());
+            assert.ok((Utils.compareBuffer(scalar, ZERO) > 0) && (Utils.compareBuffer(scalar, ED25519_L) < 0));
+        }
     });
 
     it ('Test ed25519_sqdmone', () =>
@@ -1200,6 +1196,22 @@ describe ('Make Sample Data', () =>
     before('Wait for the package libsodium to finish loading', () =>
     {
         return sdk.SodiumHelper.init();
+    });
+
+    it ('Make Sample Random Data', () =>
+    {
+        let values:Array<any> = [];
+        for (let i = 0; i < 50; i++)
+        {
+            let r = Buffer.from(sdk.randombytes_buf(sdk.ED25519Utils.crypto_core_ed25519_UNIFORMBYTES))
+            values.push(
+                {
+                    random: r.toString("hex"),
+                    crypto_core_ed25519_from_uniform: Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_from_uniform(r)).toString("hex")
+                }
+            );
+        }
+        console.log(values);
     });
 
     it ('Make Sample Point Data', () =>
