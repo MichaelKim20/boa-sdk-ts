@@ -2352,9 +2352,6 @@ export function sc25519_invert (recip: Uint8Array, s: Uint8Array)
  */
 export function sc25519_reduce (s: Uint8Array)
 {
-    if (s.length != crypto_core_ed25519_NONREDUCEDSCALARBYTES)
-        throw new Error("The size of the entered buffer is not 64.");
-
     let S: Array<JSBI> = [];
     let Carry: Array<JSBI> = [];
 
