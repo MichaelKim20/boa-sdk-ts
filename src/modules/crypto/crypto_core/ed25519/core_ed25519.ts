@@ -16,14 +16,19 @@ export function crypto_core_ed25519_scalar_random (): Uint8Array
     do {
         r = randombytes_buf(crypto_core_ed25519_SCALARBYTES);
         r[crypto_core_ed25519_SCALARBYTES - 1] &= 0x1f;
-    } while (ref10.sc25519_is_canonical(r) == 0 ||
-    (sodium_is_zero(r, crypto_core_ed25519_SCALARBYTES) != 0));
+    } while (ref10.sc25519_is_canonical(r) == 0 || (sodium_is_zero(r, crypto_core_ed25519_SCALARBYTES) != 0));
 
     return r;
 }
 
 export function crypto_core_ed25519_scalar_add (x: Uint8Array, y: Uint8Array): Uint8Array
 {
+    if (x.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
+    if (y.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
     let x_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
     let y_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
 
@@ -39,6 +44,12 @@ export function crypto_core_ed25519_scalar_add (x: Uint8Array, y: Uint8Array): U
 
 export function crypto_core_ed25519_scalar_sub (x: Uint8Array, y: Uint8Array): Uint8Array
 {
+    if (x.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
+    if (y.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
     let yn = crypto_core_ed25519_scalar_negate(y);
     return crypto_core_ed25519_scalar_add(x, yn);
 }
@@ -51,6 +62,9 @@ const L = new Uint8Array([
 
 export function crypto_core_ed25519_scalar_negate (s: Uint8Array): Uint8Array
 {
+    if (s.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
     let t_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
     let s_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
 
@@ -70,8 +84,11 @@ export function crypto_core_ed25519_scalar_negate (s: Uint8Array): Uint8Array
     return r;
 }
 
-export function crypto_core_ed25519_scalar_complement (comp: Uint8Array, s: Uint8Array)
+export function crypto_core_ed25519_scalar_complement (s: Uint8Array): Uint8Array
 {
+    if (s.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
     let t_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
     let s_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
 
@@ -84,14 +101,22 @@ export function crypto_core_ed25519_scalar_complement (comp: Uint8Array, s: Uint
 
     sodium_sub(t_, s_, crypto_core_ed25519_NONREDUCEDSCALARBYTES);
     ref10.sc25519_reduce(t_);
+
     let r = new Uint8Array(crypto_core_ed25519_SCALARBYTES);
     for (i = 0; i < r.length; i++)
         r[i] = t_[i];
+
     return r;
 }
 
 export function crypto_core_ed25519_scalar_mul (x: Uint8Array, y: Uint8Array): Uint8Array
 {
+    if (x.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
+    if (y.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
     let z = new Uint8Array(crypto_core_ed25519_SCALARBYTES);
     ref10.sc25519_mul(z, x, y);
     return z;
@@ -99,6 +124,9 @@ export function crypto_core_ed25519_scalar_mul (x: Uint8Array, y: Uint8Array): U
 
 export function crypto_core_ed25519_scalar_invert (s: Uint8Array): Uint8Array
 {
+    if (s.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
     if (sodium_is_zero(s, crypto_core_ed25519_SCALARBYTES) != 0)
         throw new Error("Invalid input value");
 
@@ -106,6 +134,7 @@ export function crypto_core_ed25519_scalar_invert (s: Uint8Array): Uint8Array
     ref10.sc25519_invert(r, s);
     return r;
 }
+
 export function crypto_core_ed25519_scalar_reduce (s: Uint8Array): Uint8Array
 {
     let t = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
@@ -125,6 +154,9 @@ export function crypto_core_ed25519_scalar_reduce (s: Uint8Array): Uint8Array
 
 export function crypto_core_ed25519_scalar_is_canonical(s: Uint8Array): boolean
 {
+    if (s.length != crypto_core_ed25519_SCALARBYTES)
+        throw new Error("Invalid input size");
+
     return ref10.sc25519_is_canonical(s) != 0
 }
 
@@ -143,6 +175,12 @@ export function crypto_core_ed25519_from_uniform (r: Uint8Array): Uint8Array
 
 export function crypto_core_ed25519_add (p: Uint8Array, q: Uint8Array): Uint8Array
 {
+    if (p.length != crypto_core_ed25519_BYTES)
+        throw new Error("Invalid input size");
+
+    if (q.length != crypto_core_ed25519_BYTES)
+        throw new Error("Invalid input size");
+
     let p_p3 = new ref10.GE25519_P3();
     let q_p3 = new ref10.GE25519_P3();
     let r_p3 = new ref10.GE25519_P3();
@@ -167,6 +205,12 @@ export function crypto_core_ed25519_add (p: Uint8Array, q: Uint8Array): Uint8Arr
 
 export function crypto_core_ed25519_sub (p: Uint8Array, q: Uint8Array): Uint8Array
 {
+    if (p.length != crypto_core_ed25519_BYTES)
+        throw new Error("Invalid input size");
+
+    if (q.length != crypto_core_ed25519_BYTES)
+        throw new Error("Invalid input size");
+
     let p_p3 = new ref10.GE25519_P3();
     let q_p3 = new ref10.GE25519_P3();
     let r_p3 = new ref10.GE25519_P3();
@@ -191,6 +235,9 @@ export function crypto_core_ed25519_sub (p: Uint8Array, q: Uint8Array): Uint8Arr
 
 export function crypto_core_ed25519_is_valid_point (p: Uint8Array): boolean
 {
+    if (p.length != crypto_core_ed25519_BYTES)
+        throw new Error("Invalid input size");
+
     let p_p3 = new ref10.GE25519_P3();
 
     if (

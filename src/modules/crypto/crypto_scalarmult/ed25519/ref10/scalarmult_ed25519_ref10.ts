@@ -101,7 +101,7 @@ export function crypto_scalarmult_ed25519_base (q: Uint8Array, n: Uint8Array)
     return _crypto_scalarmult_ed25519_base(q, n, 1);
 }
 
-export function crypto_scalarmult_ed25519_base_noclamp(q: Uint8Array, n: Uint8Array)
+export function crypto_scalarmult_ed25519_base_noclamp (q: Uint8Array, n: Uint8Array)
 {
     return _crypto_scalarmult_ed25519_base(q, n, 0);
 }
