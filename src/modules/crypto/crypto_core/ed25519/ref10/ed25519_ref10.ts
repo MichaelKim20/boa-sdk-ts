@@ -1,7 +1,8 @@
 import {
     crypto_core_ed25519_NONREDUCEDSCALARBYTES,
     sodium_is_zero,
-    JSBIUtils } from '../../../';
+    JSBIUtils
+} from '../../../';
 import JSBI from "jsbi";
 
 export class FE25519
@@ -1351,6 +1352,13 @@ export function ge25519_cmov_cached (t: GE25519_Cached, u: GE25519_Cached, b: nu
     fe25519_cmov(t.T2d, u.T2d, b);
 }
 
+export function ge25519_precomp_0 (h: GE25519_PreComp)
+{
+    fe25519_1(h.yplusx);
+    fe25519_1(h.yminusx);
+    fe25519_0(h.xy2d);
+}
+
 export function ge25519_cmov8 (t: GE25519_PreComp, precomp: Array<GE25519_PreComp>, b: number)
 {
     let minust = new GE25519_PreComp();
@@ -1374,29 +1382,30 @@ export function ge25519_cmov8 (t: GE25519_PreComp, precomp: Array<GE25519_PreCom
 
 export function ge25519_cmov8_base (t: GE25519_PreComp, pos: number, b: number)
 {
-    static const ge25519_precomp base[32][8] = { /* base[i][j] = (j+1)*256^i*B */
+    let base: Array<Array<GE25519_PreComp>> = new Array<Array<GE25519_PreComp>>();// base[32][8] = { /* base[i][j] = (j+1)*256^i*B */
     ge25519_cmov8(t, base[pos], b);
 }
+
 export function ge25519_cmov8_cached (t: GE25519_Cached, cached : Array<GE25519_Cached>, b: number)
 {
     let minust = new GE25519_Cached();
-    const unsigned char bnegative = negative(b);
-    const unsigned char babs      = b - (((-bnegative) & b) * ((signed char) 1 << 1));
+    let bnegative = negative(b);
+    let babs     = (b - (((-bnegative) & b) * (1 << 1))) & 0xff;
 
     ge25519_cached_0(t);
-    ge25519_cmov_cached(t, &cached[0], equal(babs, 1));
-    ge25519_cmov_cached(t, &cached[1], equal(babs, 2));
-    ge25519_cmov_cached(t, &cached[2], equal(babs, 3));
-    ge25519_cmov_cached(t, &cached[3], equal(babs, 4));
-    ge25519_cmov_cached(t, &cached[4], equal(babs, 5));
-    ge25519_cmov_cached(t, &cached[5], equal(babs, 6));
-    ge25519_cmov_cached(t, &cached[6], equal(babs, 7));
-    ge25519_cmov_cached(t, &cached[7], equal(babs, 8));
-    fe25519_copy(minust.YplusX, t->YminusX);
-    fe25519_copy(minust.YminusX, t->YplusX);
-    fe25519_copy(minust.Z, t->Z);
-    fe25519_neg(minust.T2d, t->T2d);
-    ge25519_cmov_cached(t, &minust, bnegative);
+    ge25519_cmov_cached(t, cached[0], equal(babs, 1));
+    ge25519_cmov_cached(t, cached[1], equal(babs, 2));
+    ge25519_cmov_cached(t, cached[2], equal(babs, 3));
+    ge25519_cmov_cached(t, cached[3], equal(babs, 4));
+    ge25519_cmov_cached(t, cached[4], equal(babs, 5));
+    ge25519_cmov_cached(t, cached[5], equal(babs, 6));
+    ge25519_cmov_cached(t, cached[6], equal(babs, 7));
+    ge25519_cmov_cached(t, cached[7], equal(babs, 8));
+    fe25519_copy(minust.YplusX, t.YminusX);
+    fe25519_copy(minust.YminusX, t.YplusX);
+    fe25519_copy(minust.Z, t.Z);
+    fe25519_neg(minust.T2d, t.T2d);
+    ge25519_cmov_cached(t, minust, bnegative);
 }
 
 export function ge25519_frombytes (h: GE25519_P3, s: Uint8Array)
@@ -1443,6 +1452,44 @@ export function ge25519_frombytes (h: GE25519_P3, s: Uint8Array)
     fe25519_mul(h.T, h.X, h.Y);
 
     return (has_m_root | has_p_root) - 1;
+}
+/*
+ r = p + q
+ */
+
+function ge25519_add_precomp (r: GE25519_P1P1, p: GE25519_P3, q: GE25519_PreComp)
+{
+    let t0 = new FE25519();
+
+    fe25519_add(r.X, p.Y, p.X);
+    fe25519_sub(r.Y, p.Y, p.X);
+    fe25519_mul(r.Z, r.X, q.yplusx);
+    fe25519_mul(r.Y, r.Y, q.yminusx);
+    fe25519_mul(r.T, q.xy2d, p.T);
+    fe25519_add(t0, p.Z, p.Z);
+    fe25519_sub(r.X, r.Z, r.Y);
+    fe25519_add(r.Y, r.Z, r.Y);
+    fe25519_add(r.Z, t0, r.T);
+    fe25519_sub(r.T, t0, r.T);
+}
+
+/*
+ r = p - q
+ */
+function ge25519_sub_precomp (r: GE25519_P1P1, p: GE25519_P3, q: GE25519_PreComp)
+{
+    let t0 = new FE25519();
+
+    fe25519_add(r.X, p.Y, p.X);
+    fe25519_sub(r.Y, p.Y, p.X);
+    fe25519_mul(r.Z, r.X, q.yminusx);
+    fe25519_mul(r.Y, r.Y, q.yplusx);
+    fe25519_mul(r.T, q.xy2d, p.T);
+    fe25519_add(t0, p.Z, p.Z);
+    fe25519_sub(r.X, r.Z, r.Y);
+    fe25519_add(r.Y, r.Z, r.Y);
+    fe25519_sub(r.Z, t0, r.T);
+    fe25519_add(r.T, t0, r.T);
 }
 
 /* montgomery to edwards */
@@ -1529,6 +1576,14 @@ export function ge25519_p3_0 (h: GE25519_P3)
     fe25519_0(h.T);
 }
 
+export function ge25519_cached_0 (h: GE25519_Cached)
+{
+    fe25519_1(h.YplusX);
+    fe25519_1(h.YminusX);
+    fe25519_1(h.Z);
+    fe25519_0(h.T2d);
+}
+
 export function ge25519_p3_to_cached (r: GE25519_Cached, p: GE25519_P3)
 {
     fe25519_add(r.YplusX, p.Y, p.X);
@@ -1562,13 +1617,6 @@ export function ge25519_p3_dbl (r: GE25519_P1P1, p: GE25519_P3)
     let q = new GE25519_P2();
     ge25519_p3_to_p2(q, p);
     ge25519_p2_dbl(r, q);
-}
-
-export function ge25519_precomp_0(h: GE25519_PreComp)
-{
-    fe25519_1(h.yplusx);
-    fe25519_1(h.yminusx);
-    fe25519_0(h.xy2d);
 }
 
 export function ge25519_clear_cofactor (p3: GE25519_P3)
@@ -2650,45 +2698,66 @@ export function sc25519_is_canonical (s: Uint8Array): number
 
 export function ge25519_scalarmult (h: GE25519_P3, a: Uint8Array, p: GE25519_P3)
 {
-    signed char     e[64];
-    signed char     carry;
-    ge25519_p1p1    r;
-    ge25519_p2      s;
-    ge25519_p1p1    t2, t3, t4, t5, t6, t7, t8;
-    ge25519_p3      p2, p3, p4, p5, p6, p7, p8;
-    ge25519_cached  pi[8];
-    ge25519_cached  t;
-    int             i;
+    let e = new Int8Array(64);
+    let carry = new Int8Array(1);
+    let r = new GE25519_P1P1();
+    let s = new GE25519_P2();
+    let t2 = new GE25519_P1P1();
+    let t3 = new GE25519_P1P1();
+    let t4 = new GE25519_P1P1();
+    let t5 = new GE25519_P1P1();
+    let t6 = new GE25519_P1P1();
+    let t7 = new GE25519_P1P1();
+    let t8 = new GE25519_P1P1();
+    let p2 = new GE25519_P3();
+    let p3 = new GE25519_P3();
+    let p4 = new GE25519_P3();
+    let p5 = new GE25519_P3();
+    let p6 = new GE25519_P3();
+    let p7 = new GE25519_P3();
+    let p8 = new GE25519_P3();
+    let pi = [
+        new GE25519_Cached(),
+        new GE25519_Cached(),
+        new GE25519_Cached(),
+        new GE25519_Cached(),
+        new GE25519_Cached(),
+        new GE25519_Cached(),
+        new GE25519_Cached(),
+        new GE25519_Cached()
+        ];
+    let t = new GE25519_Cached();
+    let i;
 
-    ge25519_p3_to_cached(&pi[1 - 1], p);   /* p */
+    ge25519_p3_to_cached(pi[1 - 1], p);   /* p */
 
-    ge25519_p3_dbl(&t2, p);
-    ge25519_p1p1_to_p3(&p2, &t2);
-    ge25519_p3_to_cached(&pi[2 - 1], &p2); /* 2p = 2*p */
+    ge25519_p3_dbl(t2, p);
+    ge25519_p1p1_to_p3(p2, t2);
+    ge25519_p3_to_cached(pi[2 - 1], p2); /* 2p = 2*p */
 
-    ge25519_add_cached(&t3, p, &pi[2 - 1]);
-    ge25519_p1p1_to_p3(&p3, &t3);
-    ge25519_p3_to_cached(&pi[3 - 1], &p3); /* 3p = 2p+p */
+    ge25519_add_cached(t3, p, pi[2 - 1]);
+    ge25519_p1p1_to_p3(p3, t3);
+    ge25519_p3_to_cached(pi[3 - 1], p3); /* 3p = 2p+p */
 
-    ge25519_p3_dbl(&t4, &p2);
-    ge25519_p1p1_to_p3(&p4, &t4);
-    ge25519_p3_to_cached(&pi[4 - 1], &p4); /* 4p = 2*2p */
+    ge25519_p3_dbl(t4, p2);
+    ge25519_p1p1_to_p3(p4, t4);
+    ge25519_p3_to_cached(pi[4 - 1], p4); /* 4p = 2*2p */
 
-    ge25519_add_cached(&t5, p, &pi[4 - 1]);
-    ge25519_p1p1_to_p3(&p5, &t5);
-    ge25519_p3_to_cached(&pi[5 - 1], &p5); /* 5p = 4p+p */
+    ge25519_add_cached(t5, p, pi[4 - 1]);
+    ge25519_p1p1_to_p3(p5, t5);
+    ge25519_p3_to_cached(pi[5 - 1], p5); /* 5p = 4p+p */
 
-    ge25519_p3_dbl(&t6, &p3);
-    ge25519_p1p1_to_p3(&p6, &t6);
-    ge25519_p3_to_cached(&pi[6 - 1], &p6); /* 6p = 2*3p */
+    ge25519_p3_dbl(t6, p3);
+    ge25519_p1p1_to_p3(p6, t6);
+    ge25519_p3_to_cached(pi[6 - 1], p6); /* 6p = 2*3p */
 
-    ge25519_add_cached(&t7, p, &pi[6 - 1]);
-    ge25519_p1p1_to_p3(&p7, &t7);
-    ge25519_p3_to_cached(&pi[7 - 1], &p7); /* 7p = 6p+p */
+    ge25519_add_cached(t7, p, pi[6 - 1]);
+    ge25519_p1p1_to_p3(p7, t7);
+    ge25519_p3_to_cached(pi[7 - 1], p7); /* 7p = 6p+p */
 
-    ge25519_p3_dbl(&t8, &p4);
-    ge25519_p1p1_to_p3(&p8, &t8);
-    ge25519_p3_to_cached(&pi[8 - 1], &p8); /* 8p = 2*4p */
+    ge25519_p3_dbl(t8, p4);
+    ge25519_p1p1_to_p3(p8, t8);
+    ge25519_p3_to_cached(pi[8 - 1], p8); /* 8p = 2*4p */
 
     for (i = 0; i < 32; ++i) {
         e[2 * i + 0] = (a[i] >> 0) & 15;
@@ -2697,41 +2766,85 @@ export function ge25519_scalarmult (h: GE25519_P3, a: Uint8Array, p: GE25519_P3)
     /* each e[i] is between 0 and 15 */
     /* e[63] is between 0 and 7 */
 
-    carry = 0;
+    carry[0] = 0;
     for (i = 0; i < 63; ++i) {
-        e[i] += carry;
-        carry = e[i] + 8;
-        carry >>= 4;
-        e[i] -= carry * ((signed char) 1 << 4);
+        e[i] += carry[0];
+        carry[0] = (e[i] + 8);
+        carry[0] >>= 4;
+        e[i] -= (carry[0] * (1 << 4)) & 0xff;
     }
-    e[63] += carry;
+    e[63] += carry[0];
     /* each e[i] is between -8 and 8 */
 
     ge25519_p3_0(h);
 
     for (i = 63; i != 0; i--) {
-        ge25519_cmov8_cached(&t, pi, e[i]);
-        ge25519_add_cached(&r, h, &t);
+        ge25519_cmov8_cached(t, pi, e[i]);
+        ge25519_add_cached(r, h, t);
 
-        ge25519_p1p1_to_p2(&s, &r);
-        ge25519_p2_dbl(&r, &s);
-        ge25519_p1p1_to_p2(&s, &r);
-        ge25519_p2_dbl(&r, &s);
-        ge25519_p1p1_to_p2(&s, &r);
-        ge25519_p2_dbl(&r, &s);
-        ge25519_p1p1_to_p2(&s, &r);
-        ge25519_p2_dbl(&r, &s);
+        ge25519_p1p1_to_p2(s, r);
+        ge25519_p2_dbl(r, s);
+        ge25519_p1p1_to_p2(s, r);
+        ge25519_p2_dbl(r, s);
+        ge25519_p1p1_to_p2(s, r);
+        ge25519_p2_dbl(r, s);
+        ge25519_p1p1_to_p2(s, r);
+        ge25519_p2_dbl(r, s);
 
-        ge25519_p1p1_to_p3(h, &r);  /* *16 */
+        ge25519_p1p1_to_p3(h, r);  /* *16 */
     }
-    ge25519_cmov8_cached(&t, pi, e[i]);
-    ge25519_add_cached(&r, h, &t);
+    ge25519_cmov8_cached(t, pi, e[i]);
+    ge25519_add_cached(r, h, t);
 
-    ge25519_p1p1_to_p3(h, &r);
-
+    ge25519_p1p1_to_p3(h, r);
 }
 
 export function ge25519_scalarmult_base (h: GE25519_P3, a: Uint8Array)
 {
+    let e = new Int8Array(64);
+    let carry = new Int8Array(1);
+    let r = new GE25519_P1P1();
+    let s = new GE25519_P2();
+    let t = new GE25519_PreComp();
+    let i;
 
+    for (i = 0; i < 32; ++i) {
+        e[2 * i + 0] = (a[i] >> 0) & 15;
+        e[2 * i + 1] = (a[i] >> 4) & 15;
+    }
+    /* each e[i] is between 0 and 15 */
+    /* e[63] is between 0 and 7 */
+
+    carry[0] = 0;
+    for (i = 0; i < 63; ++i) {
+        e[i] += carry[0];
+        carry[0] = e[i] + 8;
+        carry[0] >>= 4;
+        e[i] -= carry[0] * (1 << 4);
+    }
+    e[63] += carry[0];
+    /* each e[i] is between -8 and 8 */
+
+    ge25519_p3_0(h);
+
+    for (i = 1; i < 64; i += 2) {
+        ge25519_cmov8_base(t, i / 2, e[i]);
+        ge25519_add_precomp(r, h, t);
+        ge25519_p1p1_to_p3(h, r);
+    }
+
+    ge25519_p3_dbl(r, h);
+    ge25519_p1p1_to_p2(s, r);
+    ge25519_p2_dbl(r, s);
+    ge25519_p1p1_to_p2(s, r);
+    ge25519_p2_dbl(r, s);
+    ge25519_p1p1_to_p2(s, r);
+    ge25519_p2_dbl(r, s);
+    ge25519_p1p1_to_p3(h, r);
+
+    for (i = 0; i < 64; i += 2) {
+        ge25519_cmov8_base(t, i / 2, e[i]);
+        ge25519_add_precomp(r, h, t);
+        ge25519_p1p1_to_p3(h, r);
+    }
 }

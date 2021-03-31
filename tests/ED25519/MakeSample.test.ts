@@ -1,15 +1,15 @@
 /*******************************************************************************
 
- Test for libsodium ported to TypeScript
+    Test for libsodium ported to TypeScript
 
- Copyright:
- Copyright (c) 2020 BOS Platform Foundation Korea
- All rights reserved.
+    Copyright:
+        Copyright (c) 2020 BOS Platform Foundation Korea
+        All rights reserved.
 
- License:
- MIT License. See LICENSE for details.
+    License:
+        MIT License. See LICENSE for details.
 
- *******************************************************************************/
+*******************************************************************************/
 
 import * as sdk from '../../lib';
 

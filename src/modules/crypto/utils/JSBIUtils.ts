@@ -40,4 +40,3 @@ export class JSBIUtils
         return JSBIUtils.Sum(M);
     }
 }
-
