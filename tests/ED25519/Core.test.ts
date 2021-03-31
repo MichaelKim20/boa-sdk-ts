@@ -1365,5 +1365,4 @@ describe ('Test crypto_core', () =>
             assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_complement(x)).toString("hex"), elem.complement_x);
         });
     });
-
 });
