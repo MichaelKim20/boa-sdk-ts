@@ -11,10 +11,9 @@
 
  *******************************************************************************/
 
-import * as sdk from '../lib';
+import * as sdk from '../../lib';
 
 import * as assert from 'assert';
-import {Utils} from "../src";
 
 let seeds: Array<string> = [
     "SCSRW54L4EXJYTQIQYCJD4YLBMDALRBMHSSSZR4VW5PSBZZ2YII2RRQN",
@@ -981,6 +980,121 @@ let sample_point_add_sub = [
     }
 ];
 
+describe ('Crypto', () =>
+{
+    before('Wait for the package libsodium to finish loading', () =>
+    {
+        return sdk.SodiumHelper.init();
+    });
+
+    it ('Test crypto_core_ed25519_scalar_reduce', () =>
+    {
+        sample_for_crypto_core_ed25519_scalar_reduce.forEach((elem) => {
+            let hash = Buffer.from(elem.hash, "hex");
+            let result = sdk.crypto_core_ed25519_scalar_reduce(hash);
+            assert.deepStrictEqual(Buffer.from(result).toString("hex"), elem.result);
+        });
+    });
+
+    it ('Test crypto_sign_ed25519_sk_to_curve25519', () =>
+    {
+        sample_crypto_sign_ed25519_sk_to_curve25519.forEach((elem) => {
+            let privateKey = Buffer.from(elem.privateKey, "hex");
+            let x25519 = Buffer.from(sdk.crypto_sign_ed25519_sk_to_curve25519(privateKey));
+            assert.deepStrictEqual(Buffer.from(x25519).toString("hex"), elem.result);
+        });
+    });
+
+    it ('Test of ED25519.Sum', () =>
+    {
+        let sum = sdk.JSBIUtils.Sum(
+            [
+                sdk.JSBI.BigInt(1),
+                sdk.JSBI.BigInt(2)
+            ]);
+
+        assert.deepStrictEqual(sum, sdk.JSBI.BigInt(3));
+    });
+
+    it ('Test FE25519 1', () =>
+    {
+        let bytes = new Uint8Array(32);
+        let source = new sdk.FE25519([-10913610, 13857413, -15372611, 6949391,   114729, -8787816, -6275908, -3247719, -18696448, -12055116]);
+        let temp = new sdk.FE25519();
+        sdk.fe25519_tobytes(bytes, source);
+        sdk.fe25519_frombytes(temp, bytes);
+        assert.deepStrictEqual(temp, source);
+    });
+
+    it ('Test crypto_core_ed25519_from_uniform', () =>
+    {
+        sample_random.forEach((m) => {
+            let random = Buffer.from(m.random, "hex");
+            let res = Buffer.from(sdk.crypto_core_ed25519_from_uniform(random));
+            let expected = Buffer.from(m.crypto_core_ed25519_from_uniform, "hex");
+            assert.deepStrictEqual(res, expected);
+        });
+    });
+
+    it ('Test crypto_core_ed25519_add and crypto_core_ed25519_sub', () =>
+    {
+        sample_point_add_sub.forEach((m) => {
+            let p = Buffer.from(m.p, "hex");
+            let q = Buffer.from(m.q, "hex");
+            let add = Buffer.from(sdk.crypto_core_ed25519_add(p, q));
+            assert.deepStrictEqual(add, Buffer.from(m.add, "hex"));
+
+            let sub = Buffer.from(sdk.crypto_core_ed25519_sub(p, q));
+            assert.deepStrictEqual(sub, Buffer.from(m.sub, "hex"));
+        });
+    });
+
+    it ('Test crypto_core_ed25519_is_valid_point', () =>
+    {
+        let valid = Buffer.from("1b511086a109b23b9d38a5c809894c44ddc4bda498575d8fd3d0b8856e6f4fab", "hex");
+        assert.ok(sdk.crypto_core_ed25519_is_valid_point(valid));
+
+        let invalid = Buffer.from("1c511086a109b23b9d38a5c809894c44ddc4bda498575d8fd3d0b8856e6f4fab", "hex");
+        assert.ok(!sdk.crypto_core_ed25519_is_valid_point(invalid));
+
+        let invalid2 = Buffer.from("0000000000000000000000000000000000000000000000000000000000000000", "hex");
+        assert.ok(!sdk.crypto_core_ed25519_is_valid_point(invalid2));
+    });
+
+    it ('Test ed25519_sqdmone', () =>
+    {
+        let one = new sdk.FE25519();
+        let mone = new sdk.FE25519();
+        let dmone = new sdk.FE25519();
+        let sqdmone = new sdk.FE25519();
+        let temp = new sdk.FE25519();
+        sdk.fe25519_1(one);
+        sdk.fe25519_neg(mone, one);
+        sdk.fe25519_sub(dmone, sdk.ed25519_d, one);
+        sdk.fe25519_sq(sqdmone, dmone);
+        assert.deepStrictEqual(sqdmone, sdk.ed25519_sqdmone);
+
+        sdk.fe25519_mul(sqdmone, dmone, dmone);
+        assert.deepStrictEqual(sqdmone, sdk.ed25519_sqdmone);
+
+        sdk.fe25519_mul(temp, sdk.fe25519_sqrtm1, sdk.fe25519_sqrtm1);
+        assert.deepStrictEqual(temp, mone);
+
+        sdk.fe25519_mul32(temp, sdk.ed25519_d, 2);
+        assert.deepStrictEqual(temp, sdk.ed25519_d2);
+
+        sdk.fe25519_sqrt(temp, mone);
+        assert.deepStrictEqual(temp, sdk.fe25519_sqrtm1);
+
+        let temp1 = new sdk.FE25519();
+        let temp2 = new sdk.FE25519();
+        sdk.fe25519_sq(temp1, sdk.ed25519_d);
+        sdk.fe25519_mul32(temp1, temp1, 2);
+        sdk.fe25519_sq2(temp2, sdk.ed25519_d);
+        assert.deepStrictEqual(temp1, temp2);
+    });
+});
+
 describe ('Make Sample Data', () =>
 {
     before('Wait for the package libsodium to finish loading', () =>
@@ -1056,6 +1170,35 @@ describe ('Make Sample Data', () =>
                     q: q.toString("hex"),
                     add: add.toString("hex"),
                     sub: sub.toString("hex")
+                }
+            );
+        }
+        console.log(values);
+    });
+
+    it ('Make Sample Scalar Data', () =>
+    {
+        let values:Array<any> = [];
+        for (let i = 0; i < 50; i++)
+        {
+            let x = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_random());
+            let y = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_random());
+            let add = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_add(x, y));
+            let sub = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_sub(x, y));
+            let mul = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_mul(x, y));
+            let negate_x = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_negate(x));
+            let invert_x = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_invert(x));
+            let complement_x = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_complement(x));
+            values.push(
+                {
+                    x: x.toString("hex"),
+                    y: y.toString("hex"),
+                    add: add.toString("hex"),
+                    sub: sub.toString("hex"),
+                    mul: mul.toString("hex"),
+                    negate_x: negate_x.toString("hex"),
+                    invert_x: invert_x.toString("hex"),
+                    complement_x: complement_x.toString("hex")
                 }
             );
         }
