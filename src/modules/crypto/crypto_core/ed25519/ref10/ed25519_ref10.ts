@@ -1,4 +1,7 @@
-import { ED25519Utils, JSBIUtils } from "../../../";
+import {
+    crypto_core_ed25519_NONREDUCEDSCALARBYTES,
+    sodium_is_zero,
+    JSBIUtils } from '../../../';
 import JSBI from "jsbi";
 
 export class FE25519
@@ -414,7 +417,7 @@ export function fe25519_iszero (f: FE25519): number
 {
     let s = new Uint8Array(32);
     fe25519_tobytes(s, f);
-    return ED25519Utils.sodium_is_zero(s, 32);
+    return sodium_is_zero(s, 32);
 }
 
 /**
@@ -2349,7 +2352,7 @@ export function sc25519_invert (recip: Uint8Array, s: Uint8Array)
  */
 export function sc25519_reduce (s: Uint8Array)
 {
-    if (s.length != ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES)
+    if (s.length != crypto_core_ed25519_NONREDUCEDSCALARBYTES)
         throw new Error("The size of the entered buffer is not 64.");
 
     let S: Array<JSBI> = [];

@@ -1203,7 +1203,7 @@ describe ('Make Sample Data', () =>
         let values:Array<any> = [];
         for (let i = 0; i < 50; i++)
         {
-            let r = Buffer.from(sdk.randombytes_buf(sdk.ED25519Utils.crypto_core_ed25519_UNIFORMBYTES))
+            let r = Buffer.from(sdk.randombytes_buf(sdk.crypto_core_ed25519_UNIFORMBYTES))
             values.push(
                 {
                     random: r.toString("hex"),

@@ -1,7 +1,23 @@
 
-export { ED25519Utils } from './utils/ED25519Utils';
 export { JSBIUtils } from './utils/JSBIUtils';
-export { randombytes_buf } from './utils/random';
+
+export {
+    crypto_core_ed25519_BYTES,
+    crypto_core_ed25519_UNIFORMBYTES,
+    crypto_core_ed25519_HASHBYTES,
+    crypto_core_ed25519_SCALARBYTES,
+    crypto_core_ed25519_NONREDUCEDSCALARBYTES
+} from './utils/types';
+
+export {
+    randombytes_buf
+} from './utils/random';
+
+export {
+    sodium_add,
+    sodium_sub,
+    sodium_is_zero
+} from './utils/sodium';
 
 export {
     FE25519,
@@ -36,7 +52,14 @@ export {
     fe25519_invert,
     fe25519_pow22523,
     fe25519_sqrt,
-    fe25519_notsquare
+    fe25519_notsquare,
+    ge25519_frombytes,
+    ge25519_has_small_order,
+    ge25519_is_canonical,
+    ge25519_is_on_main_subgroup,
+    ge25519_p3_tobytes,
+    ge25519_scalarmult,
+    ge25519_scalarmult_base
 } from './crypto_core/ed25519/ref10/ed25519_ref10';
 
 export {

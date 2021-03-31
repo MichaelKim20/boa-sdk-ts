@@ -1,5 +1,6 @@
-import {ED25519Utils, GE25519_P3} from "../../..";
 import {
+    sodium_is_zero,
+    GE25519_P3,
     ge25519_frombytes,
     ge25519_has_small_order,
     ge25519_is_canonical,
@@ -7,7 +8,7 @@ import {
     ge25519_p3_tobytes,
     ge25519_scalarmult,
     ge25519_scalarmult_base
-} from "../../../crypto_core/ed25519/ref10/ed25519_ref10";
+} from '../../../';
 
 export function _crypto_scalarmult_ed25519_is_inf (s: Uint8Array): number
 {
@@ -55,7 +56,7 @@ export function _crypto_scalarmult_ed25519 (q: Uint8Array, n: Uint8Array,
 
     ge25519_scalarmult(Q, t, P);
     ge25519_p3_tobytes(q, Q);
-    if (_crypto_scalarmult_ed25519_is_inf(q) != 0 || (ED25519Utils.sodium_is_zero(n, 32) != 0)) {
+    if (_crypto_scalarmult_ed25519_is_inf(q) != 0 || (sodium_is_zero(n, 32) != 0)) {
         return -1;
     }
     return 0;
@@ -89,7 +90,7 @@ export function _crypto_scalarmult_ed25519_base (q: Uint8Array, n: Uint8Array, c
 
     ge25519_scalarmult_base(Q, t);
     ge25519_p3_tobytes(q, Q);
-    if (_crypto_scalarmult_ed25519_is_inf(q) != 0 || ED25519Utils.sodium_is_zero(n, 32)) {
+    if (_crypto_scalarmult_ed25519_is_inf(q) != 0 || sodium_is_zero(n, 32)) {
         return -1;
     }
     return 0;

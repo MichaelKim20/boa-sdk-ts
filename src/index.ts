@@ -59,6 +59,12 @@ export { Request } from './modules/net/Request';
 export { NetworkError, NotFoundError, BadRequestError, handleNetworkError } from './modules/net/error/ErrorTypes';
 
 export {
+    crypto_core_ed25519_BYTES,
+    crypto_core_ed25519_UNIFORMBYTES,
+    crypto_core_ed25519_HASHBYTES,
+    crypto_core_ed25519_SCALARBYTES,
+    crypto_core_ed25519_NONREDUCEDSCALARBYTES,
+
     FE25519,
     GE25519_P2,
     GE25519_P3,
@@ -91,10 +97,8 @@ export {
     fe25519_invert,
     fe25519_pow22523,
     fe25519_sqrt,
-    fe25519_notsquare
-} from './modules/crypto/crypto_core/ed25519/ref10/ed25519_ref10';
+    fe25519_notsquare,
 
-export {
     crypto_core_ed25519_random,
     crypto_core_ed25519_from_uniform,
     crypto_core_ed25519_add,
@@ -108,21 +112,18 @@ export {
     crypto_core_ed25519_scalar_mul,
     crypto_core_ed25519_scalar_invert,
     crypto_core_ed25519_scalar_reduce,
-    crypto_core_ed25519_scalar_is_canonical
-} from './modules/crypto/crypto_core/ed25519/core_ed25519';
+    crypto_core_ed25519_scalar_is_canonical,
 
-export {
     crypto_scalarmult_ed25519,
     crypto_scalarmult_ed25519_base,
     crypto_scalarmult_ed25519_base_noclamp,
-    crypto_scalarmult_ed25519_noclamp
-} from './modules/crypto/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10';
+    crypto_scalarmult_ed25519_noclamp,
 
-export { crypto_sign_ed25519_sk_to_curve25519 } from './modules/crypto/crypto_sign/ed25519/keypair';
+    crypto_sign_ed25519_sk_to_curve25519,
+    randombytes_buf,
 
-export { ED25519Utils } from './modules/crypto/utils/ED25519Utils';
-export { JSBIUtils } from './modules/crypto/utils/JSBIUtils';
-export { randombytes_buf } from './modules/crypto/utils/random';
+    JSBIUtils
+} from './modules/crypto';
 
 import JSBI from 'jsbi';
 export { JSBI };

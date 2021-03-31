@@ -1,24 +1,31 @@
-
-import { randombytes_buf } from '../../';
-import { ED25519Utils } from '../../';
+import {
+    crypto_core_ed25519_BYTES,
+    crypto_core_ed25519_UNIFORMBYTES,
+    crypto_core_ed25519_SCALARBYTES,
+    crypto_core_ed25519_NONREDUCEDSCALARBYTES,
+    sodium_add,
+    sodium_sub,
+    sodium_is_zero,
+    randombytes_buf
+} from '../../';
 import * as ref10 from './ref10/ed25519_ref10';
 
 export function crypto_core_ed25519_scalar_random (): Uint8Array
 {
     let r: Uint8Array;
     do {
-        r = randombytes_buf(ED25519Utils.crypto_core_ed25519_SCALARBYTES);
-        r[ED25519Utils.crypto_core_ed25519_SCALARBYTES - 1] &= 0x1f;
+        r = randombytes_buf(crypto_core_ed25519_SCALARBYTES);
+        r[crypto_core_ed25519_SCALARBYTES - 1] &= 0x1f;
     } while (ref10.sc25519_is_canonical(r) == 0 ||
-    (ED25519Utils.sodium_is_zero(r, ED25519Utils.crypto_core_ed25519_SCALARBYTES) != 0));
+    (sodium_is_zero(r, crypto_core_ed25519_SCALARBYTES) != 0));
 
     return r;
 }
 
 export function crypto_core_ed25519_scalar_add (x: Uint8Array, y: Uint8Array): Uint8Array
 {
-    let x_ = new Uint8Array(ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
-    let y_ = new Uint8Array(ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    let x_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    let y_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
 
     let idx;
     for (idx = 0; idx < x.length || idx < x_.length; idx++)
@@ -26,7 +33,7 @@ export function crypto_core_ed25519_scalar_add (x: Uint8Array, y: Uint8Array): U
     for (idx = 0; idx < y.length || idx < y_.length; idx++)
         y_[idx] = y[idx];
 
-    ED25519Utils.sodium_add(x_, y_, ED25519Utils.crypto_core_ed25519_SCALARBYTES);
+    sodium_add(x_, y_, crypto_core_ed25519_SCALARBYTES);
     return crypto_core_ed25519_scalar_reduce(x_);
 }
 
@@ -44,19 +51,19 @@ const L = new Uint8Array([
 
 export function crypto_core_ed25519_scalar_negate (s: Uint8Array): Uint8Array
 {
-    let t_ = new Uint8Array(ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
-    let s_ = new Uint8Array(ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    let t_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    let s_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
 
     let i;
-    for (i = 0; i < ED25519Utils.crypto_core_ed25519_SCALARBYTES; i++)
-        t_[i + ED25519Utils.crypto_core_ed25519_SCALARBYTES] = L[i];
-    for (i = 0; i < ED25519Utils.crypto_core_ed25519_SCALARBYTES; i++)
+    for (i = 0; i < crypto_core_ed25519_SCALARBYTES; i++)
+        t_[i + crypto_core_ed25519_SCALARBYTES] = L[i];
+    for (i = 0; i < crypto_core_ed25519_SCALARBYTES; i++)
         s_[i] = s[i];
 
-    ED25519Utils.sodium_sub(t_, s_, ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    sodium_sub(t_, s_, crypto_core_ed25519_NONREDUCEDSCALARBYTES);
     ref10.sc25519_reduce(t_);
 
-    let r = new Uint8Array(ED25519Utils.crypto_core_ed25519_SCALARBYTES);
+    let r = new Uint8Array(crypto_core_ed25519_SCALARBYTES);
     for (i = 0; i < r.length; i++)
         r[i] = t_[i];
 
@@ -65,19 +72,19 @@ export function crypto_core_ed25519_scalar_negate (s: Uint8Array): Uint8Array
 
 export function crypto_core_ed25519_scalar_complement (comp: Uint8Array, s: Uint8Array)
 {
-    let t_ = new Uint8Array(ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
-    let s_ = new Uint8Array(ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    let t_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    let s_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
 
     t_[0]++;
     let i;
-    for (i = 0; i < ED25519Utils.crypto_core_ed25519_SCALARBYTES; i++)
-        t_[i + ED25519Utils.crypto_core_ed25519_SCALARBYTES] = L[i];
-    for (i = 0; i < ED25519Utils.crypto_core_ed25519_SCALARBYTES; i++)
+    for (i = 0; i < crypto_core_ed25519_SCALARBYTES; i++)
+        t_[i + crypto_core_ed25519_SCALARBYTES] = L[i];
+    for (i = 0; i < crypto_core_ed25519_SCALARBYTES; i++)
         s_[i] = s[i];
 
-    ED25519Utils.sodium_sub(t_, s_, ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    sodium_sub(t_, s_, crypto_core_ed25519_NONREDUCEDSCALARBYTES);
     ref10.sc25519_reduce(t_);
-    let r = new Uint8Array(ED25519Utils.crypto_core_ed25519_SCALARBYTES);
+    let r = new Uint8Array(crypto_core_ed25519_SCALARBYTES);
     for (i = 0; i < r.length; i++)
         r[i] = t_[i];
     return r;
@@ -85,23 +92,23 @@ export function crypto_core_ed25519_scalar_complement (comp: Uint8Array, s: Uint
 
 export function crypto_core_ed25519_scalar_mul (x: Uint8Array, y: Uint8Array): Uint8Array
 {
-    let z = new Uint8Array(ED25519Utils.crypto_core_ed25519_SCALARBYTES);
+    let z = new Uint8Array(crypto_core_ed25519_SCALARBYTES);
     ref10.sc25519_mul(z, x, y);
     return z;
 }
 
 export function crypto_core_ed25519_scalar_invert (s: Uint8Array): Uint8Array
 {
-    if (ED25519Utils.sodium_is_zero(s, ED25519Utils.crypto_core_ed25519_SCALARBYTES) != 0)
+    if (sodium_is_zero(s, crypto_core_ed25519_SCALARBYTES) != 0)
         throw new Error("Invalid input value");
 
-    let r = new Uint8Array(ED25519Utils.crypto_core_ed25519_SCALARBYTES);
+    let r = new Uint8Array(crypto_core_ed25519_SCALARBYTES);
     ref10.sc25519_invert(r, s);
     return r;
 }
 export function crypto_core_ed25519_scalar_reduce (s: Uint8Array): Uint8Array
 {
-    let t = new Uint8Array(ED25519Utils.crypto_core_ed25519_NONREDUCEDSCALARBYTES);
+    let t = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
     let i: number;
 
     for (i = 0; i < t.length || i < s.length; i++)
@@ -109,7 +116,7 @@ export function crypto_core_ed25519_scalar_reduce (s: Uint8Array): Uint8Array
 
     ref10.sc25519_reduce(t);
 
-    let r = new Uint8Array(ED25519Utils.crypto_core_ed25519_SCALARBYTES);
+    let r = new Uint8Array(crypto_core_ed25519_SCALARBYTES);
     for (i = 0; i < r.length; i++)
         r[i] = t[i];
 
@@ -123,13 +130,13 @@ export function crypto_core_ed25519_scalar_is_canonical(s: Uint8Array): boolean
 
 export function crypto_core_ed25519_random (): Uint8Array
 {
-    let h = randombytes_buf(ED25519Utils.crypto_core_ed25519_UNIFORMBYTES);
+    let h = randombytes_buf(crypto_core_ed25519_UNIFORMBYTES);
     return crypto_core_ed25519_from_uniform(h);
 }
 
 export function crypto_core_ed25519_from_uniform (r: Uint8Array): Uint8Array
 {
-    let s = new Uint8Array(ED25519Utils.crypto_core_ed25519_BYTES);
+    let s = new Uint8Array(crypto_core_ed25519_BYTES);
     ref10.ge25519_from_uniform(s, r);
     return s
 }
@@ -143,7 +150,7 @@ export function crypto_core_ed25519_add (p: Uint8Array, q: Uint8Array): Uint8Arr
     let r_p1p1 = new ref10.GE25519_P1P1();
     let q_cached = new ref10.GE25519_Cached();
 
-    let r = new Uint8Array(ED25519Utils.crypto_core_ed25519_BYTES);
+    let r = new Uint8Array(crypto_core_ed25519_BYTES);
 
     if (ref10.ge25519_frombytes(p_p3, p) != 0 || ref10.ge25519_is_on_curve(p_p3) == 0 ||
         ref10.ge25519_frombytes(q_p3, q) != 0 || ref10.ge25519_is_on_curve(q_p3) == 0) {
@@ -167,7 +174,7 @@ export function crypto_core_ed25519_sub (p: Uint8Array, q: Uint8Array): Uint8Arr
     let r_p1p1 = new ref10.GE25519_P1P1();
     let q_cached = new ref10.GE25519_Cached();
 
-    let r = new Uint8Array(ED25519Utils.crypto_core_ed25519_BYTES);
+    let r = new Uint8Array(crypto_core_ed25519_BYTES);
 
     if (ref10.ge25519_frombytes(p_p3, p) != 0 || ref10.ge25519_is_on_curve(p_p3) == 0 ||
         ref10.ge25519_frombytes(q_p3, q) != 0 || ref10.ge25519_is_on_curve(q_p3) == 0) {
