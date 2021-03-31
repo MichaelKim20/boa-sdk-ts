@@ -1357,12 +1357,12 @@ describe ('Test crypto_core', () =>
         {
             let x = Buffer.from(elem.x, "hex");
             let y = Buffer.from(elem.y, "hex");
-            //assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_add(x, y)).toString("hex"), elem.add);
-            //assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_sub(x, y)).toString("hex"), elem.sub);
+            assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_add(x, y)).toString("hex"), elem.add);
+            assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_sub(x, y)).toString("hex"), elem.sub);
             assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_mul(x, y)).toString("hex"), elem.mul);
-            //assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_negate(x)).toString("hex"), elem.negate_x);
-            //assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_invert(x)).toString("hex"), elem.invert_x);
-            //assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_complement(x)).toString("hex"), elem.complement_x);
+            assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_negate(x)).toString("hex"), elem.negate_x);
+            assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_invert(x)).toString("hex"), elem.invert_x);
+            assert.deepStrictEqual(Buffer.from(crypto_core_ed25519_scalar_complement(x)).toString("hex"), elem.complement_x);
         });
     });
 
