@@ -1,4 +1,4 @@
-import * as nacl from "tweetnacl-ts";
+import * as nacl from 'tweetnacl-ts';
 
 export function crypto_sign_ed25519_sk_to_curve25519 (ed25519_sk: Uint8Array): Uint8Array
 {
