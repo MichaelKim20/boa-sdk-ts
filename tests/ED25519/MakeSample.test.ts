@@ -979,7 +979,7 @@ let sample_point_add_sub = [
         sub: '0df6e1545ec3713181d778c2c3be0cc8a0401bd362fee4dacc464341ab900cb2'
     }
 ];
-
+/*
 describe ('Crypto', () =>
 {
     before('Wait for the package libsodium to finish loading', () =>
@@ -1106,7 +1106,7 @@ describe ('Make Sample Data', () =>
     {
         let values:Array<any> = [];
         seeds.forEach((str) => {
-            let seed = new sdk.Seed(str);
+            let seed = new sdk.SecretKey(str);
             let hash = sdk.SodiumHelper.sodium.crypto_generichash(64, seed.data);
             let reduced = sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_reduce(hash);
 
@@ -1125,7 +1125,7 @@ describe ('Make Sample Data', () =>
     {
         let values:Array<any> = [];
         seeds.forEach((str) => {
-            let seed = new sdk.Seed(str);
+            let seed = new sdk.SecretKey(str);
             let kp_sodium = sdk.SodiumHelper.sodium.crypto_sign_seed_keypair(seed.data);
             let x25519_sk_sodium = Buffer.from(sdk.SodiumHelper.sodium.crypto_sign_ed25519_sk_to_curve25519(kp_sodium.privateKey));
 
@@ -1205,3 +1205,4 @@ describe ('Make Sample Data', () =>
         console.log(values);
     });
 });
+*/
