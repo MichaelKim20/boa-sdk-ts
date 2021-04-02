@@ -3,7 +3,8 @@ import {
     sodium_is_zero,
     JSBIUtils
 } from '../../../';
-import JSBI from "jsbi";
+import base_values from 'base';
+import JSBI from 'jsbi';
 
 export class FE25519
 {
@@ -1380,8 +1381,24 @@ export function ge25519_cmov8 (t: GE25519_PreComp, precomp: Array<GE25519_PreCom
     ge25519_cmov(t, minust, bnegative);
 }
 
+let cmov8_base: Array<Array<GE25519_PreComp>> = [];
+
+function get_cmov8_base (): Array<Array<GE25519_PreComp>>
+{
+    if (cmov8_base.length !== 0)
+        return cmov8_base;
+
+    for (let i = 0; i < base_values.length; i++)
+    {
+
+    }
+
+    return cmov8_base;
+}
+
 export function ge25519_cmov8_base (t: GE25519_PreComp, pos: number, b: number)
 {
+    /// TODO 상수정의
     let base: Array<Array<GE25519_PreComp>> = new Array<Array<GE25519_PreComp>>();// base[32][8] = { /* base[i][j] = (j+1)*256^i*B */
     ge25519_cmov8(t, base[pos], b);
 }
