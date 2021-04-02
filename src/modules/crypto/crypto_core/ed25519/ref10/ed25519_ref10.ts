@@ -3,7 +3,7 @@ import {
     sodium_is_zero,
     JSBIUtils
 } from '../../../';
-import base_values from 'base';
+import { base_values } from './base';
 import JSBI from 'jsbi';
 
 export class FE25519
@@ -92,9 +92,27 @@ export class GE25519_P1P1
 
 export class GE25519_PreComp
 {
-    public yplusx: FE25519 = new FE25519();
-    public yminusx: FE25519 = new FE25519();
-    public xy2d: FE25519 = new FE25519();
+    public yplusx: FE25519;
+    public yminusx: FE25519;
+    public xy2d: FE25519;
+
+    constructor (a?: FE25519, b?: FE25519, c?: FE25519)
+    {
+        if (a !== undefined)
+            this.yplusx = a;
+        else
+            this.yplusx = new FE25519();
+
+        if (b !== undefined)
+            this.yminusx = b;
+        else
+            this.yminusx = new FE25519();
+
+        if (c !== undefined)
+            this.xy2d = c;
+        else
+            this.xy2d = new FE25519();
+    }
 }
 
 export class GE25519_Cached
@@ -1381,26 +1399,37 @@ export function ge25519_cmov8 (t: GE25519_PreComp, precomp: Array<GE25519_PreCom
     ge25519_cmov(t, minust, bnegative);
 }
 
-let cmov8_base: Array<Array<GE25519_PreComp>> = [];
-
-function get_cmov8_base (): Array<Array<GE25519_PreComp>>
+export const _cmov8_base: Array<Array<GE25519_PreComp>> = [];
+(() =>
 {
-    if (cmov8_base.length !== 0)
-        return cmov8_base;
-
-    for (let i = 0; i < base_values.length; i++)
+    for (let m of base_values)
     {
+        let sub_array: Array<GE25519_PreComp> = [];
+        for (let n of m)
+        {
+            if (n.length === 3)
+                sub_array.push(
+                    new GE25519_PreComp(
+                        new FE25519(n[0]),
+                        new FE25519(n[1]),
+                        new FE25519(n[2])
+                    ));
+            else
+                throw new Error("not enough count");
+        }
+        if (sub_array.length !== 8)
+            throw new Error("not enough count");
 
+        _cmov8_base.push(sub_array);
     }
 
-    return cmov8_base;
-}
+    if (_cmov8_base.length != 32)
+        throw new Error("not enough count");
+})();
 
 export function ge25519_cmov8_base (t: GE25519_PreComp, pos: number, b: number)
 {
-    /// TODO 상수정의
-    let base: Array<Array<GE25519_PreComp>> = new Array<Array<GE25519_PreComp>>();// base[32][8] = { /* base[i][j] = (j+1)*256^i*B */
-    ge25519_cmov8(t, base[pos], b);
+    ge25519_cmov8(t, _cmov8_base[pos], b);
 }
 
 export function ge25519_cmov8_cached (t: GE25519_Cached, cached : Array<GE25519_Cached>, b: number)
@@ -1470,10 +1499,10 @@ export function ge25519_frombytes (h: GE25519_P3, s: Uint8Array)
 
     return (has_m_root | has_p_root) - 1;
 }
+
 /*
  r = p + q
  */
-
 function ge25519_add_precomp (r: GE25519_P1P1, p: GE25519_P3, q: GE25519_PreComp)
 {
     let t0 = new FE25519();
@@ -2783,12 +2812,14 @@ export function ge25519_scalarmult (h: GE25519_P3, a: Uint8Array, p: GE25519_P3)
     /* each e[i] is between 0 and 15 */
     /* e[63] is between 0 and 7 */
 
+    let temp = new Int8Array(1);
+    temp[0] = 1 << 4;
     carry[0] = 0;
     for (i = 0; i < 63; ++i) {
         e[i] += carry[0];
         carry[0] = (e[i] + 8);
         carry[0] >>= 4;
-        e[i] -= (carry[0] * (1 << 4)) & 0xff;
+        e[i] -= carry[0] * temp[0];
     }
     e[63] += carry[0];
     /* each e[i] is between -8 and 8 */
