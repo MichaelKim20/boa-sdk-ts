@@ -19,6 +19,7 @@ export class FE25519
         }
     }
 }
+
 export class GE25519_P2
 {
     public X: FE25519 = new FE25519();

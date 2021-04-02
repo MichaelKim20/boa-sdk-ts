@@ -1,13 +1,10 @@
-import {
-    crypto_core_ed25519_NONREDUCEDSCALARBYTES,
-    sodium_is_zero,
-    JSBIUtils
-} from '../../../';
 import { FE25519, GE25519_P2, GE25519_P3, GE25519_P1P1, GE25519_PreComp, GE25519_Cached } from './types';
 import { base_values } from './base';
+import { sodium_is_zero, JSBIUtils } from '../../../';
 import JSBI from 'jsbi';
 
-export { FE25519, GE25519_P2, GE25519_P3, GE25519_P1P1, GE25519_PreComp, GE25519_Cached } from './types';
+export * from './types';
+
 /* sqrt(-1) */
 export const fe25519_sqrtm1 =
     new FE25519([-32595792, -7943725,  9377950,  3500415, 12389472, -272473, -25146209, -2005654, 326686, 11406482]);
@@ -2624,7 +2621,7 @@ export function sc25519_reduce (s: Uint8Array)
 export function sc25519_is_canonical (s: Uint8Array): number
 {
     /* 2^252 + 27742317777372353535851937790883648493 */
-    let L = Uint8Array.from([
+    const L = Uint8Array.from([
         0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7,
         0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10

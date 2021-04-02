@@ -1,7 +1,4 @@
-import {
-    crypto_core_ed25519_BYTES,
-    crypto_core_ed25519_SCALARBYTES
-} from '../../';
+import { crypto_core_ed25519_BYTES, crypto_core_ed25519_SCALARBYTES } from '../../';
 import * as ref from "./ref10/scalarmult_ed25519_ref10";
 
 export function crypto_scalarmult_ed25519 (n: Uint8Array, p: Uint8Array): Uint8Array

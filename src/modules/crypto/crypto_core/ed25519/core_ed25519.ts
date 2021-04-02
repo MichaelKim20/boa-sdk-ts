@@ -252,3 +252,29 @@ export function crypto_core_ed25519_is_valid_point (p: Uint8Array): boolean
 
     return true;
 }
+
+export function crypto_core_ed25519_is_valid_scalar (x: Uint8Array): boolean
+{
+    if (x.length != crypto_core_ed25519_SCALARBYTES)
+        return false;
+
+    if ((ref10.ge25519_is_canonical(x) == 0) || (sodium_is_zero(x, crypto_core_ed25519_SCALARBYTES) != 0))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+export function crypto_core_ed25519_is_valid_random_scalar (r: Uint8Array): boolean
+{
+    if (r.length != crypto_core_ed25519_SCALARBYTES)
+        return false;
+
+    let t = Uint8Array.from(r);
+    t[crypto_core_ed25519_SCALARBYTES - 1] &= 0x1f;
+    if ((ref10.ge25519_is_canonical(t) == 0) || (sodium_is_zero(t, crypto_core_ed25519_SCALARBYTES) != 0))
+        return false;
+
+    return true;
+}

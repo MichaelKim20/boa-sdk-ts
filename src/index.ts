@@ -61,44 +61,8 @@ export { NetworkError, NotFoundError, BadRequestError, handleNetworkError } from
 export {
     crypto_core_ed25519_BYTES,
     crypto_core_ed25519_UNIFORMBYTES,
-    crypto_core_ed25519_HASHBYTES,
     crypto_core_ed25519_SCALARBYTES,
     crypto_core_ed25519_NONREDUCEDSCALARBYTES,
-
-    FE25519,
-    GE25519_P2,
-    GE25519_P3,
-    GE25519_P1P1,
-    GE25519_PreComp,
-    GE25519_Cached,
-    fe25519_sqrtm1,
-    ed25519_sqrtam2,
-    ed25519_d,
-    ed25519_d2,
-    ed25519_A_32,
-    ed25519_A,
-    ed25519_sqrtadm1,
-    ed25519_invsqrtamd,
-    ed25519_onemsqd,
-    ed25519_sqdmone,
-    fe25519_reduce,
-    fe25519_tobytes,
-    fe25519_frombytes,
-    fe25519_0,
-    fe25519_1,
-    fe25519_add,
-    fe25519_sub,
-    fe25519_mul,
-    fe25519_mul32,
-    fe25519_sq,
-    fe25519_sq2,
-    fe25519_neg,
-    fe25519_abs,
-    fe25519_invert,
-    fe25519_pow22523,
-    fe25519_sqrt,
-    fe25519_notsquare,
-
     crypto_core_ed25519_random,
     crypto_core_ed25519_from_uniform,
     crypto_core_ed25519_add,
@@ -113,16 +77,13 @@ export {
     crypto_core_ed25519_scalar_invert,
     crypto_core_ed25519_scalar_reduce,
     crypto_core_ed25519_scalar_is_canonical,
-
+    crypto_core_ed25519_is_valid_scalar,
+    crypto_core_ed25519_is_valid_random_scalar,
     crypto_scalarmult_ed25519,
     crypto_scalarmult_ed25519_base,
     crypto_scalarmult_ed25519_base_noclamp,
     crypto_scalarmult_ed25519_noclamp,
-
-    crypto_sign_ed25519_sk_to_curve25519,
     randombytes_buf,
-
-    JSBIUtils
 } from './modules/crypto';
 
 import JSBI from 'jsbi';

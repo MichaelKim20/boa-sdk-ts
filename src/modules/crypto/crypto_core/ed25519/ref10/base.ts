@@ -1,4 +1,5 @@
 
+import { FE25519, GE25519_P2, GE25519_P3, GE25519_P1P1, GE25519_PreComp, GE25519_Cached } from './types';
 
 export const base_values =
 [

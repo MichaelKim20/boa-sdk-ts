@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-import * as sdk from '../../lib';
+import * as sdk from '../lib';
 
 import * as assert from 'assert';
 
@@ -1208,16 +1208,23 @@ describe ('Make Sample Data', () =>
     it ('Make Sample Scalar Mult', () =>
     {
         let values:Array<any> = [];
-        for (let i = 0; i < 50; i++)
+        for (let i = 0; i < 10; i++)
         {
             let s = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_random());
-            let p = Buffer.from(sdk.SodiumHelper.sodium.crypto_scalarmult_ed25519_base_noclamp(s));
-            let mult = Buffer.from(sdk.SodiumHelper.sodium.crypto_scalarmult_ed25519_noclamp(s, p));
+            let p = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_random());
+            let scalarmult_ed25519_base = Buffer.from(sdk.SodiumHelper.sodium.crypto_scalarmult_ed25519_base(s));
+            let scalarmult_ed25519_base_noclamp = Buffer.from(sdk.SodiumHelper.sodium.crypto_scalarmult_ed25519_base_noclamp(s));
+            let scalarmult_ed25519 = Buffer.from(sdk.SodiumHelper.sodium.crypto_scalarmult_ed25519(s, p));
+            let scalarmult_ed25519_noclamp = Buffer.from(sdk.SodiumHelper.sodium.crypto_scalarmult_ed25519_noclamp(s, p));
+
             values.push(
                 {
                     s: s.toString("hex"),
                     p: p.toString("hex"),
-                    mult: mult.toString("hex"),
+                    scalarmult_ed25519_base: scalarmult_ed25519_base.toString("hex"),
+                    scalarmult_ed25519_base_noclamp: scalarmult_ed25519_base_noclamp.toString("hex"),
+                    scalarmult_ed25519: scalarmult_ed25519.toString("hex"),
+                    scalarmult_ed25519_noclamp: scalarmult_ed25519_noclamp.toString("hex"),
                 }
             );
         }

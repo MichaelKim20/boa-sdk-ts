@@ -4,7 +4,6 @@ export { JSBIUtils } from './utils/JSBIUtils';
 export {
     crypto_core_ed25519_BYTES,
     crypto_core_ed25519_UNIFORMBYTES,
-    crypto_core_ed25519_HASHBYTES,
     crypto_core_ed25519_SCALARBYTES,
     crypto_core_ed25519_NONREDUCEDSCALARBYTES
 } from './utils/types';
@@ -79,7 +78,9 @@ export {
     crypto_core_ed25519_scalar_mul,
     crypto_core_ed25519_scalar_invert,
     crypto_core_ed25519_scalar_reduce,
-    crypto_core_ed25519_scalar_is_canonical
+    crypto_core_ed25519_scalar_is_canonical,
+    crypto_core_ed25519_is_valid_scalar,
+    crypto_core_ed25519_is_valid_random_scalar
 } from './crypto_core/ed25519/core_ed25519';
 
 export {
@@ -88,7 +89,3 @@ export {
     crypto_scalarmult_ed25519_base,
     crypto_scalarmult_ed25519_base_noclamp
 } from './crypto_scalarmult/ed25519/scalarmult_ed25519';
-
-export {
-    crypto_sign_ed25519_sk_to_curve25519
-} from './crypto_sign/ed25519/keypair';

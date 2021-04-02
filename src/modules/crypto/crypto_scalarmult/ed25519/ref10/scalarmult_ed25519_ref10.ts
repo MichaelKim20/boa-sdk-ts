@@ -49,7 +49,7 @@ export function _crypto_scalarmult_ed25519 (q: Uint8Array, n: Uint8Array,
     for (i = 0; i < 32; ++i) {
         t[i] = n[i];
     }
-    if (clamp != 0) {
+    if (clamp !== 0) {
         _crypto_scalarmult_ed25519_clamp(t);
     }
     t[31] &= 127;
