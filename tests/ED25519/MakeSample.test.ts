@@ -1204,5 +1204,24 @@ describe ('Make Sample Data', () =>
         }
         console.log(values);
     });
+
+    it ('Make Sample Scalar Mult', () =>
+    {
+        let values:Array<any> = [];
+        for (let i = 0; i < 50; i++)
+        {
+            let s = Buffer.from(sdk.SodiumHelper.sodium.crypto_core_ed25519_scalar_random());
+            let p = Buffer.from(sdk.SodiumHelper.sodium.crypto_scalarmult_ed25519_base_noclamp(s));
+            let mult = Buffer.from(sdk.SodiumHelper.sodium.crypto_scalarmult_ed25519_noclamp(s, p));
+            values.push(
+                {
+                    s: s.toString("hex"),
+                    p: p.toString("hex"),
+                    mult: mult.toString("hex"),
+                }
+            );
+        }
+        console.log(values);
+    });
 });
 */

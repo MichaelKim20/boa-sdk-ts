@@ -25,7 +25,10 @@ export {
     GE25519_P3,
     GE25519_P1P1,
     GE25519_PreComp,
-    GE25519_Cached,
+    GE25519_Cached
+} from './crypto_core/ed25519/ref10/types';
+
+export {
     fe25519_sqrtm1,
     ed25519_sqrtam2,
     ed25519_d,

@@ -3,30 +3,11 @@ import {
     sodium_is_zero,
     JSBIUtils
 } from '../../../';
+import { FE25519, GE25519_P2, GE25519_P3, GE25519_P1P1, GE25519_PreComp, GE25519_Cached } from './types';
 import { base_values } from './base';
 import JSBI from 'jsbi';
 
-export class FE25519
-{
-    public static WIDTH = 10;
-
-    public items: Int32Array;
-
-    constructor (values?: Array<number> | Int32Array | FE25519)
-    {
-        this.items = new Int32Array(FE25519.WIDTH);
-        if (values !== undefined)
-        {
-            if (values instanceof Int32Array)
-                values.forEach((m, i) => this.items[i] = m);
-            else if (values instanceof FE25519)
-                values.items.forEach((m, i) => this.items[i] = m);
-            else
-                values.forEach((m, i) => this.items[i] = m);
-        }
-    }
-}
-
+export { FE25519, GE25519_P2, GE25519_P3, GE25519_P1P1, GE25519_PreComp, GE25519_Cached } from './types';
 /* sqrt(-1) */
 export const fe25519_sqrtm1 =
     new FE25519([-32595792, -7943725,  9377950,  3500415, 12389472, -272473, -25146209, -2005654, 326686, 11406482]);
@@ -67,61 +48,6 @@ export const ed25519_onemsqd =
 export const ed25519_sqdmone =
     new FE25519([15551795, -11097455, -13425098, -10125071, -11896535, 10178284, -26634327, 4729244, -5282110, -10116402]);
 
-export class GE25519_P2
-{
-    public X: FE25519 = new FE25519();
-    public Y: FE25519 = new FE25519();
-    public Z: FE25519 = new FE25519();
-}
-
-export class GE25519_P3
-{
-    public X: FE25519 = new FE25519();
-    public Y: FE25519 = new FE25519();
-    public Z: FE25519 = new FE25519();
-    public T: FE25519 = new FE25519();
-}
-
-export class GE25519_P1P1
-{
-    public X: FE25519 = new FE25519();
-    public Y: FE25519 = new FE25519();
-    public Z: FE25519 = new FE25519();
-    public T: FE25519 = new FE25519();
-}
-
-export class GE25519_PreComp
-{
-    public yplusx: FE25519;
-    public yminusx: FE25519;
-    public xy2d: FE25519;
-
-    constructor (a?: FE25519, b?: FE25519, c?: FE25519)
-    {
-        if (a !== undefined)
-            this.yplusx = a;
-        else
-            this.yplusx = new FE25519();
-
-        if (b !== undefined)
-            this.yminusx = b;
-        else
-            this.yminusx = new FE25519();
-
-        if (c !== undefined)
-            this.xy2d = c;
-        else
-            this.xy2d = new FE25519();
-    }
-}
-
-export class GE25519_Cached
-{
-    public YplusX: FE25519 = new FE25519();
-    public YminusX: FE25519 = new FE25519();
-    public Z: FE25519 = new FE25519();
-    public T2d: FE25519 = new FE25519();
-}
 
 function load_3 (s: Uint8Array, offset: number): JSBI
 {
@@ -137,23 +63,6 @@ function load_4 (s: Uint8Array, offset: number): JSBI
     result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(8)));
     result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(16)));
     result = JSBI.bitwiseOr(result, JSBI.leftShift(JSBI.BigInt(s[++offset]), JSBI.BigInt(24)));
-    return result;
-}
-
-function load_3_bigint (s: Uint8Array, offset: number): bigint
-{
-    let result: bigint = BigInt(s[offset]);
-    result = result | (BigInt(s[++offset]) << BigInt(8));
-    result = result | (BigInt(s[++offset]) << BigInt(16));
-    return result;
-}
-
-function load_4_bigint (s: Uint8Array, offset: number): bigint
-{
-    let result: bigint = BigInt(s[offset]);
-    result = result | (BigInt(s[++offset]) << BigInt(8));
-    result = result | (BigInt(s[++offset]) << BigInt(16));
-    result = result | (BigInt(s[++offset]) << BigInt(24));
     return result;
 }
 
@@ -1334,28 +1243,20 @@ export function ge25519_sub_cached(r: GE25519_P1P1, p: GE25519_P3, q: GE25519_Ca
     fe25519_add(r.T, t0, r.T);
 }
 
-function equal(b: number, c: number): number
+function equal (b: number, c: number): number
 {
-    let ub = b & 0xff;
-    let uc = c & 0xff;
-    let x  = (ub ^ uc) & 0xff; /* 0: yes; 1..255: no */
-    let y = x; /* 0: yes; 1..255: no */
-
-    y -= 1;   /* 4294967295: yes; 0..254: no */
-    y >>= 31; /* 1: yes; 0: no */
-
-    return y & 0xff;
+    return (b === c) ? 1 : 0;
+    //let x = b ^ c;
+    //x -= 1;
+    //return -(x >> 31);
 }
 
-function negative(b: number): number
+function negative (b: number): number
 {
-    /* 18446744073709551361..18446744073709551615: yes; 0..255: no */
-    let x = JSBI.BigInt(b);
-
-    x = JSBI.signedRightShift(x, JSBI.BigInt(63)); /* 1: yes; 0: no */
-
-    return JSBIUtils.toInt8(x);
+    return (b < 0) ? 1 : 0;
+    //return -(b >> 31);
 }
+
 export function ge25519_cmov (t: GE25519_PreComp, u: GE25519_PreComp, b: number)
 {
     fe25519_cmov(t.yplusx, u.yplusx, b);
@@ -1382,7 +1283,7 @@ export function ge25519_cmov8 (t: GE25519_PreComp, precomp: Array<GE25519_PreCom
 {
     let minust = new GE25519_PreComp();
     let bnegative = negative(b);
-    let babs      = (b - (((-bnegative) & b) * (1 << 1))) & 0xff;
+    let babs      = Math.abs(b);
 
     ge25519_precomp_0(t);
     ge25519_cmov(t, precomp[0], equal(babs, 1));
@@ -1436,7 +1337,7 @@ export function ge25519_cmov8_cached (t: GE25519_Cached, cached : Array<GE25519_
 {
     let minust = new GE25519_Cached();
     let bnegative = negative(b);
-    let babs     = (b - (((-bnegative) & b) * (1 << 1))) & 0xff;
+    let babs     = Math.abs(b);
 
     ge25519_cached_0(t);
     ge25519_cmov_cached(t, cached[0], equal(babs, 1));
@@ -2850,7 +2751,7 @@ export function ge25519_scalarmult (h: GE25519_P3, a: Uint8Array, p: GE25519_P3)
 export function ge25519_scalarmult_base (h: GE25519_P3, a: Uint8Array)
 {
     let e = new Int8Array(64);
-    let carry = new Int8Array(1);
+    let carry: number
     let r = new GE25519_P1P1();
     let s = new GE25519_P2();
     let t = new GE25519_PreComp();
@@ -2863,20 +2764,20 @@ export function ge25519_scalarmult_base (h: GE25519_P3, a: Uint8Array)
     /* each e[i] is between 0 and 15 */
     /* e[63] is between 0 and 7 */
 
-    carry[0] = 0;
+    carry = 0;
     for (i = 0; i < 63; ++i) {
-        e[i] += carry[0];
-        carry[0] = e[i] + 8;
-        carry[0] >>= 4;
-        e[i] -= carry[0] * (1 << 4);
+        e[i] += carry;
+        carry = (e[i] + 8) & 0xff;
+        carry >>= 4;
+        e[i] -= carry * (1 << 4);
     }
-    e[63] += carry[0];
+    e[63] += carry;
     /* each e[i] is between -8 and 8 */
 
     ge25519_p3_0(h);
 
     for (i = 1; i < 64; i += 2) {
-        ge25519_cmov8_base(t, i / 2, e[i]);
+        ge25519_cmov8_base(t, Math.floor(i / 2), e[i]);
         ge25519_add_precomp(r, h, t);
         ge25519_p1p1_to_p3(h, r);
     }
@@ -2891,7 +2792,7 @@ export function ge25519_scalarmult_base (h: GE25519_P3, a: Uint8Array)
     ge25519_p1p1_to_p3(h, r);
 
     for (i = 0; i < 64; i += 2) {
-        ge25519_cmov8_base(t, i / 2, e[i]);
+        ge25519_cmov8_base(t, Math.floor(i / 2), e[i]);
         ge25519_add_precomp(r, h, t);
         ge25519_p1p1_to_p3(h, r);
     }
