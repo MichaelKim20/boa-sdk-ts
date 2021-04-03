@@ -1,3 +1,16 @@
+/*******************************************************************************
+
+
+
+    Copyright:
+        Copyright (c) 2021 BOSAGORA Foundation
+        All rights reserved.
+
+    License:
+        MIT License. See LICENSE for details.
+
+*******************************************************************************/
+
 import JSBI from 'jsbi';
 
 export class JSBIUtils

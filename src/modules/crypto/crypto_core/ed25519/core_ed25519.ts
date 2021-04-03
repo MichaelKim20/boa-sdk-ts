@@ -1,3 +1,33 @@
+/**
+ *
+ * A set of low-level APIs to perform computations over the edwards25519 curve
+ *
+ * Scalars should ideally be randomly chosen in the [0..L[ interval, L being the order
+ * of the main subgroup (2^252 + 27742317777372353535851937790883648493).
+ *
+ * ported from the C code in libsodium
+ * (https://github.com/jedisct1/libsodium).
+ *
+ * Original_file: https://github.com/jedisct1/libsodium/blob/899c3a62b2860e81137830534311218b71f42f04/src/libsodium/crypto_core/ed25519/core_ed25519.c
+ *
+ * The code is licensed as:
+ *
+ * Copyright (c) 2013-2020
+ * Frank Denis <j at pureftpd dot org>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
 import {
     crypto_core_ed25519_BYTES,
     crypto_core_ed25519_UNIFORMBYTES,
@@ -10,6 +40,19 @@ import {
 } from '../../';
 import * as ref10 from './ref10/ed25519_ref10';
 
+/**
+ * Scalars should ideally be randomly chosen in the [0..L[ interval, L being the order
+ * of the main subgroup (2^252 + 27742317777372353535851937790883648493).
+ */
+const L = new Uint8Array([
+    0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7,
+    0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10
+]);
+
+/**
+ * Return a scalar with a crypto_core_ed25519_SCALARBYTES bytes representation of the scalar in the ]0..L[ interval.
+ */
 export function crypto_core_ed25519_scalar_random (): Uint8Array
 {
     let r: Uint8Array;
@@ -21,12 +64,15 @@ export function crypto_core_ed25519_scalar_random (): Uint8Array
     return r;
 }
 
+/**
+ * Computes x + y (mod L), and returns it.
+ */
 export function crypto_core_ed25519_scalar_add (x: Uint8Array, y: Uint8Array): Uint8Array
 {
-    if (x.length != crypto_core_ed25519_SCALARBYTES)
+    if (x.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
-    if (y.length != crypto_core_ed25519_SCALARBYTES)
+    if (y.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
     let x_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
@@ -42,27 +88,27 @@ export function crypto_core_ed25519_scalar_add (x: Uint8Array, y: Uint8Array): U
     return crypto_core_ed25519_scalar_reduce(x_);
 }
 
+/**
+ * Computes x - y (mod L), and returns it.
+ */
 export function crypto_core_ed25519_scalar_sub (x: Uint8Array, y: Uint8Array): Uint8Array
 {
-    if (x.length != crypto_core_ed25519_SCALARBYTES)
+    if (x.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
-    if (y.length != crypto_core_ed25519_SCALARBYTES)
+    if (y.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
     let yn = crypto_core_ed25519_scalar_negate(y);
     return crypto_core_ed25519_scalar_add(x, yn);
 }
 
-const L = new Uint8Array([
-    0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7,
-    0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10
-]);
-
+/**
+ * Returns neg so that s + neg = 0 (mod L)
+ */
 export function crypto_core_ed25519_scalar_negate (s: Uint8Array): Uint8Array
 {
-    if (s.length != crypto_core_ed25519_SCALARBYTES)
+    if (s.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
     let t_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
@@ -84,9 +130,12 @@ export function crypto_core_ed25519_scalar_negate (s: Uint8Array): Uint8Array
     return r;
 }
 
+/**
+ * Returns comp so that s + comp = 1 (mod L).
+ */
 export function crypto_core_ed25519_scalar_complement (s: Uint8Array): Uint8Array
 {
-    if (s.length != crypto_core_ed25519_SCALARBYTES)
+    if (s.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
     let t_ = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
@@ -109,12 +158,15 @@ export function crypto_core_ed25519_scalar_complement (s: Uint8Array): Uint8Arra
     return r;
 }
 
+/**
+ * Computes x * y (mod L), and returns it.
+ */
 export function crypto_core_ed25519_scalar_mul (x: Uint8Array, y: Uint8Array): Uint8Array
 {
-    if (x.length != crypto_core_ed25519_SCALARBYTES)
+    if (x.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
-    if (y.length != crypto_core_ed25519_SCALARBYTES)
+    if (y.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
     let z = new Uint8Array(crypto_core_ed25519_SCALARBYTES);
@@ -122,9 +174,12 @@ export function crypto_core_ed25519_scalar_mul (x: Uint8Array, y: Uint8Array): U
     return z;
 }
 
+/**
+ * Computes the multiplicative inverse of s over L, and returns it.
+ */
 export function crypto_core_ed25519_scalar_invert (s: Uint8Array): Uint8Array
 {
-    if (s.length != crypto_core_ed25519_SCALARBYTES)
+    if (s.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
     if (sodium_is_zero(s, crypto_core_ed25519_SCALARBYTES) != 0)
@@ -135,6 +190,12 @@ export function crypto_core_ed25519_scalar_invert (s: Uint8Array): Uint8Array
     return r;
 }
 
+/**
+ * Reduces s to s mod L and puts the crypto_core_ed25519_SCALARBYTES integer, and returns it.
+ * Note that s is much larger than r (64 bytes vs 32 bytes).
+ * Bits of s can be left to 0, but the interval s is sampled from should be
+ * at least 317 bits to ensure almost uniformity of r over L.
+ */
 export function crypto_core_ed25519_scalar_reduce (s: Uint8Array): Uint8Array
 {
     let t = new Uint8Array(crypto_core_ed25519_NONREDUCEDSCALARBYTES);
@@ -154,7 +215,7 @@ export function crypto_core_ed25519_scalar_reduce (s: Uint8Array): Uint8Array
 
 export function crypto_core_ed25519_scalar_is_canonical(s: Uint8Array): boolean
 {
-    if (s.length != crypto_core_ed25519_SCALARBYTES)
+    if (s.length !== crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
 
     return ref10.sc25519_is_canonical(s) != 0
@@ -175,7 +236,7 @@ export function crypto_core_ed25519_from_uniform (r: Uint8Array): Uint8Array
 
 export function crypto_core_ed25519_add (p: Uint8Array, q: Uint8Array): Uint8Array
 {
-    if (p.length != crypto_core_ed25519_BYTES)
+    if (p.length !== crypto_core_ed25519_BYTES)
         throw new Error("Invalid input size");
 
     if (q.length != crypto_core_ed25519_BYTES)
@@ -205,10 +266,10 @@ export function crypto_core_ed25519_add (p: Uint8Array, q: Uint8Array): Uint8Arr
 
 export function crypto_core_ed25519_sub (p: Uint8Array, q: Uint8Array): Uint8Array
 {
-    if (p.length != crypto_core_ed25519_BYTES)
+    if (p.length !== crypto_core_ed25519_BYTES)
         throw new Error("Invalid input size");
 
-    if (q.length != crypto_core_ed25519_BYTES)
+    if (q.length !== crypto_core_ed25519_BYTES)
         throw new Error("Invalid input size");
 
     let p_p3 = new ref10.GE25519_P3();
@@ -235,46 +296,33 @@ export function crypto_core_ed25519_sub (p: Uint8Array, q: Uint8Array): Uint8Arr
 
 export function crypto_core_ed25519_is_valid_point (p: Uint8Array): boolean
 {
-    if (p.length != crypto_core_ed25519_BYTES)
+    if (p.length !== crypto_core_ed25519_BYTES)
         throw new Error("Invalid input size");
 
     let p_p3 = new ref10.GE25519_P3();
 
-    if (
-            ref10.ge25519_is_canonical(p) == 0 ||
-            ref10.ge25519_has_small_order(p) != 0 ||
-            ref10.ge25519_frombytes(p_p3, p) != 0 ||
-            ref10.ge25519_is_on_curve(p_p3) == 0 ||
-            ref10.ge25519_is_on_main_subgroup(p_p3) == 0)
-    {
-        return false;
-    }
-
-    return true;
+    return !(ref10.ge25519_is_canonical(p) == 0 ||
+        ref10.ge25519_has_small_order(p) != 0 ||
+        ref10.ge25519_frombytes(p_p3, p) != 0 ||
+        ref10.ge25519_is_on_curve(p_p3) == 0 ||
+        ref10.ge25519_is_on_main_subgroup(p_p3) == 0);
 }
 
 export function crypto_core_ed25519_is_valid_scalar (x: Uint8Array): boolean
 {
-    if (x.length != crypto_core_ed25519_SCALARBYTES)
+    if (x.length !== crypto_core_ed25519_SCALARBYTES)
         return false;
 
-    if ((ref10.ge25519_is_canonical(x) == 0) || (sodium_is_zero(x, crypto_core_ed25519_SCALARBYTES) != 0))
-    {
-        return false;
-    }
-
-    return true;
+    return !((ref10.ge25519_is_canonical(x) == 0) || (sodium_is_zero(x, crypto_core_ed25519_SCALARBYTES) != 0));
 }
 
 export function crypto_core_ed25519_is_valid_random_scalar (r: Uint8Array): boolean
 {
-    if (r.length != crypto_core_ed25519_SCALARBYTES)
+    if (r.length !== crypto_core_ed25519_SCALARBYTES)
         return false;
 
     let t = Uint8Array.from(r);
     t[crypto_core_ed25519_SCALARBYTES - 1] &= 0x1f;
-    if ((ref10.ge25519_is_canonical(t) == 0) || (sodium_is_zero(t, crypto_core_ed25519_SCALARBYTES) != 0))
-        return false;
 
-    return true;
+    return !((ref10.ge25519_is_canonical(t) == 0) || (sodium_is_zero(t, crypto_core_ed25519_SCALARBYTES) != 0));
 }
