@@ -160,7 +160,7 @@ export class JSONValidator
                 "title": "PreImageInfo",
                 "type": "object",
                 "properties": {
-                    "enroll_key": {
+                    "utxo": {
                         "type": "string"
                     },
                     "hash": {
@@ -171,7 +171,7 @@ export class JSONValidator
                     }
                 },
                 "additionalProperties": false,
-                "required": ["enroll_key", "hash", "distance"]
+                "required": ["utxo", "hash", "distance"]
             }
 
         ],
