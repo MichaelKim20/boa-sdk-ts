@@ -32,7 +32,7 @@ export class Enrollment
     /**
      * X: The nth image of random value
      */
-    public random_seed: Hash;
+    public commitment: Hash;
 
     /**
      * n: The number of rounds a validator will participate in
@@ -54,7 +54,7 @@ export class Enrollment
     constructor (key: Hash, seed: Hash, cycle: number, sig: Signature)
     {
         this.utxo_key = key;
-        this.random_seed = seed;
+        this.commitment = seed;
         this.cycle_length = cycle;
         this.enroll_sig = sig;
     }
@@ -77,7 +77,7 @@ export class Enrollment
         JSONValidator.isValidOtherwiseThrow('Enrollment', value);
 
         return new Enrollment(
-            new Hash(value.utxo_key), new Hash(value.random_seed),
+            new Hash(value.utxo_key), new Hash(value.commitment),
             Number(value.cycle_length), new Signature(value.enroll_sig));
     }
 
@@ -88,7 +88,7 @@ export class Enrollment
     public computeHash (buffer: SmartBuffer)
     {
         this.utxo_key.computeHash(buffer);
-        this.random_seed.computeHash(buffer);
+        this.commitment.computeHash(buffer);
         buffer.writeUInt32LE(this.cycle_length);
     }
 }

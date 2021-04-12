@@ -139,7 +139,7 @@ export class JSONValidator
                     "utxo_key": {
                         "type": "string"
                     },
-                    "random_seed": {
+                    "commitment": {
                         "type": "string"
                     },
                     "cycle_length": {
@@ -150,7 +150,7 @@ export class JSONValidator
                     }
                 },
                 "additionalProperties": false,
-                "required": ["utxo_key", "random_seed", "cycle_length", "enroll_sig"]
+                "required": ["utxo_key", "commitment", "cycle_length", "enroll_sig"]
             }
 
         ],
