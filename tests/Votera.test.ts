@@ -12,6 +12,7 @@
 *******************************************************************************/
 
 import * as boasdk from '../lib';
+import { BOASodium } from "boa-crypto-ts";
 
 import * as assert from 'assert';
 import { SmartBuffer } from 'smart-buffer';
@@ -281,8 +282,10 @@ class TestAgora {
     }
 }
 
-describe('Checking the proposal and ballot data', () =>
+describe('Checking the proposal and ballot data', function ()
 {
+    this.timeout(10000);
+
     let stoa_server: TestStoa;
     let agora_server: TestAgora;
     let stoa_port: string = '5000';
@@ -290,6 +293,7 @@ describe('Checking the proposal and ballot data', () =>
 
     before('Wait for the package libsodium to finish loading', async () =>
     {
+        boasdk.SodiumHelper.assign(new BOASodium());
         await boasdk.SodiumHelper.init();
     });
 

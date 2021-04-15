@@ -12,13 +12,17 @@
 *******************************************************************************/
 
 import * as sdk from "../lib";
+import { BOASodium } from "boa-crypto-ts";
 
 import * as assert from 'assert';
 
-describe ('Test of Schnorr', () =>
+describe ('Test of Schnorr', function ()
 {
+    this.timeout(5000);
+
     before('Wait for the package libsodium to finish loading', () =>
     {
+        sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
 

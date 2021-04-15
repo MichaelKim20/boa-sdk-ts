@@ -12,13 +12,18 @@
 *******************************************************************************/
 
 import * as sdk from '../lib';
+import { BOASodium } from "boa-crypto-ts";
 
 import * as assert from 'assert';
+import * as boasdk from "../lib";
 
-describe ('Test of ECC', () =>
+describe ('Test of ECC', function ()
 {
+    this.timeout(5000);
+
     before('Wait for the package libsodium to finish loading', () =>
     {
+        boasdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
 
