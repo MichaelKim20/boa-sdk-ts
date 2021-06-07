@@ -22,15 +22,15 @@ describe ('Test that validation with JSON schema', () =>
     {
         assert.throws(() =>
         {
-            // When attribute `inputs` is not an array
+            // When attribute `payload` is not present
             boasdk.JSONValidator.isValidOtherwiseThrow
             ("Transaction", {
-                "inputs": {},
+                "inputs": [],
                 "outputs": [],
-                "payload": {"bytes": ""},
                 "lock_height": "0"
             });
-        }, new Error("Validation failed: Transaction - should be array"));
+        }, new Error("Validation failed: Transaction" +
+            " - should have required property 'payload'"));
 
         // When attribute `payload` is not present
         assert.ok(!boasdk.JSONValidator.isValidOtherwiseNoThrow
@@ -45,7 +45,7 @@ describe ('Test that validation with JSON schema', () =>
         ("Transaction", {
             "inputs": {},
             "outputs": [],
-            "payload": {"bytes": ""},
+            "payload": "",
             "lock_height": "0"
         }));
 
@@ -61,7 +61,7 @@ describe ('Test that validation with JSON schema', () =>
                     "lock": {"type": 0, "bytes": "KkpengSTntVIh037afPquSSwuq/KlbhEr/ydUPM4no4="}
                 }
             ],
-            "payload": {"bytes": ""},
+            "payload": "",
             "lock_height": "0"
         }));
 
@@ -78,15 +78,14 @@ describe ('Test that validation with JSON schema', () =>
             ],
             "outputs": [
                 {
-                    "type": 0,
                     "value": "400000000000",
                     "lock": {
                         "type": 0,
-                        "bytes": [156,198,57,161,53,47,119,242,37,22,12,66,255,137,26,106,250,91,70,161,26,105,169,73,32,134,215,120,6,118,244,42]
+                        "bytes": "md+31zMRMVqPgR9b99kSCEWZdIIdFUREO38ok6oFX50="
                     }
                 }
             ],
-            "payload": {"bytes": ""},
+            "payload": "",
             "lock_height": "0"
         }));
 
@@ -167,9 +166,9 @@ describe ('Test that JSON.stringify of Transaction', () =>
                     new boasdk.PublicKey("boa1xrgr66gdm5je646x70l5ar6qkhun0hg3yy2eh7tf8xxlmlt9fgjd2q0uj8p")
                 )
             ],
-            new boasdk.DataPayload("YXRhZCBldG92")
+            Buffer.from("YXRhZCBldG92", "base64")
         )
         assert.strictEqual(JSON.stringify(tx),
-            `{"inputs":[{"utxo":"0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32","unlock":{"bytes":"vaX+wxScBr2KIsPgKzku9kkGrfuQI8ar1eXWn9LoHxfWrLOmnliHjkGOGWk+QJ7urnpz9lRENrCMv9gsQZ4DCQ=="},"unlock_age":0}],"outputs":[{"type":0,"value":"1663400000","lock":{"type":0,"bytes":"xOYx2v6aWx69nACIFINcMrCytXJmcWy99/N+ZlGEIWM="}},{"type":0,"value":"24398336600000","lock":{"type":0,"bytes":"0D1pDd0lnVdG8/9Oj0C1+TfdESEVm/lpOY39/WVKJNU="}}],"payload":{"bytes":"YXRhZCBldG92"},"lock_height":"0"}`);
+            `{"inputs":[{"utxo":"0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32","unlock":{"bytes":"vaX+wxScBr2KIsPgKzku9kkGrfuQI8ar1eXWn9LoHxfWrLOmnliHjkGOGWk+QJ7urnpz9lRENrCMv9gsQZ4DCQ=="},"unlock_age":0}],"outputs":[{"type":0,"value":"1663400000","lock":{"type":0,"bytes":"xOYx2v6aWx69nACIFINcMrCytXJmcWy99/N+ZlGEIWM="}},{"type":0,"value":"24398336600000","lock":{"type":0,"bytes":"0D1pDd0lnVdG8/9Oj0C1+TfdESEVm/lpOY39/WVKJNU="}}],"payload":"YXRhZCBldG92","lock_height":"0"}`);
     });
 });

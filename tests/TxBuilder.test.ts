@@ -116,7 +116,7 @@ describe ('TxBuilder', () =>
                     }
                 }
             ],
-            "payload": {"bytes": ""},
+            "payload": "",
             "lock_height": "0"
         };
 
@@ -134,7 +134,7 @@ describe ('TxBuilder', () =>
     {
         let builder = new boasdk.TxBuilder(owner);
         let tx: boasdk.Transaction;
-        let payload = new boasdk.DataPayload("YXRhZCBldG92");
+        let payload = Buffer.from("YXRhZCBldG92", "base64");
         let payload_fee = JSBI.BigInt(500000);
         let tx_fee = JSBI.BigInt(0);
 
@@ -177,7 +177,7 @@ describe ('TxBuilder', () =>
                     }
                 }
             ],
-            "payload": {"bytes": "YXRhZCBldG92"},
+            "payload": "YXRhZCBldG92",
             "lock_height": "0"
         };
 
@@ -195,7 +195,7 @@ describe ('TxBuilder', () =>
     {
         let builder = new boasdk.TxBuilder(owner);
         let tx: boasdk.Transaction;
-        let payload = new boasdk.DataPayload("0x617461642065746f76");
+        let payload = Buffer.from("YXRhZCBldG92", "base64");
         let payload_fee = JSBI.BigInt(1000000000);
         let tx_fee = JSBI.BigInt(0);
 
@@ -211,7 +211,7 @@ describe ('TxBuilder', () =>
     {
         let builder = new boasdk.TxBuilder(owner);
         let tx: boasdk.Transaction;
-        let payload = new boasdk.DataPayload("0x617461642065746f76");
+        let payload = Buffer.from("YXRhZCBldG92", "base64");
         let payload_fee = JSBI.BigInt(1000000000);
         let tx_fee = JSBI.BigInt(0);
 

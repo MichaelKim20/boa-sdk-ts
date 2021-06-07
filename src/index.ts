@@ -27,7 +27,6 @@ export { Enrollment } from './modules/data/Enrollment';
 export { Transaction } from './modules/data/Transaction';
 export { TxInput } from './modules/data/TxInput';
 export { TxOutput, OutputType } from './modules/data/TxOutput';
-export { DataPayload } from './modules/data/DataPayload';
 export { PreImageInfo } from './modules/data/PreImageInfo';
 
 export { ProposalFeeData } from './modules/vote/ProposalFeeData';
