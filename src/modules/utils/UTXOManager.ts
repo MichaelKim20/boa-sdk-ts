@@ -17,7 +17,7 @@
 *******************************************************************************/
 
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
-import { TxType } from "../data/Transaction";
+import { OutputType } from "../data/TxOutput";
 import { Hash } from "../common/Hash";
 
 import JSBI from 'jsbi';
@@ -116,13 +116,13 @@ export class UTXOManager
         if (JSBI.lessThan(height, JSBI.BigInt(0)))
             throw new Error(`The height must be greater than or equal to zero, not ${height.toString()}`);
 
-        if (JSBI.greaterThan(target_amount, this.getSum(height)[TxType.Payment]))
+        if (JSBI.greaterThan(target_amount, this.getSum(height)[OutputType.Payment]))
             return [];
 
         target_amount = JSBI.add(target_amount, estimated_input_fee);
         let sum = JSBI.BigInt(0);
         return this.items
-            .filter(n => (!n.used && (n.type == TxType.Payment)
+            .filter(n => (!n.used && (n.type == OutputType.Payment)
                 && JSBI.lessThanOrEqual(JSBI.subtract(n.unlock_height, JSBI.BigInt(1)), height)))
             .filter((n) =>
             {
@@ -157,7 +157,7 @@ class InternalUTXO extends UnspentTxOutput
      * @param unlock_height The height of the block that can be used
      * @param amount        The monetary value of UTXO
      */
-    constructor (utxo: Hash, type: TxType, unlock_height: JSBI, amount: JSBI)
+    constructor (utxo: Hash, type: OutputType, unlock_height: JSBI, amount: JSBI)
     {
         super(utxo, type, unlock_height, amount);
 

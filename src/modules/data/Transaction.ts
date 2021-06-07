@@ -16,21 +16,11 @@ import { DataPayload } from './DataPayload';
 import { Height } from '../common/Height';
 import { JSONValidator } from '../utils/JSONValidator';
 import { TxInput } from './TxInput';
-import { TxOutput } from './TxOutput';
+import { TxOutput, OutputType } from './TxOutput';
 import { Utils } from '../utils/Utils';
 import { VarInt } from '../utils/VarInt';
 
 import { SmartBuffer } from 'smart-buffer';
-
-/**
- * The transaction type constant
- */
-export enum TxType
-{
-    Payment = 0,
-    Freeze = 1,
-    Coinbase = 2
-}
 
 /**
  * The class that defines the transaction of a block.
@@ -39,11 +29,6 @@ export enum TxType
  */
 export class Transaction
 {
-    /**
-     * The type of the transaction
-     */
-    public type: TxType;
-
     /**
      * The array of references to the unspent output of the previous transaction
      */
@@ -68,20 +53,19 @@ export class Transaction
 
     /**
      * Constructor
-     * @param type    The type of the transaction
      * @param inputs  The array of references to the unspent output of the previous transaction
      * @param outputs The array of newly created outputs
      * @param payload The data payload to store
      * @param lock_height The lock height
      */
-    constructor (type: number, inputs: TxInput[], outputs: TxOutput[], payload: DataPayload,
+    constructor (inputs: TxInput[], outputs: TxOutput[], payload: DataPayload,
                  lock_height: Height = new Height("0"))
     {
-        this.type = type;
         this.inputs = inputs;
         this.outputs = outputs;
         this.payload = payload;
         this.lock_height = lock_height;
+        this.sort();
     }
 
     /**
@@ -102,7 +86,6 @@ export class Transaction
         JSONValidator.isValidOtherwiseThrow('Transaction', value);
 
         return new Transaction(
-            Number(value.type),
             value.inputs.map((elem: any) => TxInput.reviver("", elem)),
             value.outputs.map((elem: any) => TxOutput.reviver("", elem)),
             DataPayload.reviver("", value.payload),
@@ -116,7 +99,6 @@ export class Transaction
     public computeHash (buffer: SmartBuffer)
     {
         this.sort();
-        buffer.writeUInt8(this.type);
         hashPart(this.inputs, buffer);
         hashPart(this.outputs, buffer);
         this.payload.computeHash(buffer);
@@ -131,7 +113,7 @@ export class Transaction
      */
     public getNumberOfBytes (): number
     {
-        let bytes_length = Utils.SIZE_OF_BYTE + //  Transaction.type
+        let bytes_length =
             this.payload.data.length +          //  Transaction.payload
             Utils.SIZE_OF_LONG;                 //  Transaction.lock_height
 
@@ -151,7 +133,7 @@ export class Transaction
      */
     public static getEstimatedNumberOfBytes (num_input: number, num_output: number, num_bytes_payload: number): number
     {
-        return Utils.SIZE_OF_BYTE + Utils.SIZE_OF_LONG + num_bytes_payload +
+        return Utils.SIZE_OF_LONG + num_bytes_payload +
             (num_input * TxInput.getEstimatedNumberOfBytes()) +
             (num_output * TxOutput.getEstimatedNumberOfBytes());
     }
@@ -166,13 +148,38 @@ export class Transaction
     }
 
     /**
+     * A `Freeze` transaction is one that has one or more `Freeze` outputs
+     * If there is more than one output then it is allowed to have a single
+     * `Payment` output for a refund of any amount
+     */
+    public isFreeze (): boolean
+    {
+        return this.outputs.find(m => m.type === OutputType.Freeze) !== undefined
+    }
+
+    /**
+     * A `Coinbase` transaction is one that has one or more `Coinbase` outputs
+     * However if all outputs are not `Coinbase` then it will fail validation
+     */
+    public isCoinbase (): boolean
+    {
+        return this.outputs.find(m => m.type === OutputType.Coinbase) !== undefined
+    }
+
+    /**
+     * A `Payment` transaction have all outputs of type "Payment".
+     */
+    public isPayment (): boolean
+    {
+        return this.outputs.find(m => m.type !== OutputType.Payment) === undefined
+    }
+
+    /**
      * Serialize as binary data.
      * @param buffer The buffer where serialized data is stored
      */
     public serialize (buffer: SmartBuffer)
     {
-        VarInt.fromNumber(this.type, buffer);
-
         VarInt.fromNumber(this.inputs.length, buffer);
         for (let elem of this.inputs)
             elem.serialize(buffer);
@@ -192,7 +199,6 @@ export class Transaction
      */
     public static deserialize (buffer: SmartBuffer): Transaction
     {
-        let type = VarInt.toNumber(buffer);
         let length = VarInt.toNumber(buffer);
         let inputs: Array<TxInput> = [];
         for (let idx = 0; idx < length; idx++)
@@ -206,6 +212,6 @@ export class Transaction
         let payload = DataPayload.deserialize(buffer);
         let lock_height = Height.deserialize(buffer);
 
-        return new Transaction(type, inputs, outputs, payload, lock_height)
+        return new Transaction(inputs, outputs, payload, lock_height)
     }
 }

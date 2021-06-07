@@ -21,12 +21,27 @@ import JSBI from 'jsbi';
 import { SmartBuffer } from 'smart-buffer';
 
 /**
+ * The transaction output type constant
+ */
+export enum OutputType
+{
+    Payment = 0,
+    Freeze = 1,
+    Coinbase = 2
+}
+
+/**
  * The class that defines the transaction's outputs of a block.
  * Convert JSON object to TypeScript's instance.
  * An exception occurs if the required property is not present.
  */
 export class TxOutput
 {
+    /**
+     * The type of the transaction output
+     */
+    public type: OutputType;
+
     /**
      * The monetary value of this output, in 1/10^7
      */
@@ -39,11 +54,13 @@ export class TxOutput
 
     /**
      * Constructor
+     * @param type    The type of the transaction output
      * @param value   The monetary value
      * @param lock    The public key or instance of Lock
      */
-    constructor (value: JSBI | string, lock: Lock | PublicKey)
+    constructor (type: number, value: JSBI | string, lock: Lock | PublicKey)
     {
+        this.type = type;
         this.value = JSBI.BigInt(value);
 
         if (lock instanceof PublicKey)
@@ -69,6 +86,7 @@ export class TxOutput
 
         JSONValidator.isValidOtherwiseThrow('TxOutput', value);
         return new TxOutput(
+            Number(value.type),
             value.value,
             Lock.reviver("", value.lock));
     }
@@ -79,6 +97,7 @@ export class TxOutput
      */
     public computeHash (buffer: SmartBuffer)
     {
+        buffer.writeUInt8(this.type);
         const buf = Buffer.allocUnsafe(8);
         Utils.writeJSBigIntLE(buf, this.value);
         buffer.writeBuffer(buf);
@@ -91,6 +110,7 @@ export class TxOutput
     public toJSON (key?: string): any
     {
         return {
+            type: this.type,
             value: this.value.toString(),
             lock: this.lock.toJSON()
         };
@@ -101,7 +121,8 @@ export class TxOutput
      */
     public getNumberOfBytes (): number
     {
-        return Utils.SIZE_OF_LONG +         //  TxOutput.value
+        return Utils.SIZE_OF_BYTE +         //  TxOutput.type
+            Utils.SIZE_OF_LONG +            //  TxOutput.value
             this.lock.getNumberOfBytes();   //  TxOutput.lock
     }
 
@@ -110,7 +131,7 @@ export class TxOutput
      */
     public static getEstimatedNumberOfBytes (): number
     {
-        return Utils.SIZE_OF_LONG + Utils.SIZE_OF_BYTE + Utils.SIZE_OF_PUBLIC_KEY;
+        return Utils.SIZE_OF_BYTE + Utils.SIZE_OF_LONG + Utils.SIZE_OF_BYTE + Utils.SIZE_OF_PUBLIC_KEY;
     }
 
     /**
@@ -130,6 +151,7 @@ export class TxOutput
      */
     public serialize (buffer: SmartBuffer)
     {
+        VarInt.fromNumber(this.type, buffer);
         VarInt.fromJSBI(this.value, buffer);
         this.lock.serialize(buffer);
     }
@@ -140,8 +162,9 @@ export class TxOutput
      */
     public static deserialize (buffer: SmartBuffer): TxOutput
     {
+        let type = VarInt.toNumber(buffer);
         let value = VarInt.toJSBI(buffer);
         let lock = Lock.deserialize(buffer);
-        return new TxOutput(value, lock);
+        return new TxOutput(type, value, lock);
     }
 }

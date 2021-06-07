@@ -27,7 +27,7 @@ describe ('Transaction', () =>
     it ('Test of estimated size', () =>
     {
         assert.strictEqual(boasdk.TxInput.getEstimatedNumberOfBytes(), 132);
-        assert.strictEqual(boasdk.TxOutput.getEstimatedNumberOfBytes(), 41);
-        assert.strictEqual(boasdk.Transaction.getEstimatedNumberOfBytes(0, 0, 0), 9);
+        assert.strictEqual(boasdk.TxOutput.getEstimatedNumberOfBytes(), 42);
+        assert.strictEqual(boasdk.Transaction.getEstimatedNumberOfBytes(0, 0, 0), 8);
     });
 });

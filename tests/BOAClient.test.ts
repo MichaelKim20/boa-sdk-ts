@@ -150,7 +150,6 @@ let sample_utxo =
     ];
 
 let sample_tx = {
-    "type": 0,
     "inputs": [
         {
             "utxo": "0xc0abcbff07879bfdb1495b8fdb9a9e5d2b07a689c7b9b3c583459082259be35687c125a1ddd6bd28b4fe8533ff794d3dba466b5f91117bbf557c3f1b6ff50e5f",
@@ -162,6 +161,7 @@ let sample_tx = {
     ],
     "outputs": [
         {
+            "type": 0,
             "value": "4000000000000",
             "lock": {
                 "type": 0,
@@ -169,6 +169,7 @@ let sample_tx = {
             }
         },
         {
+            "type": 0,
             "value": "4000000000000",
             "lock": {
                 "type": 0,
@@ -176,6 +177,7 @@ let sample_tx = {
             }
         },
         {
+            "type": 0,
             "value": "4000000000000",
             "lock": {
                 "type": 0,
@@ -183,6 +185,7 @@ let sample_tx = {
             }
         },
         {
+            "type": 0,
             "value": "4000000000000",
             "lock": {
                 "type": 0,
@@ -190,6 +193,7 @@ let sample_tx = {
             }
         },
         {
+            "type": 0,
             "value": "4000000000000",
             "lock": {
                 "type": 0,
@@ -1078,35 +1082,35 @@ describe('BOA Client', () => {
                 .addInput(utxos[2].utxo, utxos[2].amount, keys[2].secret)
                 .assignPayload(vote_data)
                 .addOutput(new boasdk.PublicKey(boasdk.TxPayloadFee.CommonsBudgetAddress), fee)
-                .sign(boasdk.TxType.Payment)
+                .sign(boasdk.OutputType.Payment)
 
         let expected_object = {
-            "type": 0,
             "inputs": [
                 {
                     "utxo": "0x4028965b7408566a66e4cf8c603a1cdebc7659a3e693d36d2fdcb39b196da967914f40ef4966d5b4b1f4b3aae00fbd68ffe8808b070464c2a101d44f4d7b0170",
                     "unlock": {
-                        "bytes": "C5pmt6ooKs5dTJA15NtfnlKaBFfkDeoZqDVHWMxQHQyX/TkB5zb212U3TZDZ8WMc6XiFz/7/DJ9pJMQjw5JMkg=="
+                        "bytes": "BhQE+Ogjj97DeDbClaeDEqWS/fyLUtLTtTwS46KxbQJ5ZFnM5W6iKLJ5FKzHTn509u2BrdxTJiezItnm4kiigw=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0x81a326afa790003c32517a2a2556613004e6147edac28d576cf7bcc2daadf4bb60be1f644c229b775e7894844ec66b2d70ddf407b8196b46bc1dfe42061c7497",
                     "unlock": {
-                        "bytes": "+TOLZeBdzIC8zJl2uHcpp41/pmGl5KlQ0OfxNPqtlQmg7MrluTkyfg0pmjrbzws65YVGVNoBhFhQAeCxGbn2Aw=="
+                        "bytes": "JJwTBos7ViqFQbDFIfqgX36mfFnxwUAhUomj/ylw6Qk+mjYQZzxyg/fNjNThj+qcL/0mWg1o3veXgs9oiIUNlg=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0xb82cb96710af2e9804c59d1f1e1679f8b8b69f4c0f6cd79c8c12f365dd766c09aaa4febcc18b3665d33301cb248ac7afd343ac7b98b27beaf246ad12d3b3219a",
                     "unlock": {
-                        "bytes": "eAqHhK8YfRjPGlc/nWB+OvIi6B5bJiqL9sE0botT4wZFmZZrE3tveq8WmcE7ait/FA/T4/14HRF8PNzUXhLSCg=="
+                        "bytes": "6dCFceum5yeO4jrufIlYPXDmsQJ7WVnjZrIfjS9Dkw9ZXGcAY6o3fCFKO1I6i0FCNhr/UYgULRj1oPFuYY1v9w=="
                     },
                     "unlock_age": 0
                 }
             ],
             "outputs": [
                 {
+                    "type": 0,
                     "value": "100000",
                     "lock": {
                         "type": 0,
@@ -1114,6 +1118,7 @@ describe('BOA Client', () => {
                     }
                 },
                 {
+                    "type": 0,
                     "value": "500000",
                     "lock": {
                         "type": 0,
@@ -1168,7 +1173,7 @@ describe('BOA Client', () => {
             .addInput(utxo.utxo, utxo.amount)
             .addOutput(new boasdk.PublicKey(boasdk.TxPayloadFee.CommonsBudgetAddress), fee)
             .assignPayload(vote_data)
-            .sign(boasdk.TxType.Payment);
+            .sign(boasdk.OutputType.Payment);
 
         let res = await boa_client.sendTransaction(tx);
         assert.ok(res);
@@ -1201,7 +1206,6 @@ describe('BOA Client', () => {
 
         let expected =
             {
-                "type": 0,
                 "inputs": [
                     {
                         "utxo": "0x3451d94322524e3923fd26f0597fb8a9cdbf3a9427c38ed1ca61104796d39c5b9b5ea33d576f17c2dc17bebc5d84a0559de8c8c521dfe725d4c352255fc71e85",
@@ -1227,6 +1231,7 @@ describe('BOA Client', () => {
                 ],
                 "outputs": [
                     {
+                        "type": 0,
                         "value": "100000",
                         "lock": {
                             "type": 0,
@@ -1242,7 +1247,7 @@ describe('BOA Client', () => {
 
         let tx = builder
             .assignPayload(vote_data)
-            .sign(boasdk.TxType.Payment, tx_fee, payload_fee);
+            .sign(boasdk.OutputType.Payment, tx_fee, payload_fee);
 
         // Because randomly generated values are used when signing,
         // different signatures are created even when signed using the same secret key.
@@ -1287,7 +1292,7 @@ describe('BOA Client', () => {
         assert.throws(() => {
             let tx = builder
                 .assignPayload(vote_data)
-                .sign(boasdk.TxType.Payment, tx_fee, payload_fee);
+                .sign(boasdk.OutputType.Payment, tx_fee, payload_fee);
         });
     });
 
@@ -1319,11 +1324,10 @@ describe('BOA Client', () => {
 
         let tx = builder
             .assignPayload(vote_data)
-            .sign(boasdk.TxType.Payment, tx_fee, payload_fee);
+            .sign(boasdk.OutputType.Payment, tx_fee, payload_fee);
 
         let expected =
             {
-                "type": 0,
                 "inputs": [
                     {
                         "utxo": "0x3451d94322524e3923fd26f0597fb8a9cdbf3a9427c38ed1ca61104796d39c5b9b5ea33d576f17c2dc17bebc5d84a0559de8c8c521dfe725d4c352255fc71e85",
@@ -1342,6 +1346,7 @@ describe('BOA Client', () => {
                 ],
                 "outputs": [
                     {
+                        "type": 0,
                         "value": "200000",
                         "lock": {
                             "type": 0,
@@ -1435,7 +1440,7 @@ describe('BOA Client', () => {
         let tx = builder
             .addOutput(new boasdk.PublicKey(output_address), send_boa)
             .assignPayload(vote_data)
-            .sign(boasdk.TxType.Payment, estimated_tx_fee, payload_fee);
+            .sign(boasdk.OutputType.Payment, estimated_tx_fee, payload_fee);
 
         // Get the size of the transaction
         let tx_size = tx.getNumberOfBytes();
@@ -1467,7 +1472,7 @@ describe('BOA Client', () => {
             tx = builder
                 .addOutput(new boasdk.PublicKey(output_address), send_boa)
                 .assignPayload(vote_data)
-                .sign(boasdk.TxType.Payment, estimated_tx_fee, payload_fee);
+                .sign(boasdk.OutputType.Payment, estimated_tx_fee, payload_fee);
 
             // Get the size of the transaction
             tx_size = tx.getNumberOfBytes();
@@ -1483,56 +1488,57 @@ describe('BOA Client', () => {
         tx = builder
             .addOutput(new boasdk.PublicKey(output_address), send_boa)
             .assignPayload(vote_data)
-            .sign(boasdk.TxType.Payment, tx_fee, payload_fee);
+            .sign(boasdk.OutputType.Payment, tx_fee, payload_fee);
 
         let expected = {
-            "type": 0,
             "inputs": [
                 {
                     "utxo": "0xc3780f9907a97c20a2955945544e7732a60702c32d81e016bdf1ea172b7b7fb96e9a4164176663a146615307aaadfbbad77e615a7c792a89191e85471120d314",
                     "unlock": {
-                        "bytes": "0fei4dS0rEXHm8PlQbUMqQE4oZTG10ZcRnp5mupQGgsz0aoXD+wVbjPIKc1ZfANmpjWD/A3894/w3DNBo23ojQ=="
+                        "bytes": "O0rgsZcBaSJltxBE3Z57rPRP1tACxtSM7ErfFiycZgqeLzVByMGk7ngZNIwKoRjFSyn1ETyZybDoa6pbZNS/TQ=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0x3451d94322524e3923fd26f0597fb8a9cdbf3a9427c38ed1ca61104796d39c5b9b5ea33d576f17c2dc17bebc5d84a0559de8c8c521dfe725d4c352255fc71e85",
                     "unlock": {
-                        "bytes": "sjDI7R8Nml111aW4js2z9VCHIxbvO2jqHOyW766WmQRTUr8ueZAFqad48P/3qkksvopEs09AhpbLRoGdz+rKzA=="
+                        "bytes": "CVneqbZyBo/698E62P0PgB3wqPvS+6McmId5/yk7jgo0ywsT43Fx1GqFJJAo1PqvTBi8lLXztxou8xBdYwd1pA=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0x7e1958dbe6839d8520d65013bbc85d36d47a9f64cf608cc66c0d816f0b45f5c8a85a8990725ffbb1ab13c3c65b45fdc06f4745d455e00e1068c4c5c0b661d685",
                     "unlock": {
-                        "bytes": "kiRSWOYb5Bsutwm2LEyspMYcPvUrKjB6JeE2sBf3XgGILxyt8o2OnmkYA9hSXIxR1aTlPJuWHQ2n0KmcJOUDqA=="
+                        "bytes": "yjtwtdNQyYIRtXcF4xJR2NpNUczQUlimi7t7YBfk9wXbMY7fHrgFiUGFEaP4mEYwG0jcUjXHJa9jLGCna0o77A=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0xd44608de8a5015b04f933098fd7f67f84ffbf00c678836d38c661ab6dc1f149606bdc96bad149375e16dc5722b077b14c0a4afdbe6d30932f783650f435bcb92",
                     "unlock": {
-                        "bytes": "LahB8gbf3RUgGF/jN5y9xALvTLIHtYArM5+22NLAnQnb0NXmm31i0TGfoTdIdndfrx/jAN4U9tyOf0r1rDPOBQ=="
+                        "bytes": "aAMtVMszr1KvDsflyQ6Jpjhod60p55g/jCdJCMeMtwIhzf0l7Ue3TOMazRnpzQiQUuMOGftCdKXlfOCLN8VLUw=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0xfca92fe76629311c6208a49e89cb26f5260777278cd8b272e7bb3021adf429957fd6844eb3b8ff64a1f6074126163fd636877fa92a1f4329c5116873161fbaf8",
                     "unlock": {
-                        "bytes": "5D9/WKVnd+WNrairHmw3rDshuDVETVvS2Fag5ApUiAR4O70X3/b9U1G4FKHEjMbSLZpBnfc7vp0SPHQs/stlZw=="
+                        "bytes": "TjAyrxB5htxVizw6ZwAl8SIyo/LGwO5D4VhOZSFKtgZIlw4tYpUKIIo8B4S4ZEeTN/sbWoiNFsOC22MLBS9ArQ=="
                     },
                     "unlock_age": 0
                 }
             ],
             "outputs": [
                 {
-                    "value": "148000",
+                    "type": 0,
+                    "value": "147800",
                     "lock": {
                         "type": 0,
                         "bytes": "wa1PiNOnmZYBpjfjXS58SZ6fJTaihHSRZRt86aWWRgE="
                     }
                 },
                 {
+                    "type": 0,
                     "value": "200000",
                     "lock": {
                         "type": 0,

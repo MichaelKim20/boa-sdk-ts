@@ -22,23 +22,9 @@ describe ('Test that validation with JSON schema', () =>
     {
         assert.throws(() =>
         {
-            // When attribute `type` is not present
-            boasdk.JSONValidator.isValidOtherwiseThrow
-            ("Transaction", {
-                "inputs": [],
-                "outputs": [],
-                "payload": {"bytes": ""},
-                "lock_height": "0"
-            });
-        }, new Error("Validation failed: Transaction" +
-            " - should have required property 'type'"));
-
-        assert.throws(() =>
-        {
             // When attribute `inputs` is not an array
             boasdk.JSONValidator.isValidOtherwiseThrow
             ("Transaction", {
-                "type": 1,
                 "inputs": {},
                 "outputs": [],
                 "payload": {"bytes": ""},
@@ -46,19 +32,17 @@ describe ('Test that validation with JSON schema', () =>
             });
         }, new Error("Validation failed: Transaction - should be array"));
 
-        // When attribute `type` is not present
+        // When attribute `payload` is not present
         assert.ok(!boasdk.JSONValidator.isValidOtherwiseNoThrow
         ("Transaction", {
             "inputs": [],
             "outputs": [],
-            "payload": {"bytes": ""},
             "lock_height": "0"
         }));
 
         // When attribute `inputs` is not an array
         assert.ok(!boasdk.JSONValidator.isValidOtherwiseNoThrow
         ("Transaction", {
-            "type": 1,
             "inputs": {},
             "outputs": [],
             "payload": {"bytes": ""},
@@ -69,10 +53,10 @@ describe ('Test that validation with JSON schema', () =>
         assert.ok(boasdk.JSONValidator.isValidOtherwiseThrow
         ("Transaction",
         {
-            "type": 0,
             "inputs": [],
             "outputs": [
                 {
+                    "type": 0,
                     "value": "400000000000",
                     "lock": {"type": 0, "bytes": "KkpengSTntVIh037afPquSSwuq/KlbhEr/ydUPM4no4="}
                 }
@@ -85,7 +69,6 @@ describe ('Test that validation with JSON schema', () =>
         assert.ok(boasdk.JSONValidator.isValidOtherwiseThrow
         ("Transaction",
         {
-            "type": 0,
             "inputs": [
                 {
                     "utxo": "0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32",
@@ -95,6 +78,7 @@ describe ('Test that validation with JSON schema', () =>
             ],
             "outputs": [
                 {
+                    "type": 0,
                     "value": "400000000000",
                     "lock": {
                         "type": 0,
@@ -166,7 +150,6 @@ describe ('Test that JSON.stringify of Transaction', () =>
     it ('Test that JSON of Transaction', () =>
     {
         let tx = new boasdk.Transaction(
-            boasdk.TxType.Payment,
             [
                 new boasdk.TxInput(
                     new boasdk.Hash("0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32"),
@@ -174,10 +157,12 @@ describe ('Test that JSON.stringify of Transaction', () =>
             ],
             [
                 new boasdk.TxOutput(
+                    boasdk.OutputType.Payment,
                     "1663400000",
                     new boasdk.PublicKey("boa1xrzwvvw6l6d9k84ansqgs9yrtsetpv44wfn8zm9a7lehuej3ssskxth867s")
                 ),
                 new boasdk.TxOutput(
+                    boasdk.OutputType.Payment,
                     "24398336600000",
                     new boasdk.PublicKey("boa1xrgr66gdm5je646x70l5ar6qkhun0hg3yy2eh7tf8xxlmlt9fgjd2q0uj8p")
                 )
@@ -185,6 +170,6 @@ describe ('Test that JSON.stringify of Transaction', () =>
             new boasdk.DataPayload("YXRhZCBldG92")
         )
         assert.strictEqual(JSON.stringify(tx),
-            `{"type":0,"inputs":[{"utxo":"0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32","unlock":{"bytes":"vaX+wxScBr2KIsPgKzku9kkGrfuQI8ar1eXWn9LoHxfWrLOmnliHjkGOGWk+QJ7urnpz9lRENrCMv9gsQZ4DCQ=="},"unlock_age":0}],"outputs":[{"value":"1663400000","lock":{"type":0,"bytes":"xOYx2v6aWx69nACIFINcMrCytXJmcWy99/N+ZlGEIWM="}},{"value":"24398336600000","lock":{"type":0,"bytes":"0D1pDd0lnVdG8/9Oj0C1+TfdESEVm/lpOY39/WVKJNU="}}],"payload":{"bytes":"YXRhZCBldG92"},"lock_height":"0"}`);
+            `{"inputs":[{"utxo":"0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32","unlock":{"bytes":"vaX+wxScBr2KIsPgKzku9kkGrfuQI8ar1eXWn9LoHxfWrLOmnliHjkGOGWk+QJ7urnpz9lRENrCMv9gsQZ4DCQ=="},"unlock_age":0}],"outputs":[{"type":0,"value":"1663400000","lock":{"type":0,"bytes":"xOYx2v6aWx69nACIFINcMrCytXJmcWy99/N+ZlGEIWM="}},{"type":0,"value":"24398336600000","lock":{"type":0,"bytes":"0D1pDd0lnVdG8/9Oj0C1+TfdESEVm/lpOY39/WVKJNU="}}],"payload":{"bytes":"YXRhZCBldG92"},"lock_height":"0"}`);
     });
 });

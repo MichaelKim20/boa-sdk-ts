@@ -12,7 +12,7 @@
 *******************************************************************************/
 
 import { Hash }  from '../../common/Hash';
-import { TxType } from '../../data/Transaction';
+import { OutputType } from '../../data/TxOutput';
 import { Utils } from '../../utils/Utils';
 
 import JSBI from 'jsbi';
@@ -30,7 +30,7 @@ export class UnspentTxOutput
     /**
      * The type of the transaction
      */
-    type: TxType;
+    type: OutputType;
 
     /**
      * The height of the block to be unlock
@@ -55,13 +55,13 @@ export class UnspentTxOutput
     /**
      * Constructor
      * @param utxo          The hash of the UTXO key
-     * @param type          The type of the transaction
+     * @param type          The type of the transaction output
      * @param unlock_height The height of the block to be unlock
      * @param amount        The amount value of this utxo, in 1/10^7
      * @param height        The height of the block on created
      * @param time          The time of the block on created
      */
-    constructor (utxo?: Hash, type?: TxType, unlock_height?: JSBI, amount?: JSBI,
+    constructor (utxo?: Hash, type?: OutputType, unlock_height?: JSBI, amount?: JSBI,
                  height?: JSBI, time?: number)
     {
         if (utxo != undefined)
@@ -72,7 +72,7 @@ export class UnspentTxOutput
         if (type != undefined)
             this.type = type;
         else
-            this.type = TxType.Payment;
+            this.type = OutputType.Payment;
 
         if (unlock_height != undefined)
             this.unlock_height = JSBI.BigInt(unlock_height);

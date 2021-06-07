@@ -16,9 +16,9 @@ import { Height } from "../common/Height";
 import { KeyPair, SecretKey, PublicKey } from "../common/KeyPair";
 import { Lock, Unlock } from "../script/Lock";
 import { DataPayload } from '../data/DataPayload';
-import { Transaction, TxType } from '../data/Transaction';
+import { Transaction } from '../data/Transaction';
 import { TxInput } from '../data/TxInput';
-import { TxOutput } from '../data/TxOutput';
+import { TxOutput, OutputType } from '../data/TxOutput';
 
 import JSBI from 'jsbi';
 
@@ -103,7 +103,7 @@ export class TxBuilder
         if (JSBI.greaterThan(amount, this.amount))
             throw new Error(`Insufficient amount. ${amount.toString()}:${this.amount.toString()}`);
 
-        this.outputs.push(new TxOutput(amount.toString(), lock));
+        this.outputs.push(new TxOutput(OutputType.Payment, amount.toString(), lock));
         this.outputs.sort(TxOutput.compare);
 
         this.amount = JSBI.subtract(this.amount, amount);
@@ -133,7 +133,7 @@ export class TxBuilder
      * If one is not provided then a LockType.Key unlock script
      * is automatically generated.
      */
-    public sign (type: TxType = TxType.Payment,
+    public sign (type: OutputType = OutputType.Payment,
                  tx_fee: JSBI = JSBI.BigInt(0),
                  payload_fee: JSBI = JSBI.BigInt(0),
                  lock_height: Height = new Height("0"),
@@ -143,8 +143,11 @@ export class TxBuilder
         if (this.inputs.length == 0)
             throw (new Error("No input for transaction."));
 
-        if ((type === TxType.Freeze) && (this.payload !== undefined) && (this.payload.data.length > 0))
+        if ((type === OutputType.Freeze) && (this.payload !== undefined) && (this.payload.data.length > 0))
             throw (new Error("Freeze transaction cannot have data payload."));
+
+        for (let elem of this.outputs)
+            elem.type = type;
 
         let total_fee = JSBI.add(tx_fee, payload_fee);
         if (JSBI.greaterThan(this.amount, total_fee))
@@ -155,7 +158,7 @@ export class TxBuilder
         if (this.outputs.length == 0)
             throw (new Error("No output for transaction."));
 
-        let tx = new Transaction(type,
+        let tx = new Transaction(
             this.inputs.map(n => new TxInput(n.utxo, Unlock.Null, unlock_age)),
             this.outputs,
             (
