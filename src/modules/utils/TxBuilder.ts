@@ -15,7 +15,6 @@ import { Hash, hashFull } from "../common/Hash";
 import { Height } from "../common/Height";
 import { KeyPair, SecretKey, PublicKey } from "../common/KeyPair";
 import { Lock, Unlock } from "../script/Lock";
-import { DataPayload } from '../data/DataPayload';
 import { Transaction } from '../data/Transaction';
 import { TxInput } from '../data/TxInput';
 import { TxOutput, OutputType } from '../data/TxOutput';
@@ -45,7 +44,7 @@ export class TxBuilder
     /**
      * The data payload in transaction to be created
      */
-    private payload: DataPayload | undefined;
+    private payload: Buffer | undefined;
 
     /**
      * The default owner key pair
@@ -115,7 +114,7 @@ export class TxBuilder
      * Sets the data payload.
      * @param payload
      */
-    public assignPayload (payload: DataPayload): TxBuilder
+    public assignPayload (payload: Buffer): TxBuilder
     {
         this.payload = payload;
 
@@ -143,7 +142,7 @@ export class TxBuilder
         if (this.inputs.length == 0)
             throw (new Error("No input for transaction."));
 
-        if ((type === OutputType.Freeze) && (this.payload !== undefined) && (this.payload.data.length > 0))
+        if ((type === OutputType.Freeze) && (this.payload !== undefined) && (this.payload.length > 0))
             throw (new Error("Freeze transaction cannot have data payload."));
 
         for (let elem of this.outputs)
@@ -164,7 +163,7 @@ export class TxBuilder
             (
                 (this.payload !== undefined)
                     ? this.payload
-                    : new DataPayload(Buffer.alloc(0))
+                    : Buffer.alloc(0)
             ),
             lock_height);
 

@@ -201,7 +201,7 @@ let sample_tx = {
             }
         }
     ],
-    "payload": {"bytes": ""},
+    "payload": "",
     "lock_height": "0"
 };
 
@@ -1072,8 +1072,8 @@ describe('BOA Client', () => {
         let builder = new boasdk.TxBuilder(
             boasdk.KeyPair.fromSeed(new boasdk.SecretKey("SD4IEXJ6GWZ226ALTDDM72SYMHBTTJ6CHDPUNNTVZK4XSDHAM4BAQIC4")));
 
-        let vote_data = new boasdk.DataPayload("YXRhZCBldG92");
-        let fee = boasdk.TxPayloadFee.getFee(vote_data.data.length);
+        let vote_data = Buffer.from("YXRhZCBldG92", "base64");
+        let fee = boasdk.TxPayloadFee.getFee(vote_data.length);
 
         let vote_tx =
             builder
@@ -1126,9 +1126,7 @@ describe('BOA Client', () => {
                     }
                 }
             ],
-            "payload": {
-                "bytes": "YXRhZCBldG92"
-            },
+            "payload": "YXRhZCBldG92",
             "lock_height": "0"
         };
 
@@ -1164,8 +1162,8 @@ describe('BOA Client', () => {
                 "4ec66b2d70ddf407b8196b46bc1dfe42061c7497"),
             amount : JSBI.BigInt(100000000)
         };
-        let vote_data = new boasdk.DataPayload("YXRhZCBldG92");
-        let fee = boasdk.TxPayloadFee.getFee(vote_data.data.length);
+        let vote_data = Buffer.from("YXRhZCBldG92", "base64");
+        let fee = boasdk.TxPayloadFee.getFee(vote_data.length);
 
         let builder = new boasdk.TxBuilder(
             boasdk.KeyPair.fromSeed(new boasdk.SecretKey("SD4IEXJ6GWZ226ALTDDM72SYMHBTTJ6CHDPUNNTVZK4XSDHAM4BAQIC4")));
@@ -1192,8 +1190,8 @@ describe('BOA Client', () => {
         let block_height = await boa_client.getBlockHeight();
         let utxos = await boa_client.getUTXOs(key_pair.address);
 
-        let vote_data = new boasdk.DataPayload("YXRhZCBldG92");
-        let payload_fee = boasdk.TxPayloadFee.getFee(vote_data.data.length);
+        let vote_data = Buffer.from("YXRhZCBldG92", "base64");
+        let payload_fee = boasdk.TxPayloadFee.getFee(vote_data.length);
         let tx_fee = JSBI.BigInt(0);
 
         let builder = new boasdk.TxBuilder(key_pair);
@@ -1239,9 +1237,7 @@ describe('BOA Client', () => {
                         }
                     }
                 ],
-                "payload": {
-                    "bytes": "YXRhZCBldG92"
-                },
+                "payload": "YXRhZCBldG92",
                 "lock_height": "0"
             };
 
@@ -1275,7 +1271,7 @@ describe('BOA Client', () => {
         let block_height = await boa_client.getBlockHeight();
         let utxos = await boa_client.getUTXOs(key_pair.address);
 
-        let vote_data = new boasdk.DataPayload("YXRhZCBldG92");
+        let vote_data = Buffer.from("YXRhZCBldG92", "base64");
         let payload_fee = JSBI.BigInt(200000);
         let tx_fee = JSBI.BigInt(0);
 
@@ -1309,7 +1305,7 @@ describe('BOA Client', () => {
         let block_height = await boa_client.getBlockHeight();
         let utxos = await boa_client.getUTXOs(key_pair.address);
 
-        let vote_data = new boasdk.DataPayload("YXRhZCBldG92");
+        let vote_data = Buffer.from("YXRhZCBldG92", "base64");
         let payload_fee = JSBI.BigInt(200000);
         let tx_fee = JSBI.BigInt(0);
 
@@ -1354,7 +1350,7 @@ describe('BOA Client', () => {
                         }
                     }
                 ],
-                "payload": {"bytes": "YXRhZCBldG92"},
+                "payload": "YXRhZCBldG92",
                 "lock_height": "0"
             };
 
@@ -1413,8 +1409,8 @@ describe('BOA Client', () => {
         let block_height = await boa_client.getBlockHeight();
         let utxos = await boa_client.getUTXOs(key_pair.address);
 
-        let vote_data = new boasdk.DataPayload("YXRhZCBldG92");
-        let payload_fee = boasdk.TxPayloadFee.getFee(vote_data.data.length);
+        let vote_data = Buffer.from("YXRhZCBldG92", "base64");
+        let payload_fee = boasdk.TxPayloadFee.getFee(vote_data.length);
 
         let builder = new boasdk.TxBuilder(key_pair);
 
@@ -1424,7 +1420,7 @@ describe('BOA Client', () => {
         let output_address = "boa1xrr66q4rthn4qvhhsl4y5hptqm366pgarqpk26wfzh6d38wg076tsqqesgg";
         let output_count = 2;
         let estimated_tx_fee = JSBI.BigInt(boasdk.Utils.FEE_FACTOR *
-            boasdk.Transaction.getEstimatedNumberOfBytes(0, output_count, vote_data.data.length));
+            boasdk.Transaction.getEstimatedNumberOfBytes(0, output_count, vote_data.length));
 
         let send_boa = JSBI.BigInt(200000);
         let total_fee = JSBI.add(payload_fee, estimated_tx_fee);
@@ -1434,7 +1430,7 @@ describe('BOA Client', () => {
             JSBI.BigInt(boasdk.Utils.FEE_FACTOR * boasdk.TxInput.getEstimatedNumberOfBytes()));
         in_utxos.forEach((u: boasdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
         estimated_tx_fee = JSBI.BigInt(boasdk.Utils.FEE_FACTOR *
-            boasdk.Transaction.getEstimatedNumberOfBytes(in_utxos.length, output_count, vote_data.data.length));
+            boasdk.Transaction.getEstimatedNumberOfBytes(in_utxos.length, output_count, vote_data.length));
 
         // Build a transaction
         let tx = builder
@@ -1466,7 +1462,7 @@ describe('BOA Client', () => {
             );
             in_utxos.forEach((u: boasdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
             estimated_tx_fee = JSBI.BigInt(boasdk.Utils.FEE_FACTOR *
-                boasdk.Transaction.getEstimatedNumberOfBytes(in_utxos.length, output_count, vote_data.data.length));
+                boasdk.Transaction.getEstimatedNumberOfBytes(in_utxos.length, output_count, vote_data.length));
 
             // Build a transaction
             tx = builder
@@ -1546,9 +1542,7 @@ describe('BOA Client', () => {
                     }
                 }
             ],
-            "payload": {
-                "bytes": "YXRhZCBldG92"
-            },
+            "payload": "YXRhZCBldG92",
             "lock_height": "0"
         };
 

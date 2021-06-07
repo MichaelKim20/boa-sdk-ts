@@ -132,9 +132,7 @@ describe ('Serialize and Deserialize', () =>
                             }
                         }
                     ],
-                    "payload": {
-                        "bytes": ""
-                    },
+                    "payload": "",
                     "lock_height": "0"
                 },
                 {
@@ -205,9 +203,7 @@ describe ('Serialize and Deserialize', () =>
                             }
                         }
                     ],
-                    "payload": {
-                        "bytes": ""
-                    },
+                    "payload": "",
                     "lock_height": "0"
                 }
             ],

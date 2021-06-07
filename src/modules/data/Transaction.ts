@@ -12,7 +12,6 @@
 *******************************************************************************/
 
 import { hashPart } from '../common/Hash';
-import { DataPayload } from './DataPayload';
 import { Height } from '../common/Height';
 import { JSONValidator } from '../utils/JSONValidator';
 import { TxInput } from './TxInput';
@@ -42,7 +41,7 @@ export class Transaction
     /**
      * The data payload to store
      */
-    public payload: DataPayload;
+    public payload: Buffer;
 
     /**
      * This transaction may only be included in a block with `height >= lock_height`.
@@ -58,12 +57,15 @@ export class Transaction
      * @param payload The data payload to store
      * @param lock_height The lock height
      */
-    constructor (inputs: TxInput[], outputs: TxOutput[], payload: DataPayload,
+    constructor (inputs: TxInput[], outputs: TxOutput[], payload: Buffer | string,
                  lock_height: Height = new Height("0"))
     {
         this.inputs = inputs;
         this.outputs = outputs;
-        this.payload = payload;
+        if (typeof payload === 'string')
+            this.payload = Buffer.from(payload, "base64");
+        else
+            this.payload = Buffer.from(payload);
         this.lock_height = lock_height;
         this.sort();
     }
@@ -88,7 +90,7 @@ export class Transaction
         return new Transaction(
             value.inputs.map((elem: any) => TxInput.reviver("", elem)),
             value.outputs.map((elem: any) => TxOutput.reviver("", elem)),
-            DataPayload.reviver("", value.payload),
+            value.payload,
             new Height(value.lock_height));
     }
 
@@ -101,11 +103,24 @@ export class Transaction
         this.sort();
         hashPart(this.inputs, buffer);
         hashPart(this.outputs, buffer);
-        this.payload.computeHash(buffer);
+        hashPart(this.payload, buffer);
 
         const buf = Buffer.allocUnsafe(8);
         Utils.writeJSBigIntLE(buf, this.lock_height.value);
         buffer.writeBuffer(buf);
+    }
+
+    /**
+     * Converts this object to its JSON representation
+     */
+    public toJSON (key?: string): any
+    {
+        return {
+            inputs: this.inputs,
+            outputs: this.outputs,
+            payload: this.payload.toString("base64"),
+            lock_height: this.lock_height
+        };
     }
 
     /**
@@ -114,7 +129,7 @@ export class Transaction
     public getNumberOfBytes (): number
     {
         let bytes_length =
-            this.payload.data.length +          //  Transaction.payload
+            this.payload.length +          //  Transaction.payload
             Utils.SIZE_OF_LONG;                 //  Transaction.lock_height
 
         for (let elem of this.inputs)
@@ -188,7 +203,9 @@ export class Transaction
         for (let elem of this.outputs)
             elem.serialize(buffer);
 
-        this.payload.serialize(buffer);
+        VarInt.fromNumber(this.payload.length, buffer);
+        buffer.writeBuffer(this.payload);
+
         this.lock_height.serialize(buffer);
     }
 
@@ -209,7 +226,9 @@ export class Transaction
         for (let idx = 0; idx < length; idx++)
             outputs.push(TxOutput.deserialize(buffer));
 
-        let payload = DataPayload.deserialize(buffer);
+        length = VarInt.toNumber(buffer);
+        let payload = buffer.readBuffer(length);
+
         let lock_height = Height.deserialize(buffer);
 
         return new Transaction(inputs, outputs, payload, lock_height)

@@ -88,7 +88,7 @@ describe('Hash', () =>
             [
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "0", boasdk.Lock.Null)
             ],
-            boasdk.DataPayload.init
+            ""
         );
         assert.strictEqual(boasdk.hashFull(payment_tx).toString(),
             "0xf35092a843a1ca6b00fc671f8913717564bc5ff51000fe515cdaace80e1a823" +
@@ -117,7 +117,7 @@ describe('Hash', () =>
             [
                 new boasdk.TxOutput(boasdk.OutputType.Freeze, "0", boasdk.Lock.Null)
             ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
 
         assert.strictEqual(boasdk.hashFull(freeze_tx).toString(),
@@ -138,7 +138,7 @@ describe('Hash', () =>
             [
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "0", boasdk.Lock.Null)
             ],
-            new boasdk.DataPayload(Buffer.from([1,2,3]))
+            Buffer.from([1,2,3])
         );
         assert.strictEqual(boasdk.hashFull(payload_tx).toString(),
             "0x610cada756982f8d2c7d180f9e52a9b087dfb8ada939d7ae232aff65d6068aa" +
@@ -155,7 +155,7 @@ describe('Hash', () =>
             [
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "0", boasdk.Lock.Null)
             ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
         assert.strictEqual(boasdk.hashFull(tx1).toString(),
             "0x68d43a026b896469ca46fdfe266b8915a528da51eda4238d34a0bacfedc0225" +
@@ -170,7 +170,7 @@ describe('Hash', () =>
             [
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "0", boasdk.Lock.Null)
             ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
         assert.strictEqual(boasdk.hashFull(tx2).toString(),
             "0x68d43a026b896469ca46fdfe266b8915a528da51eda4238d34a0bacfedc0225" +
@@ -187,7 +187,7 @@ describe('Hash', () =>
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "0", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrp66va5qe84kyfhywhxz9luy7glpxu99n30cuv3mu0vkhcswuzajgak3pw"))),
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "0", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrq66nug6wnen9sp5cm7xhfw03yea8e9x63ggay3v5dhe6d9jerqz50eld0")))
             ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
         assert.strictEqual(boasdk.hashFull(tx1).toString(),
             "0x213f69bbb8ba5b7f4aee877c78c7437ba97c46bdee076083467480d794ecbf7" +
@@ -202,7 +202,7 @@ describe('Hash', () =>
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "0", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrq66nug6wnen9sp5cm7xhfw03yea8e9x63ggay3v5dhe6d9jerqz50eld0"))),
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "0", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrp66va5qe84kyfhywhxz9luy7glpxu99n30cuv3mu0vkhcswuzajgak3pw")))
             ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
         assert.strictEqual(boasdk.hashFull(tx2).toString(),
             "0x213f69bbb8ba5b7f4aee877c78c7437ba97c46bdee076083467480d794ecbf7" +
@@ -219,7 +219,7 @@ describe('Hash', () =>
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "200", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrp66va5qe84kyfhywhxz9luy7glpxu99n30cuv3mu0vkhcswuzajgak3pw"))),
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "100", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrp66va5qe84kyfhywhxz9luy7glpxu99n30cuv3mu0vkhcswuzajgak3pw")))
             ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
         assert.strictEqual(boasdk.hashFull(tx1).toString(),
             "0xd9df094c12c59913436932cf43041c3f5472acb9983d6ae574339ccd2a20c87" +
@@ -233,7 +233,7 @@ describe('Hash', () =>
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "100", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrp66va5qe84kyfhywhxz9luy7glpxu99n30cuv3mu0vkhcswuzajgak3pw"))),
                 new boasdk.TxOutput(boasdk.OutputType.Payment, "200", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrp66va5qe84kyfhywhxz9luy7glpxu99n30cuv3mu0vkhcswuzajgak3pw")))
             ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
         assert.strictEqual(boasdk.hashFull(tx2).toString(),
             "0xd9df094c12c59913436932cf43041c3f5472acb9983d6ae574339ccd2a20c87" +
@@ -248,7 +248,7 @@ describe('Hash', () =>
         let tx = new boasdk.Transaction(
             [ ],
             [ new boasdk.TxOutput(boasdk.OutputType.Payment, "100", pubkey) ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
 
         let header: boasdk.BlockHeader = new boasdk.BlockHeader(
@@ -275,7 +275,7 @@ describe('Hash', () =>
         let tx = new boasdk.Transaction(
             [ ],
             [ new boasdk.TxOutput(boasdk.OutputType.Payment, "100", pubkey) ],
-            boasdk.DataPayload.init
+            Buffer.alloc(0)
         );
 
         let header: boasdk.BlockHeader = new boasdk.BlockHeader(
