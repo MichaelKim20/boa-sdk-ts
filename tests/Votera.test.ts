@@ -126,12 +126,11 @@ export class TestStoa {
                     if (tx_hash.toString() === "0x9a7217177205fda7a0a2716fbe86a8928e624b10b0a19414b354b2bb84a12524a0993ba724b6c9c7e5afe3ed25860ce4e006e6a390933b4d38eb6de2da575f7e")
                     {
                         let tx = new boasdk.Transaction(
-                            boasdk.TxType.Payment,
                             [
                                 new boasdk.TxInput(new boasdk.Hash("0xc0abcbff07879bfdb1495b8fdb9a9e5d2b07a689c7b9b3c583459082259be35687c125a1ddd6bd28b4fe8533ff794d3dba466b5f91117bbf557c3f1b6ff50e5f"))
                             ],
                             [
-                                new boasdk.TxOutput("100000000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrzwvvw6l6d9k84ansqgs9yrtsetpv44wfn8zm9a7lehuej3ssskxth867s")))
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "100000000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrzwvvw6l6d9k84ansqgs9yrtsetpv44wfn8zm9a7lehuej3ssskxth867s")))
                             ],
                             new boasdk.DataPayload(Buffer.from("CFBST1AtRkVFBlZvdGVyYQxJRDEyMzQ1Njc4OTA=", "base64"))
                         );
@@ -140,20 +139,19 @@ export class TestStoa {
                     else if (tx_hash.toString() === "0x2ad019850d964384812a15fa5413a9a9ae6dc21d96c7bb93d7c50bafb63145e7ff4252c6126e617502c6e2ef89198b0d02d3450a6d4301aa8d25fa21c9964209")
                     {
                         let tx = new boasdk.Transaction(
-                            boasdk.TxType.Payment,
                             [
                                 new boasdk.TxInput(new boasdk.Hash("0xc0abcbff07879bfdb1495b8fdb9a9e5d2b07a689c7b9b3c583459082259be35687c125a1ddd6bd28b4fe8533ff794d3dba466b5f91117bbf557c3f1b6ff50e5f"))
                             ],
                             [
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8q66jvs4xye4yx80vv0rrv7gh0quue3jrntl7tkseagj3t07767tg808f"))),
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8p66enrg38qshzn6slnqe3fye6g6xa42kj8hm364yn238ks5ywc59nwyj"))),
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8z66s0dcagyd57ykfwm3yplgv4x6zasf42hxn5gkmx0lxjtceq7my0vqc"))),
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8r66fcuywd6kp7y9ywslwqlsf8rxtajt8pw53rj39wxfwvkxp2663dajh"))),
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8y66e3rjm0fpj9s59r44l8nplfnplhhj6pya0cg5ejsr3ues92jmdztnm"))),
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8966pz0jyxgxrjatp6tuplnhzmaulj9rsuahrxjcr5cu8jxh2hsapmc6y"))),
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8x66qtpp9fd6w8wtmwk9e9k3e7gur0vvjs9axd4gxm36avm8cxczdenyu"))),
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr88665hn7nlz60230tc80ymq6r3mvzhvjzx9sg3lnkjmqy0w4ne22637v6"))),
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8g66r5xa9qj5dcpp322pnk9706k8rvlhsynx9qk8lpeasw85022lnxadw"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8q66jvs4xye4yx80vv0rrv7gh0quue3jrntl7tkseagj3t07767tg808f"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8p66enrg38qshzn6slnqe3fye6g6xa42kj8hm364yn238ks5ywc59nwyj"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8z66s0dcagyd57ykfwm3yplgv4x6zasf42hxn5gkmx0lxjtceq7my0vqc"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8r66fcuywd6kp7y9ywslwqlsf8rxtajt8pw53rj39wxfwvkxp2663dajh"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8y66e3rjm0fpj9s59r44l8nplfnplhhj6pya0cg5ejsr3ues92jmdztnm"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8966pz0jyxgxrjatp6tuplnhzmaulj9rsuahrxjcr5cu8jxh2hsapmc6y"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8x66qtpp9fd6w8wtmwk9e9k3e7gur0vvjs9axd4gxm36avm8cxczdenyu"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr88665hn7nlz60230tc80ymq6r3mvzhvjzx9sg3lnkjmqy0w4ne22637v6"))),
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xr8g66r5xa9qj5dcpp322pnk9706k8rvlhsynx9qk8lpeasw85022lnxadw"))),
                             ],
                             new boasdk.DataPayload(Buffer.from("'CFBST1BPU0FMBlZvdGVyYQEMSUQxMjM0NTY3ODkwBVRpdGxl/egD/dILAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8AoHJOGAkAAP8A6HZIFwAAAP7A/JsBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN2tOi+MKGfTMi85pssUrbmVFl5Vu3UowAYGsEqeEt26xOYx2v6aWx69nACIFINcMrCytXJmcWy99/N+ZlGEIWM=", "base64"))
                         );
@@ -162,12 +160,11 @@ export class TestStoa {
                     else
                     {
                         let tx = new boasdk.Transaction(
-                            boasdk.TxType.Payment,
                             [
                                 new boasdk.TxInput(new boasdk.Hash("0xc0abcbff07879bfdb1495b8fdb9a9e5d2b07a689c7b9b3c583459082259be35687c125a1ddd6bd28b4fe8533ff794d3dba466b5f91117bbf557c3f1b6ff50e5f"))
                             ],
                             [
-                                new boasdk.TxOutput("3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e")))
+                                new boasdk.TxOutput(boasdk.OutputType.Payment, "3000000", boasdk.Lock.fromPublicKey(new boasdk.PublicKey("boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e")))
                             ],
                             new boasdk.DataPayload(Buffer.from("CEJBTExPVCAgBlZvdGVyYQxJRDEyMzQ1Njc4OTApLiJ5n0+MzlHg5Uqz+nRlD7pzNaXdURBJy7SEcNxc3WtEOqLsJ2ReXOnFrSKdkwbnyCSISJw+l76oyJmY8Vncx0mYjWFV1big5setAqNd51Ay94fqSlwrBuOtBR0YA2VpyRX02J3If7S4FDIwMjEtMDQtMTVUMDA6MDA6MDBaAoR3zMbQrdFDVCZVO91GE/lmyK7DqeSD+kCM+KGdHQNlieKjkzQvqQxWBbPUoVTm20AfjYom48ZT4LqFJGxvbmQ0gWQYAaLEO0FR0kfGZtRyKDhNf0po8wNtC3mN9VroDEj4iyyhkk9bWg6Q9t53KWxwNehXQ0LpQrlwBSfcHs+q", "base64"))
                         );

@@ -74,7 +74,7 @@ describe ('TxBuilder', () =>
                 .addInput(utxo_data1.utxo, utxo_data1.amount)
                 .addInput(utxo_data2.utxo, utxo_data2.amount)
                 .addOutput(destination, JSBI.BigInt(20000000))
-                .sign(boasdk.TxType.Payment);
+                .sign(boasdk.OutputType.Payment);
         }
         catch (error)
         {
@@ -82,25 +82,25 @@ describe ('TxBuilder', () =>
         }
 
         let expected = {
-            "type": 0,
             "inputs": [
                 {
                     "utxo": "0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32",
                     "unlock": {
-                        "bytes": "baLr3KhfUzr0WEYxYuQpthF8x+xIYihkWf+RnfXjldAGvnArN0hDVLcNZsHFCBaP2zKmRJm3sQUmKko7ZGlgDw=="
+                        "bytes": "J4kiUyFzQP+2jToI7OFJSmQzWkklCdB5OD4uqxPhjwl8SVN9XT6THqDk1Z2zEKFBuCWIKmQDMFsPCxrungvAfQ=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0x4dde806d2e09367f9d5bdaaf46deab01a336a64fdb088dbb94edb171560c63cf6a39377bf0c4d35118775681d989dee46531926299463256da303553f09be6ef",
                     "unlock": {
-                        "bytes": "2zY7qq/EKWQpAePoOjT4eFd3soO71EAE9P/E6PaLfzN5e4ZcxR9zZvsqH76pFgENlwTozYVARS6HRzY/l+FnBA=="
+                        "bytes": "SwwNLYNgDP+trbErXKIKNjVfv2QiBxg0s0cxocKWFg86fiVIbX+wElOuDHf5UzJ+JCob3Fr1JAGx6oRPdevBQA=="
                     },
                     "unlock_age": 0
                 }
             ],
             "outputs": [
                 {
+                    "type": 0,
                     "value": "1980000000",
                     "lock": {
                         "type": 0,
@@ -108,6 +108,7 @@ describe ('TxBuilder', () =>
                     }
                 },
                 {
+                    "type": 0,
                     "value": "20000000",
                     "lock": {
                         "type": 0,
@@ -142,7 +143,7 @@ describe ('TxBuilder', () =>
                 .addInput(utxo_data1.utxo, utxo_data1.amount)
                 .addInput(utxo_data2.utxo, utxo_data2.amount)
                 .assignPayload(payload)
-                .sign(boasdk.TxType.Payment, tx_fee, payload_fee);
+                .sign(boasdk.OutputType.Payment, tx_fee, payload_fee);
         }
         catch (error)
         {
@@ -150,25 +151,25 @@ describe ('TxBuilder', () =>
         }
 
         let expected = {
-            "type": 0,
             "inputs": [
                 {
                     "utxo": "0xd9482016835acc6defdfd060216a5890e00cf8f0a79ab0b83d3385fc723cd45bfea66eb3587a684518ff1756951d38bf4f07abda96dcdea1c160a4f83e377c32",
                     "unlock": {
-                        "bytes": "Y1fK4ZgV0ujaiJesexIv1QdamFUe6oZFDzWnoF/gVGP8ovuLs6Sxsg/40bLXOJvk1zuReko0IYgYAdk8DK+pCA=="
+                        "bytes": "K5ZN24UQeR5vJcMDzOg9ODHiDvMHAbC9zhW2w3ugNgvZw/tU7vm3Ww9enFwHwC2B/Vnq5qK9YKhRjnNleMmOqQ=="
                     },
                     "unlock_age": 0
                 },
                 {
                     "utxo": "0x4dde806d2e09367f9d5bdaaf46deab01a336a64fdb088dbb94edb171560c63cf6a39377bf0c4d35118775681d989dee46531926299463256da303553f09be6ef",
                     "unlock": {
-                        "bytes": "Y1fK4ZgV0ujaiJesexIv1QdamFUe6oZFDzWnoF/gVGP8ovuLs6Sxsg/40bLXOJvk1zuReko0IYgYAdk8DK+pCA=="
+                        "bytes": "FZYYYwBu5U8JnBX7UUOTn1viN1sdzL5c/NoLxXVJsg7lvOY/4XaAe2zffF4Tb2PNi1RjBPVnmdY95sw5yoeiBQ=="
                     },
                     "unlock_age": 0
                 }
             ],
             "outputs": [
                 {
+                    "type": 0,
                     "value": "1999500000",
                     "lock": {
                         "type": 0,
@@ -202,7 +203,7 @@ describe ('TxBuilder', () =>
             tx = builder
                 .addInput(utxo_data1.utxo, utxo_data1.amount)
                 .assignPayload(payload)
-                .sign(boasdk.TxType.Payment, tx_fee, payload_fee);
+                .sign(boasdk.OutputType.Payment, tx_fee, payload_fee);
         }, new Error("No output for transaction."));
     });
 
@@ -219,7 +220,7 @@ describe ('TxBuilder', () =>
                 .addInput(utxo_data1.utxo, utxo_data1.amount)
                 .addInput(utxo_data2.utxo, utxo_data2.amount)
                 .assignPayload(payload)
-                .sign(boasdk.TxType.Payment, tx_fee, payload_fee);
+                .sign(boasdk.OutputType.Payment, tx_fee, payload_fee);
         }, new Error("No output for transaction."));
     });
 });

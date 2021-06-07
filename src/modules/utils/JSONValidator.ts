@@ -185,9 +185,6 @@ export class JSONValidator
                 "title": "Transaction",
                 "type": "object",
                 "properties": {
-                    "type": {
-                        "type": "number"
-                    },
                     "inputs": {
                         "items": {
                             "type": "object"
@@ -208,7 +205,7 @@ export class JSONValidator
                     }
                 },
                 "additionalProperties": false,
-                "required": ["type", "inputs", "outputs", "payload", "lock_height"]
+                "required": ["inputs", "outputs", "payload", "lock_height"]
             }
         ],
         [
@@ -237,6 +234,9 @@ export class JSONValidator
                 "title": "TxOutput",
                 "type": "object",
                 "properties": {
+                    "type": {
+                        "type": "number"
+                    },
                     "value": {
                         "type": "string"
                     },
@@ -245,7 +245,7 @@ export class JSONValidator
                     }
                 },
                 "additionalProperties": false,
-                "required": ["value", "lock"]
+                "required": ["type", "value", "lock"]
             }
         ],
         [

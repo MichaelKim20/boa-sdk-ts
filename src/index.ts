@@ -24,9 +24,9 @@ export { BitField } from './modules/data/BitField';
 export { Block } from './modules/data/Block';
 export { BlockHeader } from './modules/data/BlockHeader';
 export { Enrollment } from './modules/data/Enrollment';
-export { Transaction, TxType } from './modules/data/Transaction';
+export { Transaction } from './modules/data/Transaction';
 export { TxInput } from './modules/data/TxInput';
-export { TxOutput } from './modules/data/TxOutput';
+export { TxOutput, OutputType } from './modules/data/TxOutput';
 export { DataPayload } from './modules/data/DataPayload';
 export { PreImageInfo } from './modules/data/PreImageInfo';
 
