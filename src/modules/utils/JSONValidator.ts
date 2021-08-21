@@ -275,6 +275,304 @@ export class JSONValidator {
                 required: ["address", "balance", "spendable", "frozen", "locked"],
             },
         ],
+        [
+            "Invoice",
+            {
+                title: "Invoice",
+                type: "object",
+                properties: {
+                    payment_hash: {
+                        type: "string",
+                    },
+                    destination: {
+                        type: "string",
+                    },
+                    amount: {
+                        type: "string",
+                    },
+                    expiry: {
+                        type: "number",
+                    },
+                    description: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+                required: ["payment_hash", "destination", "amount", "expiry", "description"],
+            },
+        ],
+        [
+            "InvoicePair",
+            {
+                title: "InvoicePair",
+                type: "object",
+                properties: {
+                    invoice: {
+                        type: "object",
+                    },
+                    secret: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+                required: ["invoice", "secret"],
+            },
+        ],
+        [
+            "UTXO",
+            {
+                title: "UTXO",
+                type: "object",
+                properties: {
+                    unlock_height: {
+                        type: "string",
+                    },
+                    output: {
+                        type: "object",
+                    },
+                },
+                additionalProperties: false,
+                required: ["unlock_height", "output"],
+            },
+        ],
+        [
+            "ChannelConfig",
+            {
+                title: "ChannelConfig",
+                type: "object",
+                properties: {
+                    gen_hash: {
+                        type: "string",
+                    },
+                    funder_pk: {
+                        type: "string",
+                    },
+                    peer_pk: {
+                        type: "string",
+                    },
+                    pair_pk: {
+                        type: "string",
+                    },
+                    num_peers: {
+                        type: "integer",
+                    },
+                    update_pair_pk: {
+                        type: "string",
+                    },
+                    funding_tx: {
+                        type: "string",
+                    },
+                    funding_tx_hash: {
+                        type: "string",
+                    },
+                    funding_utxo_idx: {
+                        type: "number",
+                    },
+                    capacity: {
+                        type: "string",
+                    },
+                    settle_time: {
+                        type: "number",
+                    },
+                    cooperative_close_timeout: {
+                        type: "number",
+                    },
+                },
+                additionalProperties: true,
+                required: [
+                    "gen_hash",
+                    "funder_pk",
+                    "peer_pk",
+                    "pair_pk",
+                    "num_peers",
+                    "update_pair_pk",
+                    "funding_tx",
+                    "funding_tx_hash",
+                    "funding_utxo_idx",
+                    "capacity",
+                    "settle_time",
+                    "cooperative_close_timeout",
+                ],
+            },
+        ],
+        [
+            "ChannelInfo",
+            {
+                title: "ChannelInfo",
+                type: "object",
+                properties: {
+                    chan_id: {
+                        type: "string",
+                    },
+                    owner_key: {
+                        type: "string",
+                    },
+                    peer_key: {
+                        type: "string",
+                    },
+                    owner_balance: {
+                        type: "string",
+                    },
+                    peer_balance: {
+                        type: "string",
+                    },
+                    state: {
+                        type: "integer",
+                    },
+                },
+                additionalProperties: false,
+                required: ["chan_id", "owner_key", "peer_key", "owner_balance", "peer_balance", "state"],
+            },
+        ],
+        [
+            "FeeUTXOs",
+            {
+                title: "FeeUTXOs",
+                type: "object",
+                properties: {
+                    utxos: {
+                        type: "array",
+                    },
+                    total_value: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+                required: ["utxos", "total_value"],
+            },
+        ],
+        [
+            "OpenNewChannelRequest",
+            {
+                title: "OpenNewChannelRequest",
+                type: "object",
+                properties: {
+                    reg_pk: {
+                        type: "string",
+                    },
+                    funding_utxo: {
+                        type: "object",
+                    },
+                    funding_utxo_hash: {
+                        type: "string",
+                    },
+                    capacity: {
+                        type: "string",
+                    },
+                    settle_time: {
+                        type: "integer",
+                    },
+                    peer_pk: {
+                        type: "string",
+                    },
+                    signature: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+                required: [
+                    "reg_pk",
+                    "funding_utxo",
+                    "funding_utxo_hash",
+                    "capacity",
+                    "settle_time",
+                    "peer_pk",
+                    "signature",
+                ],
+            },
+        ],
+        [
+            "CreateNewInvoiceRequest",
+            {
+                title: "CreateNewInvoiceRequest",
+                type: "object",
+                properties: {
+                    reg_pk: {
+                        type: "string",
+                    },
+                    amount: {
+                        type: "string",
+                    },
+                    expiry: {
+                        type: "number",
+                    },
+                    description: {
+                        type: "string",
+                    },
+                    signature: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+                required: ["reg_pk", "amount", "expiry", "description", "signature"],
+            },
+        ],
+        [
+            "BeginCloseRequest",
+            {
+                title: "BeginCloseRequest",
+                type: "object",
+                properties: {
+                    reg_pk: {
+                        type: "string",
+                    },
+                    chan_id: {
+                        type: "string",
+                    },
+                    signature: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+                required: ["reg_pk", "chan_id", "signature"],
+            },
+        ],
+        [
+            "PayInvoiceRequest",
+            {
+                title: "PayInvoiceRequest",
+                type: "object",
+                properties: {
+                    reg_pk: {
+                        type: "string",
+                    },
+                    invoice: {
+                        type: "string",
+                    },
+                    signature: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+                required: ["reg_pk", "invoice", "signature"],
+            },
+        ],
+        [
+            "ChangeFeeRequest",
+            {
+                title: "ChangeFeeRequest",
+                type: "object",
+                properties: {
+                    reg_pk: {
+                        type: "string",
+                    },
+                    chan_id: {
+                        type: "string",
+                    },
+                    fixed_fee: {
+                        type: "string",
+                    },
+                    proportional_fee: {
+                        type: "string",
+                    },
+                    signature: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+                required: ["reg_pk", "chan_id", "fixed_fee", "proportional_fee", "signature"],
+            },
+        ],
     ]);
 
     /**
@@ -319,7 +617,7 @@ export class JSONValidator {
      */
     public static isValidOtherwiseThrow(schema_name: string, candidate: any) {
         const validator = this.buildValidator(schema_name);
-        if (this.isValid(validator, candidate) === true) {
+        if (this.isValid(validator, candidate)) {
             return true;
         } else if (validator.errors !== undefined && validator.errors !== null && validator.errors.length > 0) {
             if (validator.errors.length === 1) {
