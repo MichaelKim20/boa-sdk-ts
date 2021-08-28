@@ -122,11 +122,11 @@ describe("Test of Utils", () => {
 
         buffer.clear();
         sdk.VarInt.fromNumber(253, buffer);
-        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfd, 0xfd, 0x00]));
+        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfd, 0x00, 0xfd]));
 
         buffer.clear();
         sdk.VarInt.fromNumber(255, buffer);
-        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfd, 0xff, 0x00]));
+        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfd, 0x00, 0xff]));
 
         buffer.clear();
         sdk.VarInt.fromNumber(0xffff, buffer);
@@ -134,7 +134,7 @@ describe("Test of Utils", () => {
 
         buffer.clear();
         sdk.VarInt.fromNumber(0x10000, buffer);
-        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfe, 0x00, 0x00, 0x01, 0x00]));
+        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfe, 0x00, 0x01, 0x00, 0x00]));
 
         buffer.clear();
         sdk.VarInt.fromNumber(0xffffffff, buffer);
@@ -150,11 +150,11 @@ describe("Test of Utils", () => {
 
         buffer.clear();
         sdk.VarInt.fromJSBI(sdk.JSBI.BigInt(253), buffer);
-        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfd, 0xfd, 0x00]));
+        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfd, 0x00, 0xfd]));
 
         buffer.clear();
         sdk.VarInt.fromJSBI(sdk.JSBI.BigInt(255), buffer);
-        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfd, 0xff, 0x00]));
+        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfd, 0x00, 0xff]));
 
         buffer.clear();
         sdk.VarInt.fromJSBI(sdk.JSBI.BigInt(0xffff), buffer);
@@ -162,7 +162,7 @@ describe("Test of Utils", () => {
 
         buffer.clear();
         sdk.VarInt.fromJSBI(sdk.JSBI.BigInt(0x10000), buffer);
-        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfe, 0x00, 0x00, 0x01, 0x00]));
+        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xfe, 0x00, 0x01, 0x00, 0x00]));
 
         buffer.clear();
         sdk.VarInt.fromJSBI(sdk.JSBI.BigInt(0xffffffff), buffer);
@@ -170,7 +170,7 @@ describe("Test of Utils", () => {
 
         buffer.clear();
         sdk.VarInt.fromJSBI(sdk.JSBI.BigInt(0x100000000), buffer);
-        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xff, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]));
+        assert.deepStrictEqual(buffer.toBuffer(), Buffer.from([0xff, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00]));
 
         buffer.clear();
         const unsigned_log_max = sdk.JSBI.add(
@@ -233,11 +233,11 @@ describe("Test of Utils", () => {
         assert.deepStrictEqual(sdk.VarInt.toNumber(buffer), 252);
 
         buffer.clear();
-        buffer.writeBuffer(Buffer.from([0xfd, 0xfd, 0x00]));
+        buffer.writeBuffer(Buffer.from([0xfd, 0x00, 0xfd]));
         assert.deepStrictEqual(sdk.VarInt.toNumber(buffer), 253);
 
         buffer.clear();
-        buffer.writeBuffer(Buffer.from([0xfd, 0xff, 0x00]));
+        buffer.writeBuffer(Buffer.from([0xfd, 0x00, 0xff]));
         assert.deepStrictEqual(sdk.VarInt.toNumber(buffer), 255);
 
         buffer.clear();
@@ -245,7 +245,7 @@ describe("Test of Utils", () => {
         assert.deepStrictEqual(sdk.VarInt.toNumber(buffer), 0xffff);
 
         buffer.clear();
-        buffer.writeBuffer(Buffer.from([0xfe, 0x00, 0x00, 0x01, 0x00]));
+        buffer.writeBuffer(Buffer.from([0xfe, 0x00, 0x01, 0x00, 0x00]));
         assert.deepStrictEqual(sdk.VarInt.toNumber(buffer), 0x10000);
 
         buffer.clear();
@@ -261,11 +261,11 @@ describe("Test of Utils", () => {
         assert.deepStrictEqual(sdk.VarInt.toJSBI(buffer), sdk.JSBI.BigInt(252));
 
         buffer.clear();
-        buffer.writeBuffer(Buffer.from([0xfd, 0xfd, 0x00]));
+        buffer.writeBuffer(Buffer.from([0xfd, 0x00, 0xfd]));
         assert.deepStrictEqual(sdk.VarInt.toJSBI(buffer), sdk.JSBI.BigInt(253));
 
         buffer.clear();
-        buffer.writeBuffer(Buffer.from([0xfd, 0xff, 0x00]));
+        buffer.writeBuffer(Buffer.from([0xfd, 0x00, 0xff]));
         assert.deepStrictEqual(sdk.VarInt.toJSBI(buffer), sdk.JSBI.BigInt(255));
 
         buffer.clear();
@@ -273,7 +273,7 @@ describe("Test of Utils", () => {
         assert.deepStrictEqual(sdk.VarInt.toJSBI(buffer), sdk.JSBI.BigInt(0xffff));
 
         buffer.clear();
-        buffer.writeBuffer(Buffer.from([0xfe, 0x00, 0x00, 0x01, 0x00]));
+        buffer.writeBuffer(Buffer.from([0xfe, 0x00, 0x01, 0x00, 0x00]));
         assert.deepStrictEqual(sdk.VarInt.toJSBI(buffer), sdk.JSBI.BigInt(0x10000));
 
         buffer.clear();
@@ -281,7 +281,7 @@ describe("Test of Utils", () => {
         assert.deepStrictEqual(sdk.VarInt.toJSBI(buffer), sdk.JSBI.BigInt(0xffffffff));
 
         buffer.clear();
-        buffer.writeBuffer(Buffer.from([0xff, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]));
+        buffer.writeBuffer(Buffer.from([0xff, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00]));
         assert.deepStrictEqual(sdk.VarInt.toJSBI(buffer), sdk.JSBI.BigInt(0x100000000));
 
         buffer.clear();

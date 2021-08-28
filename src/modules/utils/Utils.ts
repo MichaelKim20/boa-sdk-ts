@@ -140,6 +140,34 @@ export class Utils {
     }
 
     /**
+     * Writes big endian 64-bits Big integer value to an allocated buffer
+     * See https://github.com/nodejs/node/blob/88fb5a5c7933022de750745e51e5dc0996a1e2c4/lib/internal/buffer.js#L599-L619
+     * @param buffer The allocated buffer
+     * @param value  The big integer value
+     */
+    public static writeJSBigIntBE(buffer: Buffer, value: JSBI) {
+        // See https://github.com/nodejs/node/blob/
+        // 88fb5a5c7933022de750745e51e5dc0996a1e2c4/lib/internal/buffer.js#L573-L592
+        let lo = JSBI.toNumber(JSBI.bitwiseAnd(value, JSBI.BigInt(0xffffffff)));
+        buffer[7] = lo;
+        lo = lo >> 8;
+        buffer[6] = lo;
+        lo = lo >> 8;
+        buffer[5] = lo;
+        lo = lo >> 8;
+        buffer[4] = lo;
+
+        let hi = JSBI.toNumber(JSBI.bitwiseAnd(JSBI.signedRightShift(value, JSBI.BigInt(32)), JSBI.BigInt(0xffffffff)));
+        buffer[3] = hi;
+        hi = hi >> 8;
+        buffer[2] = hi;
+        hi = hi >> 8;
+        buffer[1] = hi;
+        hi = hi >> 8;
+        buffer[0] = hi;
+    }
+
+    /**
      * Reads little endian 64-bits Big integer value to an allocated buffer
      * An exception occurs when the size of the remaining data is less than the required.
      * See https://github.com/nodejs/node/blob/88fb5a5c7933022de750745e51e5dc0996a1e2c4/lib/internal/buffer.js#L86-L105
@@ -154,6 +182,25 @@ export class Utils {
 
         const hi =
             buffer[++offset] + buffer[++offset] * 2 ** 8 + buffer[++offset] * 2 ** 16 + buffer[++offset] * 2 ** 24;
+
+        return JSBI.add(JSBI.BigInt(lo), JSBI.leftShift(JSBI.BigInt(hi), JSBI.BigInt(32)));
+    }
+
+    /**
+     * Reads big endian 64-bits Big integer value to an allocated buffer
+     * An exception occurs when the size of the remaining data is less than the required.
+     * See https://github.com/nodejs/node/blob/88fb5a5c7933022de750745e51e5dc0996a1e2c4/lib/internal/buffer.js#L107-L125
+     * @param buffer The allocated buffer
+     * @returns The instance of JSBI
+     */
+    public static readJSBigIntBE(buffer: Buffer): JSBI {
+        if (buffer.length < 8) throw new Error(`Requested 8 bytes but only ${buffer.length} bytes available`);
+
+        let offset = 0;
+        const hi = buffer[offset] * 2 ** 24 + buffer[++offset] * 2 ** 16 + buffer[++offset] * 2 ** 8 + buffer[++offset];
+
+        const lo =
+            buffer[++offset] * 2 ** 24 + buffer[++offset] * 2 ** 16 + buffer[++offset] * 2 ** 8 + buffer[++offset];
 
         return JSBI.add(JSBI.BigInt(lo), JSBI.leftShift(JSBI.BigInt(hi), JSBI.BigInt(32)));
     }

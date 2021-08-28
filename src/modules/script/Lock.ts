@@ -46,7 +46,7 @@ import { SigPair } from "./Signature";
 import { SmartBuffer } from "smart-buffer";
 
 /**
- * The input lock types.
+ * The input lock types. 1 Byte unsigned integer
  */
 export enum LockType {
     /// lock is a 64-byte public key, unlock is the signature
@@ -152,7 +152,7 @@ export class Lock {
      * @param buffer - The buffer where serialized data is stored
      */
     public serialize(buffer: SmartBuffer) {
-        VarInt.fromNumber(this.type, buffer);
+        VarInt.fromNumber(this.type, buffer, 1);
         VarInt.fromNumber(this.bytes.length, buffer);
         buffer.writeBuffer(this.bytes);
     }
@@ -162,7 +162,7 @@ export class Lock {
      * @param buffer - The buffer to be deserialized
      */
     public static deserialize(buffer: SmartBuffer): Lock {
-        const type = VarInt.toNumber(buffer);
+        const type = VarInt.toNumber(buffer, 1);
         const length = VarInt.toNumber(buffer);
         return new Lock(type, Utils.readBuffer(buffer, length));
     }

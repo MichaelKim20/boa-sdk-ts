@@ -11,6 +11,8 @@
 
 *******************************************************************************/
 
+import { Sig } from "./Schnorr";
+
 import { SmartBuffer } from "smart-buffer";
 import { Endian, Utils } from "../utils/Utils";
 
@@ -100,7 +102,7 @@ export class Signature {
      * @param buffer - The buffer where serialized data is stored
      */
     public serialize(buffer: SmartBuffer) {
-        buffer.writeBuffer(this.data);
+        Sig.fromSignature(this).serialize(buffer);
     }
 
     /**
@@ -108,6 +110,6 @@ export class Signature {
      * @param buffer - The buffer to be deserialized
      */
     public static deserialize(buffer: SmartBuffer): Signature {
-        return new Signature(Utils.readBuffer(buffer, Signature.Width));
+        return Sig.deserialize(buffer).toSignature();
     }
 }

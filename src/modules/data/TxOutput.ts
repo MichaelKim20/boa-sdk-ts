@@ -22,7 +22,7 @@ import JSBI from "jsbi";
 import { SmartBuffer } from "smart-buffer";
 
 /**
- * The transaction output type constant
+ * The transaction output type constant, 4 Byte unsigned integer
  */
 export enum OutputType {
     Payment = 0,
@@ -141,7 +141,7 @@ export class TxOutput {
      * @param buffer - The buffer where serialized data is stored
      */
     public serialize(buffer: SmartBuffer) {
-        VarInt.fromNumber(this.type, buffer);
+        VarInt.fromNumber(this.type, buffer, 4);
         this.lock.serialize(buffer);
         VarInt.fromJSBI(this.value.value, buffer);
     }
@@ -151,7 +151,7 @@ export class TxOutput {
      * @param buffer - The buffer to be deserialized
      */
     public static deserialize(buffer: SmartBuffer): TxOutput {
-        const type = VarInt.toNumber(buffer);
+        const type = VarInt.toNumber(buffer, 4);
         const lock = Lock.deserialize(buffer);
         const value = VarInt.toJSBI(buffer);
         return new TxOutput(type, value, lock);

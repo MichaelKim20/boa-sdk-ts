@@ -141,7 +141,6 @@ export class BitMask {
      */
     public serialize(buffer: SmartBuffer) {
         VarInt.fromNumber(this.length, buffer);
-        VarInt.fromNumber(this.bytes.length, buffer);
         buffer.writeBuffer(this.bytes);
     }
 
@@ -151,7 +150,8 @@ export class BitMask {
      */
     public static deserialize(buffer: SmartBuffer): BitMask {
         const length = VarInt.toNumber(buffer);
-        const bytes = Utils.readBuffer(buffer, VarInt.toNumber(buffer));
+        const bytes_length = Math.floor((length + 8) / 8);
+        const bytes = Utils.readBuffer(buffer, bytes_length);
 
         return new BitMask(length, bytes);
     }
