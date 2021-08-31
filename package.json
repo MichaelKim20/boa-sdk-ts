@@ -10,7 +10,9 @@
         "testnobuild": "mocha -r ts-node/register tests/**/*.test.ts",
         "build": "rimraf ./lib && tsc",
         "browser": "rimraf ./dist && webpack --config webpack.config.js",
-        "docs": "rimraf ./docs && ./node_modules/.bin/typedoc --options ./typedoc.js --module commonjs"
+        "docs": "rimraf ./docs && ./node_modules/.bin/typedoc --options ./typedoc.js --module commonjs",
+        "lint": "tslint --config tslint.json \"{src,tests}/**/*.ts\"",
+        "lint-fix": "tslint --fix --config tslint.json \"{src,tests}/**/*.ts\""
     },
     "repository": {
         "type": "git",
