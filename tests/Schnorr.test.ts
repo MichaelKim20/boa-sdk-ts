@@ -24,10 +24,10 @@ describe("Test of Schnorr", () => {
     });
 
     it("Create Signature", () => {
-        const signature = new sdk.Sig(
+        const signature = sdk.Signature.fromSchnorr(
             new sdk.Point("0x921405afbfa97813293770efd55865c01055f39ad2a70f2b7a04ac043766a693"),
             new sdk.Scalar("0x074360d5eab8e888df07d862c4fc845ebd10b6a6c530919d66221219bba50216")
-        ).toSignature();
+        );
         assert.deepStrictEqual(
             signature.toString(),
             "0x921405afbfa97813293770efd55865c01055f39ad2a70f2b7a04ac043766a693074360d5eab8e888df07d862c4fc845ebd10b6a6c530919d66221219bba50216"
@@ -52,10 +52,7 @@ describe("Test of Schnorr", () => {
 
         const sig1 = sdk.Schnorr.sign<string>(kp1.v, X, R1.v, R, secret);
         const sig2 = sdk.Schnorr.sign<string>(kp2.v, X, R2.v, R, secret);
-        const sig3 = new sdk.Sig(
-            R,
-            sdk.Scalar.add(sdk.Sig.fromSignature(sig1).s, sdk.Sig.fromSignature(sig2).s)
-        ).toSignature();
+        const sig3 = sdk.Signature.fromSchnorr(R, sdk.Scalar.add(sig1.s, sig2.s));
 
         // No one can verify any of those individually
         assert.ok(!sdk.Schnorr.verify<string>(kp1.V, sig1, secret));
@@ -142,10 +139,10 @@ describe("Test of Schnorr", () => {
         );
         const message = "Bosagora:-)";
         const signature = sdk.Schnorr.signPair<string>(kp, message);
-        const invalid_sig: sdk.Signature = new sdk.Sig(
+        const invalid_sig: sdk.Signature = sdk.Signature.fromSchnorr(
             new sdk.Point("0xab4f6f6e85b8d0d38f5d5798a4bdc4dd444c8909c8a5389d3bb209a18610511c"),
-            sdk.Sig.fromSignature(signature).s
-        ).toSignature();
+            signature.s
+        );
         assert.ok(!sdk.Schnorr.verify<string>(kp.V, invalid_sig, message));
     });
 

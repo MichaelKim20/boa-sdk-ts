@@ -19,7 +19,7 @@ export { Height } from "./modules/common/Height";
 export { KeyPair, PublicKey, SecretKey } from "./modules/common/KeyPair";
 export { Signature } from "./modules/common/Signature";
 export { Scalar, Point } from "./modules/common/ECC";
-export { Sig, Pair, Schnorr, Message } from "./modules/common/Schnorr";
+export { Pair, Schnorr, Message } from "./modules/common/Schnorr";
 
 export { BitMask } from "./modules/data/BitMask";
 export { Block } from "./modules/data/Block";

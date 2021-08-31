@@ -37,88 +37,11 @@
 
 *******************************************************************************/
 
-import { SodiumHelper } from "../utils/SodiumHelper";
-import { Utils } from "../utils/Utils";
 import { Point, Scalar } from "./ECC";
 import { hashFull, hashPart } from "./Hash";
 import { Signature } from "./Signature";
 
 import { SmartBuffer } from "smart-buffer";
-
-/**
- * Represent a signature (R, s)
- */
-export class Sig {
-    /**
-     * Commitment
-     */
-    public R: Point;
-
-    /**
-     * Proof
-     */
-    public s: Scalar;
-
-    /**
-     * Construct a new instance of this class
-     *
-     * @param R The instance of Point
-     * @param s The instance of Scalar
-     */
-    constructor(R: Point, s: Scalar) {
-        this.R = R;
-        this.s = s;
-    }
-
-    /**
-     * Converts this to a Signature
-     */
-    public toSignature(): Signature {
-        return new Signature(Buffer.concat([this.s.data, this.R.data]));
-    }
-
-    /**
-     * Converts a Signature to Sig
-     */
-    public static fromSignature(s: Signature): Sig {
-        return new Sig(new Point(s.data.slice(Scalar.Width)), new Scalar(s.data.slice(0, Scalar.Width)));
-    }
-
-    /**
-     * Collects data to create a hash.
-     * @param buffer The buffer where collected data is stored
-     */
-    public computeHash(buffer: SmartBuffer) {
-        this.R.computeHash(buffer);
-        this.s.computeHash(buffer);
-    }
-
-    /**
-     * Converts this object to its JSON representation
-     */
-    public toJSON(): string {
-        return this.toSignature().toJSON();
-    }
-
-    /**
-     * Serialize as binary data.
-     * @param buffer - The buffer where serialized data is stored
-     */
-    public serialize(buffer: SmartBuffer) {
-        buffer.writeBuffer(this.R.data);
-        buffer.writeBuffer(this.s.data);
-    }
-
-    /**
-     * Deserialize as binary data.
-     * @param buffer - The buffer to be deserialized
-     */
-    public static deserialize(buffer: SmartBuffer): Sig {
-        const R = new Point(Utils.readBuffer(buffer, SodiumHelper.sodium.crypto_core_ed25519_BYTES));
-        const s = new Scalar(Utils.readBuffer(buffer, SodiumHelper.sodium.crypto_core_ed25519_SCALARBYTES));
-        return new Sig(R, s);
-    }
-}
 
 /**
  * Represent the message to hash (part of `c`)
@@ -318,7 +241,7 @@ export class Schnorr {
 
         // Compute `s` part of the proof
         const s: Scalar = Scalar.add(r, Scalar.mul(c, x));
-        return new Sig(R, s).toSignature();
+        return Signature.fromSchnorr(R, s);
     }
 
     /**
@@ -340,26 +263,24 @@ export class Schnorr {
      * `R` is referred to as the nonce and is a cryptographically randomly
      * generated number that should neither be reused nor leaked.
      */
-    public static verify<T>(X: Point, sig: Signature, data: T): boolean {
-        const s: Sig = Sig.fromSignature(sig);
-
+    public static verify<T>(X: Point, signature: Signature, data: T): boolean {
         // First check if Scalar from signature is valid
-        if (!s.s.isValid()) return false;
+        if (!signature.s.isValid()) return false;
 
         /// Compute `s.G`
-        const S = s.s.toPoint();
+        const S = signature.s.toPoint();
 
         // Now check that provided Point X is valid
         if (!X.isValid()) return false;
 
         // Also check the Point R from the Signature
-        if (!s.R.isValid()) return false;
+        if (!signature.R.isValid()) return false;
 
         // Compute the challenge and reduce the hash to a scalar
-        const c: Scalar = Scalar.fromHash(hashFull(new Message<T>(X, s.R, data)));
+        const c: Scalar = Scalar.fromHash(hashFull(new Message<T>(X, signature.R, data)));
 
         // Compute `R + c*X`
-        const RcX: Point = Point.add(s.R, Point.scalarMul(c, X));
+        const RcX: Point = Point.add(signature.R, Point.scalarMul(c, X));
         return Point.compare(S, RcX) === 0;
     }
 }

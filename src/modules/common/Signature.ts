@@ -11,10 +11,10 @@
 
 *******************************************************************************/
 
-import { Sig } from "./Schnorr";
+import { Endian, Utils } from "../utils/Utils";
+import { Point, Scalar } from "./ECC";
 
 import { SmartBuffer } from "smart-buffer";
-import { Endian, Utils } from "../utils/Utils";
 
 /**
  * Define the signature
@@ -24,6 +24,16 @@ export class Signature {
      * Buffer containing signature values
      */
     public readonly data: Buffer;
+
+    /**
+     * Commitment
+     */
+    public R: Point;
+
+    /**
+     * Proof
+     */
+    public s: Scalar;
 
     /**
      * The number of byte of the signature
@@ -44,6 +54,17 @@ export class Signature {
             this.fromBinary(data, endian);
         }
         if (this.data.length !== Signature.Width) throw new Error("The size of the data is abnormal.");
+        this.R = new Point(this.data.slice(Scalar.Width));
+        this.s = new Scalar(this.data.slice(0, Scalar.Width));
+    }
+
+    /**
+     * Returns new instance of Signature from Scalar and Point
+     * @param R The instance of Point
+     * @param s The instance of Scalar
+     */
+    public static fromSchnorr(R: Point, s: Scalar): Signature {
+        return new Signature(Buffer.concat([s.data, R.data]));
     }
 
     /**
@@ -91,6 +112,15 @@ export class Signature {
     }
 
     /**
+     * Collects data to create a hash.
+     * @param buffer The buffer where collected data is stored
+     */
+    public computeHash(buffer: SmartBuffer) {
+        this.R.computeHash(buffer);
+        this.s.computeHash(buffer);
+    }
+
+    /**
      * Converts this object to its JSON representation
      */
     public toJSON(): string {
@@ -99,17 +129,20 @@ export class Signature {
 
     /**
      * Serialize as binary data.
-     * @param buffer - The buffer where serialized data is stored
+     * @param buffer The buffer where serialized data is stored
      */
     public serialize(buffer: SmartBuffer) {
-        Sig.fromSignature(this).serialize(buffer);
+        buffer.writeBuffer(this.R.data);
+        buffer.writeBuffer(this.s.data);
     }
 
     /**
      * Deserialize as binary data.
-     * @param buffer - The buffer to be deserialized
+     * @param buffer The buffer to be deserialized
      */
     public static deserialize(buffer: SmartBuffer): Signature {
-        return Sig.deserialize(buffer).toSignature();
+        const R = new Point(Utils.readBuffer(buffer, Point.Width));
+        const s = new Scalar(Utils.readBuffer(buffer, Scalar.Width));
+        return Signature.fromSchnorr(R, s);
     }
 }

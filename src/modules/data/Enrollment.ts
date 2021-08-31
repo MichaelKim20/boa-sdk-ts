@@ -12,7 +12,6 @@
 *******************************************************************************/
 
 import { Hash, hashPart } from "../common/Hash";
-import { Sig } from "../common/Schnorr";
 import { Signature } from "../common/Signature";
 import { JSONValidator } from "../utils/JSONValidator";
 import { VarInt } from "../utils/VarInt";
@@ -43,7 +42,7 @@ export class Enrollment {
     /**
      * S: A signature for the message H(K, X, n, R) and the key K, using R
      */
-    public enroll_sig: Sig;
+    public enroll_sig: Signature;
 
     /**
      * Constructor
@@ -52,7 +51,7 @@ export class Enrollment {
      * @param cycle The number of rounds a validator will participate in
      * @param sig A signature for the message H(K, X, n, R) and the key K, using R
      */
-    constructor(key: Hash, seed: Hash, cycle: number, sig: Sig) {
+    constructor(key: Hash, seed: Hash, cycle: number, sig: Signature) {
         this.utxo_key = key;
         this.commitment = seed;
         this.cycle_length = cycle;
@@ -78,7 +77,7 @@ export class Enrollment {
             new Hash(value.utxo_key),
             new Hash(value.commitment),
             Number(value.cycle_length),
-            Sig.fromSignature(new Signature(value.enroll_sig))
+            new Signature(value.enroll_sig)
         );
     }
 
@@ -111,7 +110,7 @@ export class Enrollment {
         const utxo_key = Hash.deserialize(buffer);
         const commitment = Hash.deserialize(buffer);
         const cycle_length = VarInt.toNumber(buffer);
-        const enroll_sig = Sig.deserialize(buffer);
+        const enroll_sig = Signature.deserialize(buffer);
 
         return new Enrollment(utxo_key, commitment, cycle_length, enroll_sig);
     }
