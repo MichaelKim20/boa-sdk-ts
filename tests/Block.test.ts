@@ -25,7 +25,7 @@ const samples: any[] = (() => {
 
 describe("Test of Block", () => {
     before("Wait for the package libsodium to finish loading", async () => {
-        sdk.SodiumHelper.assign(new BOASodium());
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         await sdk.SodiumHelper.init();
     });
 

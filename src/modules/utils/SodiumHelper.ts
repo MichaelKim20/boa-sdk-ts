@@ -37,7 +37,7 @@ export class SodiumHelper {
      * @returns Returns true if the module is specified or false if not.
      */
     public static isAssigned(): boolean {
-        return SodiumHelper.sodium !== null;
+        return SodiumHelper._sodium !== undefined;
     }
 
     /**

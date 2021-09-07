@@ -21,7 +21,7 @@ import { bech32, bech32m } from "bech32";
 
 describe("Public Key", () => {
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.SodiumHelper.assign(new BOASodium());
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
 
@@ -166,7 +166,7 @@ describe("Public Key", () => {
 
 describe("Secret Key", () => {
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.SodiumHelper.assign(new BOASodium());
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
 
@@ -198,7 +198,7 @@ describe("Secret Key", () => {
 
 describe("KeyPair", () => {
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.SodiumHelper.assign(new BOASodium());
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
 

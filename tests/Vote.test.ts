@@ -20,7 +20,7 @@ import { SmartBuffer } from "smart-buffer";
 
 describe("Vote Data", () => {
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.SodiumHelper.assign(new BOASodium());
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
 

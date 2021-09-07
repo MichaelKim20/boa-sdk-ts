@@ -26,7 +26,7 @@ describe("Wallet", () => {
     const agora_port: string = "6000";
 
     before("Wait for the package libsodium to finish loading", async () => {
-        sdk.SodiumHelper.assign(new BOASodium());
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         await sdk.SodiumHelper.init();
     });
 

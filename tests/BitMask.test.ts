@@ -20,7 +20,7 @@ import { SmartBuffer } from "smart-buffer";
 
 describe("Test of BitMask", () => {
     before("Wait for the package libsodium to finish loading", async () => {
-        sdk.SodiumHelper.assign(new BOASodium());
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         await sdk.SodiumHelper.init();
     });
 
