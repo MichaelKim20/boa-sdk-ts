@@ -1001,7 +1001,7 @@ export class TestAgora {
             res.status(200).send("{}");
         });
 
-        this.app.put("/transaction", (req: express.Request, res: express.Response) => {
+        this.app.post("/transaction", (req: express.Request, res: express.Response) => {
             if (req.body.tx === undefined) {
                 res.status(400).send("Missing 'tx' object in body");
                 return;

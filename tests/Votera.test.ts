@@ -321,14 +321,6 @@ class TestAgora {
         // parse application/json
         this.app.use(bodyParser.json());
 
-        this.app.put("/transaction", (req: express.Request, res: express.Response) => {
-            if (req.body.tx === undefined) {
-                res.status(400).send("Missing 'tx' object in body");
-                return;
-            }
-            res.status(200).send();
-        });
-
         this.app.set("port", this.port);
 
         // Listen on provided this.port on this.address.

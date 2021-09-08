@@ -245,7 +245,7 @@ export class BOAClient {
         return new Promise<boolean>((resolve, reject) => {
             const url = uri(this.agora_url).filename("transaction");
 
-            Request.put(url.toString(), { tx })
+            Request.post(url.toString(), { tx })
                 .then((response: AxiosResponse) => {
                     if (response.status === 200) resolve(true);
                     else reject(handleNetworkError({ response }));
