@@ -71,7 +71,14 @@ export enum WalletResultCode {
  * The interface of receiver
  */
 export interface IWalletReceiver {
+    /**
+     * The address of the receiver
+     */
     address: PublicKey;
+
+    /**
+     * The amount to transfer
+     */
     amount: Amount;
 }
 
@@ -79,8 +86,19 @@ export interface IWalletReceiver {
  * This is the return value that is delivered after processing the wallet function.
  */
 export interface IWalletResult {
+    /**
+     * The result code
+     */
     code: WalletResultCode;
+
+    /**
+     * The result message
+     */
     message: string;
+
+    /**
+     * The result data
+     */
     data?: any;
 }
 
@@ -88,8 +106,19 @@ export interface IWalletResult {
  * An interface that defines the options used in a wallet.
  */
 export interface IWalletOption {
+    /**
+     * The address of Agora
+     */
     agoraEndpoint: string;
+
+    /**
+     * The address of Stoa
+     */
     stoaEndpoint: string;
+
+    /**
+     * Fee option to be used when transferring
+     */
     fee: WalletFeeOption;
 }
 
