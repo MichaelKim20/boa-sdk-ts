@@ -292,7 +292,7 @@ export class Wallet {
         const sendBOA = receiver.reduce<Amount>((sum, value) => Amount.add(sum, value.amount), Amount.make(0));
         const outputCount = receiver.length + 1;
         let estimatedTxFee = Amount.make(
-            Utils.FEE_FACTOR * Transaction.getEstimatedNumberOfBytes(0, outputCount, payloadLength)
+            Utils.FEE_RATE * Transaction.getEstimatedNumberOfBytes(0, outputCount, payloadLength)
         );
         let totalFee = Amount.add(payloadFee, estimatedTxFee);
         let totalSpendAmount = Amount.add(totalFee, sendBOA);
@@ -302,7 +302,7 @@ export class Wallet {
         try {
             utxosToSpend = await this.spendableUtxoProvider.getUTXO(
                 totalSpendAmount,
-                Amount.make(Utils.FEE_FACTOR * TxInput.getEstimatedNumberOfBytes())
+                Amount.make(Utils.FEE_RATE * TxInput.getEstimatedNumberOfBytes())
             );
         } catch (e) {
             return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
@@ -317,8 +317,7 @@ export class Wallet {
             utxosToSpend.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.utxo, u.amount));
 
             estimatedTxFee = Amount.make(
-                Utils.FEE_FACTOR *
-                    Transaction.getEstimatedNumberOfBytes(utxosToSpend.length, outputCount, payloadLength)
+                Utils.FEE_RATE * Transaction.getEstimatedNumberOfBytes(utxosToSpend.length, outputCount, payloadLength)
             );
 
             // Assign Payload
@@ -355,7 +354,7 @@ export class Wallet {
             try {
                 moreUtxosToSpend = await this.spendableUtxoProvider.getUTXO(
                     Amount.subtract(totalSpendAmount, sumAmountUtxo),
-                    Amount.make(Utils.FEE_FACTOR * TxInput.getEstimatedNumberOfBytes())
+                    Amount.make(Utils.FEE_RATE * TxInput.getEstimatedNumberOfBytes())
                 );
             } catch (e) {
                 return { code: WalletResultCode.FailedRequestUTXO, message: e.message };

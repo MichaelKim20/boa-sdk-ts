@@ -32,7 +32,7 @@ describe("TxCanceller", () => {
         const input_count = 2;
         const output_count = 2;
         const tx_size = sdk.Transaction.getEstimatedNumberOfBytes(input_count, output_count, 0);
-        let tx_fee = sdk.JSBI.BigInt(sdk.Utils.FEE_FACTOR * tx_size);
+        let tx_fee = sdk.JSBI.BigInt(sdk.Utils.FEE_RATE * tx_size);
         const minimum = sdk.JSBI.BigInt(100_000);
         if (sdk.JSBI.lessThan(tx_fee, minimum)) tx_fee = sdk.JSBI.BigInt(minimum);
 
@@ -161,11 +161,11 @@ describe("TxCanceller", () => {
     it("Transactions with amounts of UTXO that are not large enough cannot be cancelled.", () => {
         const utxo_data = JSON.parse(JSON.stringify(utxo_array));
         // change amount
-        utxo_data[0].amount = "52000";
-        utxo_data[1].amount = "52000";
+        utxo_data[0].amount = "152880";
+        utxo_data[1].amount = "152880";
         const utxos = utxo_data.map((m: any) => sdk.UnspentTxOutput.reviver("", m));
 
-        const tx = makeOriginalTransaction(key_pairs[0], sdk.JSBI.BigInt(52000), sdk.JSBI.BigInt(0.0001 * 10_000_000));
+        const tx = makeOriginalTransaction(key_pairs[0], sdk.JSBI.BigInt(152880), sdk.JSBI.BigInt(10000));
         const canceller = new sdk.TxCanceller(tx, utxos, key_pairs);
         const res = canceller.build();
         assert.strictEqual(res.code, sdk.TxCancelResultCode.NotEnoughFee);
@@ -191,14 +191,14 @@ describe("TxCanceller", () => {
                 {
                     utxo: "0x6fbcdb2573e0f5120f21f1875b6dc281c2eca3646ec2c39d703623d89b0eb83cd4b12b73f18db6bc6e8cbcaeb100741f6384c498ff4e61dd189e728d80fb9673",
                     unlock: {
-                        bytes: "Qgp1us76zo/9NyHXqMxyoTrYg1xclG9h8oi99GgOqwjQnMeyw2Lfaab2RufAiuSk5Z4XCvc4oHTqMxf56A8qvAE=",
+                        bytes: "ZU/TczLX33fadkwcS581ZxIVtC6R91TyfZR7LmOOIAnjljME5EFwYTM+WKR7UdZZJ+KsPyLFGhtySxtMNNg1lQE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0x75283072696d82d8bca2fe45471906a26df1dbe0736e41a9f78e02a14e2bfced6e0cb671f023626f890f28204556aca217f3023c891fe64b9f4b3450cb3e80ad",
                     unlock: {
-                        bytes: "9z0yk2uWscgX9FdHtQsaGFoNGpOLWKsEcwGPaVOqIQKYsf+SfRQL/uxq+JCuWLdTFUca+bCXLyfhz4Hf2TYmCgE=",
+                        bytes: "qsG5dLefZuT16AspASU+UAhXMrbFGfJiVlVAopz0JwqipLYzhss57dRWgYQd4yzUpUrt4nQFkb3khKU39yqqmQE=",
                     },
                     unlock_age: 0,
                 },
@@ -206,22 +206,21 @@ describe("TxCanceller", () => {
             outputs: [
                 {
                     type: 0,
-                    value: "19999999940304",
+                    value: "19999999847120",
                     lock: { type: 0, bytes: "uvf5H/3E3rpj8r12wjpHMPSOcoAhhCa2ecQMw6HCI84=" },
                 },
                 {
                     type: 0,
-                    value: "19999999940304",
+                    value: "19999999847120",
                     lock: { type: 0, bytes: "8Pfbo1EB2MhMyXG64ZzvTt50VuOGRGwIDjiXoA5xyZ8=" },
                 },
             ],
             payload: "",
             lock_height: "0",
         };
-
         if (res.tx !== undefined) {
             const tx_size = tx.getNumberOfBytes();
-            let total_fee = sdk.Amount.make(sdk.Utils.FEE_FACTOR * tx_size);
+            let total_fee = sdk.Amount.make(sdk.Utils.FEE_RATE * tx_size);
             const minimum = sdk.Amount.make(100_000);
             if (sdk.Amount.lessThan(total_fee, minimum)) total_fee = sdk.Amount.make(minimum);
 

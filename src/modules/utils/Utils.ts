@@ -30,7 +30,7 @@ export class Utils {
     public static readonly SIZE_OF_PUBLIC_KEY: number = 32;
     public static readonly SIZE_OF_SECRET_KEY: number = 32;
 
-    public static readonly FEE_FACTOR: number = 200;
+    public static readonly FEE_RATE: number = 700;
 
     /**
      * Check whether the string is a integer.
