@@ -148,13 +148,13 @@ export class Wallet {
     private readonly client: BOAClient;
 
     /**
-     * The instance of UTXOManager
+     * The instance of UTXOProvider
      * @private
      */
     private spendableUtxoProvider: UTXOProvider;
 
     /**
-     * The instance of UTXOManager
+     * The instance of UTXOProvider
      * @private
      */
     private frozenUtxoProvider: UTXOProvider;
