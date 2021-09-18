@@ -35,11 +35,6 @@ export class Enrollment {
     public commitment: Hash;
 
     /**
-     * n: The number of rounds a validator will participate in
-     */
-    public cycle_length: number;
-
-    /**
      * S: A signature for the message H(K, X, n, R) and the key K, using R
      */
     public enroll_sig: Signature;
@@ -48,13 +43,11 @@ export class Enrollment {
      * Constructor
      * @param key   A hash of a frozen UTXO
      * @param seed  The nth image of random value
-     * @param cycle The number of rounds a validator will participate in
      * @param sig A signature for the message H(K, X, n, R) and the key K, using R
      */
-    constructor(key: Hash, seed: Hash, cycle: number, sig: Signature) {
+    constructor(key: Hash, seed: Hash, sig: Signature) {
         this.utxo_key = key;
         this.commitment = seed;
-        this.cycle_length = cycle;
         this.enroll_sig = sig;
     }
 
@@ -73,12 +66,7 @@ export class Enrollment {
 
         JSONValidator.isValidOtherwiseThrow("Enrollment", value);
 
-        return new Enrollment(
-            new Hash(value.utxo_key),
-            new Hash(value.commitment),
-            Number(value.cycle_length),
-            new Signature(value.enroll_sig)
-        );
+        return new Enrollment(new Hash(value.utxo_key), new Hash(value.commitment), new Signature(value.enroll_sig));
     }
 
     /**
@@ -88,7 +76,6 @@ export class Enrollment {
     public computeHash(buffer: SmartBuffer) {
         this.utxo_key.computeHash(buffer);
         this.commitment.computeHash(buffer);
-        hashPart(this.cycle_length, buffer);
     }
 
     /**
@@ -98,7 +85,6 @@ export class Enrollment {
     public serialize(buffer: SmartBuffer) {
         this.utxo_key.serialize(buffer);
         this.commitment.serialize(buffer);
-        VarInt.fromNumber(this.cycle_length, buffer);
         this.enroll_sig.serialize(buffer);
     }
 
@@ -109,9 +95,8 @@ export class Enrollment {
     public static deserialize(buffer: SmartBuffer): Enrollment {
         const utxo_key = Hash.deserialize(buffer);
         const commitment = Hash.deserialize(buffer);
-        const cycle_length = VarInt.toNumber(buffer);
         const enroll_sig = Signature.deserialize(buffer);
 
-        return new Enrollment(utxo_key, commitment, cycle_length, enroll_sig);
+        return new Enrollment(utxo_key, commitment, enroll_sig);
     }
 }

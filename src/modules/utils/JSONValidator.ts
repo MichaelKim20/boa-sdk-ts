@@ -118,15 +118,12 @@ export class JSONValidator {
                     commitment: {
                         type: "string",
                     },
-                    cycle_length: {
-                        type: "number",
-                    },
                     enroll_sig: {
                         type: "string",
                     },
                 },
                 additionalProperties: false,
-                required: ["utxo_key", "commitment", "cycle_length", "enroll_sig"],
+                required: ["utxo_key", "commitment", "enroll_sig"],
             },
         ],
         [

@@ -96,7 +96,6 @@ describe("Test that validation with JSON schema", () => {
             sdk.JSONValidator.isValidOtherwiseThrow("Enrollment", {
                 commitment:
                     "0xfb05e20321ae11b2f799a71a736fd172c5dec39540f53d6213cd1b7522898c8bfb86445c6b6db9437899f5917bb5f9c9be7358ba0ecaa37675692f7d08766950",
-                cycle_length: 1008,
                 enroll_sig:
                     "0x0c48e78972e1b138a37e37ae27a01d5ebdea193088ddef2d9883446efe63086925e8803400d7b93d22b1eef5c475098ce08a5b47e8125cf6b04274cc4db34bfd",
             });
@@ -107,7 +106,6 @@ describe("Test that validation with JSON schema", () => {
             !sdk.JSONValidator.isValidOtherwiseNoThrow("Enrollment", {
                 commitment:
                     "0xfb05e20321ae11b2f799a71a736fd172c5dec39540f53d6213cd1b7522898c8bfb86445c6b6db9437899f5917bb5f9c9be7358ba0ecaa37675692f7d08766950",
-                cycle_length: 1008,
                 enroll_sig:
                     "0x0c48e78972e1b138a37e37ae27a01d5ebdea193088ddef2d9883446efe63086925e8803400d7b93d22b1eef5c475098ce08a5b47e8125cf6b04274cc4db34bfd",
             })
@@ -120,7 +118,6 @@ describe("Test that validation with JSON schema", () => {
                     "0x210b66053c73e7bd7b27673706f0272617d09b8cda76605e91ab66ad1cc3bfc1f3f5fede91fd74bb2d2073de587c6ee495cfb0d981f03a83651b48ce0e576a1a",
                 commitment:
                     "0xfb05e20321ae11b2f799a71a736fd172c5dec39540f53d6213cd1b7522898c8bfb86445c6b6db9437899f5917bb5f9c9be7358ba0ecaa37675692f7d08766950",
-                cycle_length: 1008,
                 enroll_sig:
                     "0x0c48e78972e1b138a37e37ae27a01d5ebdea193088ddef2d9883446efe63086925e8803400d7b93d22b1eef5c475098ce08a5b47e8125cf6b04274cc4db34bfd",
             })
