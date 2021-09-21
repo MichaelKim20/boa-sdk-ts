@@ -452,7 +452,7 @@ describe("BOA Client", () => {
         assert.ok(res);
     });
 
-    it("Test saving a vote data with `UTXOManager`", async () => {
+    it("Test saving a vote data with `UTXOProvider`", async () => {
         // Set URL
         const stoa_uri = URI("http://localhost").port(stoa_port);
         const agora_uri = URI("http://localhost").port(agora_port);
@@ -463,8 +463,6 @@ describe("BOA Client", () => {
         const key_pair = sdk.KeyPair.fromSeed(
             new sdk.SecretKey("SD4IEXJ6GWZ226ALTDDM72SYMHBTTJ6CHDPUNNTVZK4XSDHAM4BAQIC4")
         );
-        const block_height = await boa_client.getBlockHeight();
-        const utxos = await boa_client.getUTXOs(key_pair.address);
 
         const vote_data = Buffer.from("YXRhZCBldG92", "base64");
         const payload_fee = sdk.TxPayloadFee.getFee(vote_data.length);
@@ -472,12 +470,11 @@ describe("BOA Client", () => {
 
         const builder = new sdk.TxBuilder(key_pair);
 
-        // Create UTXOManager
-        const utxo_manager = new sdk.UTXOManager(utxos);
+        // Create UTXOProvider
+        const utxo_provider = new sdk.UTXOProvider(key_pair.address, boa_client);
         // Get UTXO for the amount to need.
-        utxo_manager
-            .getUTXO(sdk.JSBI.add(sdk.JSBI.add(payload_fee, tx_fee), sdk.JSBI.BigInt(1)), block_height)
-            .forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        const utxos = await utxo_provider.getUTXO(sdk.JSBI.add(sdk.JSBI.add(payload_fee, tx_fee), sdk.JSBI.BigInt(1)));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
 
         const expected = {
             inputs: [
@@ -524,7 +521,7 @@ describe("BOA Client", () => {
         assert.ok(res);
     });
 
-    it("Test saving a vote data with `UTXOManager` - There is no output", async () => {
+    it("Test saving a vote data with `UTXOProvider` - There is no output", async () => {
         // Set URL
         const stoa_uri = URI("http://localhost").port(stoa_port);
         const agora_uri = URI("http://localhost").port(agora_port);
@@ -535,8 +532,6 @@ describe("BOA Client", () => {
         const key_pair = sdk.KeyPair.fromSeed(
             new sdk.SecretKey("SD4IEXJ6GWZ226ALTDDM72SYMHBTTJ6CHDPUNNTVZK4XSDHAM4BAQIC4")
         );
-        const block_height = await boa_client.getBlockHeight();
-        const utxos = await boa_client.getUTXOs(key_pair.address);
 
         const vote_data = Buffer.from("YXRhZCBldG92", "base64");
         const payload_fee = sdk.JSBI.BigInt(200000);
@@ -544,14 +539,13 @@ describe("BOA Client", () => {
 
         const builder = new sdk.TxBuilder(key_pair);
 
-        // Create UTXOManager
-        const utxo_manager = new sdk.UTXOManager(utxos);
+        // Create UTXOProvider
+        const utxo_provider = new sdk.UTXOProvider(key_pair.address, boa_client);
         // Get UTXO for the amount to need.
         // There can't be any output. An error occurs because the constraint of
         // the transaction is not satisfied that it must have at least one output.
-        utxo_manager
-            .getUTXO(sdk.JSBI.add(payload_fee, tx_fee), block_height)
-            .forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        const utxos = await utxo_provider.getUTXO(sdk.JSBI.add(payload_fee, tx_fee));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
 
         assert.throws(() => {
             const tx = builder.assignPayload(vote_data).sign(sdk.OutputType.Payment, tx_fee, payload_fee);
@@ -569,8 +563,6 @@ describe("BOA Client", () => {
         const key_pair = sdk.KeyPair.fromSeed(
             new sdk.SecretKey("SD4IEXJ6GWZ226ALTDDM72SYMHBTTJ6CHDPUNNTVZK4XSDHAM4BAQIC4")
         );
-        const block_height = await boa_client.getBlockHeight();
-        const utxos = await boa_client.getUTXOs(key_pair.address);
 
         const vote_data = Buffer.from("YXRhZCBldG92", "base64");
         const payload_fee = sdk.JSBI.BigInt(200000);
@@ -578,13 +570,12 @@ describe("BOA Client", () => {
 
         const builder = new sdk.TxBuilder(key_pair);
 
-        // Create UTXOManager
-        const utxo_manager = new sdk.UTXOManager(utxos);
+        // Create UTXOProvider
+        const utxo_provider = new sdk.UTXOProvider(key_pair.address, boa_client);
         // Get UTXO for the amount to need.
         // The amount of the UTXO found is one greater than the fee, allowing at least one change output.
-        utxo_manager
-            .getUTXO(sdk.JSBI.add(sdk.JSBI.add(payload_fee, tx_fee), sdk.JSBI.BigInt(1)), block_height)
-            .forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        const utxos = await utxo_provider.getUTXO(sdk.JSBI.add(sdk.JSBI.add(payload_fee, tx_fee), sdk.JSBI.BigInt(1)));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
 
         const tx = builder.assignPayload(vote_data).sign(sdk.OutputType.Payment, tx_fee, payload_fee);
 
@@ -663,16 +654,14 @@ describe("BOA Client", () => {
         const key_pair = sdk.KeyPair.fromSeed(
             new sdk.SecretKey("SD4IEXJ6GWZ226ALTDDM72SYMHBTTJ6CHDPUNNTVZK4XSDHAM4BAQIC4")
         );
-        const block_height = await boa_client.getBlockHeight();
-        const utxos = await boa_client.getUTXOs(key_pair.address);
 
         const vote_data = Buffer.from("YXRhZCBldG92", "base64");
         const payload_fee = sdk.TxPayloadFee.getFeeAmount(vote_data.length);
 
         const builder = new sdk.TxBuilder(key_pair);
 
-        // Create UTXOManager
-        const utxo_manager = new sdk.UTXOManager(utxos);
+        // Create UTXOProvider
+        const utxo_provider = new sdk.UTXOProvider(key_pair.address, boa_client);
 
         const output_address = "boa1xrr66q4rthn4qvhhsl4y5hptqm366pgarqpk26wfzh6d38wg076tsqqesgg";
         const output_count = 2;
@@ -684,9 +673,8 @@ describe("BOA Client", () => {
         let total_fee = sdk.Amount.add(payload_fee, estimated_tx_fee);
         let total_send_amount = sdk.Amount.add(total_fee, send_boa);
 
-        const in_utxos = utxo_manager.getUTXO(
+        const in_utxos = await utxo_provider.getUTXO(
             total_send_amount,
-            block_height,
             sdk.Amount.make(sdk.Utils.FEE_RATE * sdk.TxInput.getEstimatedNumberOfBytes())
         );
         in_utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
@@ -720,13 +708,11 @@ describe("BOA Client", () => {
         // If the value of LockType in UTXO is not a 'LockType.Key', the size may vary. The code below is for that.
         if (sdk.Amount.lessThan(sum_amount_utxo, total_send_amount)) {
             //  Add additional UTXO for the required amount.
-            in_utxos.push(
-                ...utxo_manager.getUTXO(
-                    sdk.Amount.subtract(total_send_amount, sum_amount_utxo),
-                    block_height,
-                    sdk.Amount.make(sdk.Utils.FEE_RATE * sdk.TxInput.getEstimatedNumberOfBytes())
-                )
+            const additional = await utxo_provider.getUTXO(
+                sdk.Amount.subtract(total_send_amount, sum_amount_utxo),
+                sdk.Amount.make(sdk.Utils.FEE_RATE * sdk.TxInput.getEstimatedNumberOfBytes())
             );
+            in_utxos.push(...additional);
             in_utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
             estimated_tx_fee = sdk.Amount.make(
                 sdk.Utils.FEE_RATE *
@@ -760,70 +746,77 @@ describe("BOA Client", () => {
                 {
                     utxo: "0x3451d94322524e3923fd26f0597fb8a9cdbf3a9427c38ed1ca61104796d39c5b9b5ea33d576f17c2dc17bebc5d84a0559de8c8c521dfe725d4c352255fc71e85",
                     unlock: {
-                        bytes: "JRSM3FhHH55RtkvFJr2DOuui3gkuMRIqVD0CvzXu6gNKRrU/sx7TGUscvcDxsONj8FoGIBiYOYp3PtqAeT6lQQE=",
-                    },
-                    unlock_age: 0,
-                },
-                {
-                    utxo: "0x37e17420b4bfd8be693475fbbe8b53bb80904dd3e45f3080c0d0b912b004324a27693559d884b943830f6a21b05c69061f453e8b9f03d56f3b6fd5b0c6fc2f8b",
-                    unlock: {
-                        bytes: "mR+gBalAMzUyZAoDK+0u/GoK226h4J3jnyQ8JTEmoQ+Le6UKk4/EPQijDiurdfMoBLHA1BNM7IqNpEQdirxysQE=",
+                        bytes: "EfG5NZSb0qACJaWgsO+VZhypnWnBByst+ZHWm2RcPACuNls51gpAWuuOhLslQTuTuWr3XknT7BsSE3MTDpJVwQE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0x451a5b7929615121e0f2be759222853ea3acb45c94430a03de29a47db7c70e04eb4fce5b4a0c5af01d98331732546fede05fdfaf6ab429b3960aad6a20bbf0eb",
                     unlock: {
-                        bytes: "vqmwajodHpm9+r2Z3a7JmZEKbcTm6CoIpKOmxlkZkQB49gWmI4Hn54oRecCe4UhkGs1R3E9rN0JkLg9Hnjw/ogE=",
+                        bytes: "ROpyConbX+i2PyOwhiQ+ONdlrOaUd5SugQc0zz7LLw5ynpSuommZLClJiE8daf9h6VK5wACVrrUKMFz+LteRQwE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0x7e1958dbe6839d8520d65013bbc85d36d47a9f64cf608cc66c0d816f0b45f5c8a85a8990725ffbb1ab13c3c65b45fdc06f4745d455e00e1068c4c5c0b661d685",
                     unlock: {
-                        bytes: "dooCBwqznquB7XQsa5vMsHBb35iRJU6nPG0T/CpaBwmw6gVJ8+Y6h1oOLxRkAxPIyaTsJqLxdcXpyfzJUt24pAE=",
+                        bytes: "XqgeBdfXWvSQicrmTWfVlHGqqiK/4e4W9P/BmP5kngwLQtxEClhv+0CkeSLDDhq7t/FyibDmL4X2sb1PkqAaDAE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0xc3780f9907a97c20a2955945544e7732a60702c32d81e016bdf1ea172b7b7fb96e9a4164176663a146615307aaadfbbad77e615a7c792a89191e85471120d314",
                     unlock: {
-                        bytes: "FQbi+r+mFDVgDswCT+Lxeq4w9jA439RPLD+wLIemagPyjtJGfz+lBZ+zBhFLBGuROHxHP6urQgUFzBPXeX+SDQE=",
+                        bytes: "yqB8Ng9Bh68cFW8I39Qyb/rcD0TtaWPTd0ir7cbWfQngEBCDZjzilJq8xLVcnQjsgOmYWBi3oj5DHh23Es7SNQE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0xcfa89b7a9cd48fddc16cdcbbf0ffa7a9fd14d89c96bc3da0151db0bd7e453fe031f8a1e4d575a299c16942d9c96fbafff2497332bc48532aa7e0acf6122be0e2",
                     unlock: {
-                        bytes: "XxMbK+LyCudaqMkpF07c/tCedS9N7/XkF5z2utJGKgmImlSr7iY8emqaUwo8WlGohO4cl2bmNsH1T6KJpqdsegE=",
+                        bytes: "bQwYUQsecfKMsfXvfG49vP5hr0ab5y3uds1EOFeJ2gG5qmx9sWIEnTdoehsMt3KMlVskPLQUhUIKmHZQlDQ6BwE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0xd44608de8a5015b04f933098fd7f67f84ffbf00c678836d38c661ab6dc1f149606bdc96bad149375e16dc5722b077b14c0a4afdbe6d30932f783650f435bcb92",
                     unlock: {
-                        bytes: "aKsrg25yqGAXTQEijRrDpVqXqkghbPKYgeQwGrVDDAz5tn8lCLzfqmhUvYefREhnUaNQx7+lFslUa5JRp9OaeAE=",
+                        bytes: "URLI/BDry0UMe/OasNR/YQ9S5C5A10POYfcuqE5ixAy8GQznZevOv1Pe5dG1EXqwu9XalgEZE6RObW4IG3kyBAE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0xfca92fe76629311c6208a49e89cb26f5260777278cd8b272e7bb3021adf429957fd6844eb3b8ff64a1f6074126163fd636877fa92a1f4329c5116873161fbaf8",
                     unlock: {
-                        bytes: "EeIKsGRioeaztplmaGWk1XUWySjeFPUIQy6P+Ft1pAfTA4tArt4K75CM+AK/m+mONiKkgg9Uz/cN43qzVL/nBwE=",
+                        bytes: "nm9Bc6oQakBC/GVifShU1l9faHSdtku8cB6xghoe8gdCSM5KlJVgqOL3pDCwI5KUJZB7pN3ZcM5WpHsXWTHl5wE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0xff05579da497ac482ccd2be1851e9ff1196314e97228a1fca62e6292b5e7ea91cadca41d6afe2d57048bf594c6dd73ab1f93e96717c73c128807905e7175beeb",
                     unlock: {
-                        bytes: "nOrAeK2+u13Ji3c1dgZm7CLxD6YvAEcdN8EvojoAygnetC2wzOMaHYwjbfYt/O+RGNXTBIgY8IednWCmgWcXfwE=",
+                        bytes: "dHj6nlJx4t/Q5q4b3Sow1axxVa78RanGs6FRlFPSzQ9mFXqulxFDrIQ64XDbEW3IrXzI5V7OOONXkHx765cWwgE=",
                     },
                     unlock_age: 0,
                 },
             ],
             outputs: [
-                { type: 0, value: "739200", lock: { type: 0, bytes: "wa1PiNOnmZYBpjfjXS58SZ6fJTaihHSRZRt86aWWRgE=" } },
-                { type: 0, value: "200000", lock: { type: 0, bytes: "x60Co13nUDL3h+pKXCsG460FHRgDZWnJFfTYnch/tLg=" } },
+                {
+                    type: 0,
+                    value: "665800",
+                    lock: {
+                        type: 0,
+                        bytes: "wa1PiNOnmZYBpjfjXS58SZ6fJTaihHSRZRt86aWWRgE=",
+                    },
+                },
+                {
+                    type: 0,
+                    value: "200000",
+                    lock: {
+                        type: 0,
+                        bytes: "x60Co13nUDL3h+pKXCsG460FHRgDZWnJFfTYnch/tLg=",
+                    },
+                },
             ],
             payload: "YXRhZCBldG92",
             lock_height: "0",
