@@ -78,6 +78,23 @@ describe("Hash", () => {
         assert.strictEqual(h3.toString(), h2.toString());
     });
 
+    it("Test of multi hash of string", () => {
+        const pre_image = new sdk.Hash(
+            "0x76c481db1ebcc0dbd463115b2f1d66e012c62725eee4b266498657f2d6b9a236f5606384b06fca25f8c2eb6d68885878a09902ec6d01ed1b47cb4b725a672584"
+        );
+
+        const app_name = "Votera";
+
+        // Hash Multi
+        const key = sdk.hashMulti(pre_image, app_name);
+
+        // Check
+        assert.strictEqual(
+            key.toString(),
+            "0x4c4e169e6619207b6613496c777b21431c5e14a29c44b316a55c8132416823bf9d202b8335d4c90810783e139ac0795b9a58993bf4bd10d1bc0b1a131fd09c64"
+        );
+    });
+
     // The test codes below compare with the values calculated in Agora.
     it("Test of multi hash of variables", () => {
         // Source 1 : "foo"

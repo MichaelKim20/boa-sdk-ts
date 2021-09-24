@@ -225,7 +225,7 @@ export function hash(source: Buffer): Hash {
  */
 export function hashMulti(...args: any[]): Hash {
     const buffer = new SmartBuffer();
-    for (const m of args) hashPart(m, buffer, false);
+    for (const m of args) hashPart(m, buffer);
     return new Hash(Buffer.from(SodiumHelper.sodium.crypto_generichash(Hash.Width, buffer.toBuffer())));
 }
 
@@ -237,9 +237,7 @@ export function hashMulti(...args: any[]): Hash {
  * See_Also https://github.com/bosagora/agora/blob/93c31daa616e76011deee68a8645e1b86624ce3d/source/agora/consensus/data/UTXOSetValue.d#L50-L53
  */
 export function makeUTXOKey(h: Hash, index: JSBI): Hash {
-    const buf = Buffer.allocUnsafe(8);
-    Utils.writeJSBigIntLE(buf, index);
-    return hashMulti(h, buf);
+    return hashMulti(h, index);
 }
 
 /**
@@ -261,9 +259,8 @@ export function hashFull(record: any): Hash {
  * Serializes all internal objects that the instance contains in the buffer.
  * @param record The object to serialize for the hash for creation
  * @param buffer The storage of serialized data for creating the hash
- * @param write_length Choose whether to record the size of the array or not.
  */
-export function hashPart(record: any, buffer: SmartBuffer, write_length: boolean = true) {
+export function hashPart(record: any, buffer: SmartBuffer) {
     if (record === null || record === undefined) return;
 
     // If the record has a method called `computeHash`,
@@ -274,7 +271,7 @@ export function hashPart(record: any, buffer: SmartBuffer, write_length: boolean
 
     if (typeof record === "string") {
         const buf = Buffer.from(record);
-        if (write_length) hashVarInt(JSBI.BigInt(buf.length), buffer);
+        hashVarInt(JSBI.BigInt(buf.length), buffer);
         buffer.writeBuffer(buf);
         return;
     }
@@ -292,13 +289,13 @@ export function hashPart(record: any, buffer: SmartBuffer, write_length: boolean
     }
 
     if (record instanceof Buffer) {
-        if (write_length) hashVarInt(JSBI.BigInt(record.length), buffer);
+        hashVarInt(JSBI.BigInt(record.length), buffer);
         buffer.writeBuffer(record);
         return;
     }
 
     if (Array.isArray(record)) {
-        if (write_length) hashVarInt(JSBI.BigInt(record.length), buffer);
+        hashVarInt(JSBI.BigInt(record.length), buffer);
         for (const elem of record) {
             hashPart(elem, buffer);
         }
