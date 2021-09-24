@@ -79,6 +79,30 @@ describe("Hash", () => {
     });
 
     // The test codes below compare with the values calculated in Agora.
+    it("Test of multi hash of variables", () => {
+        // Source 1 : "foo"
+        const foo = sdk.hash(Buffer.from("foo"));
+
+        // UInt8
+        assert.strictEqual(
+            sdk.hashMulti(foo, sdk.VariableBytes.fromUInt8(45)).toString(),
+            "0xf61564563b39715729ced8bff16b50b622d3ae38bc41f40d2f131961cf68ad8b931906921ff40e9e024fae067bea3bc48a86be5729713952b64d1f15b03a9f62"
+        );
+
+        // UInt16
+        assert.strictEqual(
+            sdk.hashMulti(foo, sdk.VariableBytes.fromUInt16(45)).toString(),
+            "0x605ca7649eda97e108ade8f1c390ad109dd39ac3824369c31a9647d234dafda65d8159ec5f9f7808052abed8e95bc9d86fc7f612632a156b81b4082aa2da4435"
+        );
+
+        // UInt32
+        assert.strictEqual(
+            sdk.hashMulti(foo, sdk.VariableBytes.fromUInt32(45)).toString(),
+            "0xfd36a5e3a160b516c459a0ab08f65e352bd63b1ec3ceea393a04d7009b3c301c150057ca5a6363607c7c0cc37bffba853c3351ed6b953e7c947e82c810f453b9"
+        );
+    });
+
+    // The test codes below compare with the values calculated in Agora.
     it("Test of utxo key, using makeUTXOKey", () => {
         const tx_hash = new sdk.Hash(
             "0x5d7f6a7a30f7ff591c8649f61eb8a35d034824ed5cd252c2c6f10cdbd2236713dc369ef2a44b62ba113814a9d819a276ff61582874c9aee9c98efa2aa1f10d73"

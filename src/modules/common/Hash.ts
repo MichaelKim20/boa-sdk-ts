@@ -131,6 +131,84 @@ export class Hash {
 }
 
 /**
+ * A definition of various variable types. This was written to hash them.
+ */
+export enum VariableType {
+    UINT8 = 0,
+    UINT16 = 1,
+    UINT32 = 2,
+}
+
+/**
+ * A class used to hash a variable.
+ * This variable does not record their size at the beginning.
+ */
+export class VariableBytes {
+    /**
+     * Buffer where variables will be written in bytes.
+     * @private
+     */
+    private readonly data: Buffer;
+
+    /**
+     * Constructor
+     * @param value The value of the variable.
+     * @param type  The type of the variable.
+     */
+    constructor(value: number, type: VariableType = VariableType.UINT8) {
+        switch (type) {
+            case VariableType.UINT8:
+                this.data = Buffer.alloc(1);
+                this.data.writeUInt8(value);
+                break;
+            case VariableType.UINT16:
+                this.data = Buffer.alloc(2);
+                this.data.writeUInt16LE(value);
+                break;
+            case VariableType.UINT32:
+                this.data = Buffer.alloc(4);
+                this.data.writeUInt32LE(value);
+                break;
+        }
+    }
+
+    /**
+     * Convert the unsigned 8Byte integer to the VariableBytes
+     * @param value The value of the variable
+     * @returns The instance of VariableBytes
+     */
+    public static fromUInt8(value: number): VariableBytes {
+        return new VariableBytes(value, VariableType.UINT8);
+    }
+
+    /**
+     * Convert the unsigned 16Byte integer to the VariableBytes
+     * @param value The value of the variable
+     * @returns The instance of VariableBytes
+     */
+    public static fromUInt16(value: number): VariableBytes {
+        return new VariableBytes(value, VariableType.UINT16);
+    }
+
+    /**
+     * Convert the unsigned 32Byte integer to the VariableBytes
+     * @param value The value of the variable
+     * @returns The instance of VariableBytes
+     */
+    public static fromUInt32(value: number): VariableBytes {
+        return new VariableBytes(value, VariableType.UINT32);
+    }
+
+    /**
+     * Collects data to create a hash.
+     * @param buffer The buffer where collected data is stored
+     */
+    public computeHash(buffer: SmartBuffer) {
+        buffer.writeBuffer(this.data);
+    }
+}
+
+/**
  * Creates a hash and stores it in buffer.
  * @param source Original for creating hash
  * @returns Instance of Hash
