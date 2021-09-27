@@ -19,9 +19,11 @@ import axios from "axios";
 // tslint:disable-next-line:no-var-requires
 const version = require("../../../package.json").version;
 
-export const Request = axios.create({
-    headers: {
-        "X-Client-Name": "boa-sdk-ts",
-        "X-Client-Version": version,
-    },
-});
+export function Request() {
+    return axios.create({
+        headers: {
+            "X-Client-Name": "boa-sdk-ts",
+            "X-Client-Version": version,
+        },
+    });
+}

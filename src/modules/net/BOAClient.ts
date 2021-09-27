@@ -72,7 +72,8 @@ export class BOAClient {
 
             if (height !== undefined) url.addSearch("height", height);
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     const validators: Validator[] = new Array<Validator>();
                     if (response.status === 200) {
@@ -109,7 +110,8 @@ export class BOAClient {
 
             if (height !== undefined) url.addSearch("height", height);
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     const validators: Validator[] = new Array<Validator>();
                     if (response.status === 200) {
@@ -195,7 +197,8 @@ export class BOAClient {
             const time = Math.ceil(when.getTime() / 1000);
             const url = uri(this.server_url).directory("block_height_at").filename(time.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     if (response.status === 200) resolve(Number(response.data));
                     else reject(new Error("The date before Genesis Block creation is invalid."));
@@ -219,7 +222,8 @@ export class BOAClient {
                 .then((last) => {
                     const url = uri(this.server_url).directory("/wallet/blocks/header");
                     if (JSBI.lessThanOrEqual(height, last)) url.addSearch("height", height.toString());
-                    Request.get(url.toString())
+                    Request()
+                        .get(url.toString())
                         .then((response: AxiosResponse) => {
                             const stoa_height = JSBI.BigInt(response.data.height);
                             const stoa_timestamp = Number(response.data.time_stamp);
@@ -245,7 +249,8 @@ export class BOAClient {
         return new Promise<boolean>((resolve, reject) => {
             const url = uri(this.agora_url).filename("transaction");
 
-            Request.post(url.toString(), { tx })
+            Request()
+                .post(url.toString(), { tx })
                 .then((response: AxiosResponse) => {
                     if (response.status === 200) resolve(true);
                     else reject(handleNetworkError({ response }));
@@ -266,7 +271,8 @@ export class BOAClient {
         return new Promise<UnspentTxOutput[]>((resolve, reject) => {
             const url = uri(this.server_url).directory("utxo").filename(address.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     const utxos: UnspentTxOutput[] = new Array<UnspentTxOutput>();
                     response.data.forEach((elem: any) => {
@@ -291,7 +297,8 @@ export class BOAClient {
             const url = uri(this.server_url).directory("utxos");
 
             const utxo_hashes = hashes.map((m) => m.toString());
-            Request.post(url.toString(), { utxos: utxo_hashes })
+            Request()
+                .post(url.toString(), { utxos: utxo_hashes })
                 .then((response: AxiosResponse) => {
                     const utxos: UnspentTxOutput[] = new Array<UnspentTxOutput>();
                     response.data.forEach((elem: any) => {
@@ -311,9 +318,11 @@ export class BOAClient {
     public getBlockHeight(): Promise<JSBI> {
         const url = uri(this.server_url).filename("/block_height");
 
-        return Request.get(url.toString()).then((response: AxiosResponse) => {
-            return JSBI.BigInt(response.data);
-        });
+        return Request()
+            .get(url.toString())
+            .then((response: AxiosResponse) => {
+                return JSBI.BigInt(response.data);
+            });
     }
 
     /**
@@ -322,7 +331,8 @@ export class BOAClient {
     public getStoaStatus(): Promise<boolean> {
         const url = uri(this.server_url).filename("/block_height");
 
-        return Request.get(url.toString())
+        return Request()
+            .get(url.toString())
             .then((response: AxiosResponse) => {
                 return Utils.isInteger(response.data);
             })
@@ -337,7 +347,8 @@ export class BOAClient {
     public getAgoraStatus(): Promise<boolean> {
         const url = uri(this.agora_url).filename("/block_height");
 
-        return Request.get(url.toString())
+        return Request()
+            .get(url.toString())
             .then((response: AxiosResponse) => {
                 return Utils.isInteger(response.data);
             })
@@ -356,7 +367,8 @@ export class BOAClient {
         return new Promise<TransactionFee>((resolve, reject) => {
             const url = uri(this.server_url).directory("transaction/fees").filename(tx_size.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     if (response.status === 200) {
                         resolve(TransactionFee.reviver("", response.data));
@@ -406,7 +418,8 @@ export class BOAClient {
 
             if (peer !== undefined) url.addSearch("peer", peer);
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     resolve(response.data);
                 })
@@ -424,7 +437,8 @@ export class BOAClient {
         return new Promise<ITxOverview>((resolve, reject) => {
             const url = uri(this.server_url).directory("/wallet/transaction/overview").filename(tx_hash.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     if (response.status === 200) {
                         resolve(response.data);
@@ -447,7 +461,8 @@ export class BOAClient {
         return new Promise<IPendingTxs[]>((resolve, reject) => {
             const url = uri(this.server_url).directory("/wallet/transactions/pending").filename(address.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     resolve(response.data);
                 })
@@ -467,7 +482,8 @@ export class BOAClient {
         return new Promise<Transaction>((resolve, reject) => {
             const url = uri(this.server_url).directory("transaction/pending").filename(tx_hash.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     if (response.status === 200) {
                         const tx = Transaction.reviver("", response.data);
@@ -493,7 +509,8 @@ export class BOAClient {
         return new Promise<Transaction>((resolve, reject) => {
             const url = uri(this.server_url).directory("transaction").filename(tx_hash.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     if (response.status === 200) {
                         const tx = Transaction.reviver("", response.data);
@@ -552,7 +569,8 @@ export class BOAClient {
                 .addSearch("type", type);
             if (last !== undefined) url.addSearch("last", last.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     const utxos: UnspentTxOutput[] = new Array<UnspentTxOutput>();
                     response.data.forEach((elem: any) => {
@@ -576,7 +594,8 @@ export class BOAClient {
         return new Promise<Balance>((resolve, reject) => {
             const url = uri(this.server_url).directory("wallet/balance").filename(address.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     resolve(Balance.reviver("", response.data));
                 })
@@ -598,7 +617,8 @@ export class BOAClient {
         return new Promise<ISPVStatus>((resolve, reject) => {
             const url = uri(this.server_url).directory("spv").filename(tx_hash.toString());
 
-            Request.get(url.toString())
+            Request()
+                .get(url.toString())
                 .then((response: AxiosResponse) => {
                     resolve(response.data);
                 })

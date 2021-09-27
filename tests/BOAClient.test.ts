@@ -309,7 +309,7 @@ describe("BOA Client", () => {
 
         const stoa_uri = URI("http://localhost").port(stoa_port).directory("client_info");
 
-        const response = await sdk.Request.get(stoa_uri.toString());
+        const response = await sdk.Request().get(stoa_uri.toString());
         assert.strictEqual(response.data["X-Client-Name"], "boa-sdk-ts");
         assert.strictEqual(response.data["X-Client-Version"], version);
     });
