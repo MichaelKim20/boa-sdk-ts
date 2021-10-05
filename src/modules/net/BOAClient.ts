@@ -23,7 +23,7 @@ import { Utils } from "../utils/Utils";
 import { handleNetworkError } from "./error/ErrorTypes";
 import { Request } from "./Request";
 import { Balance } from "./response/Balance";
-import { TransactionFee } from "./response/TrasactionFee";
+import { TransactionFee } from "./response/TransactionFee";
 import { BalanceType, IPendingTxs, ISPVStatus, ITxHistoryElement, ITxOverview } from "./response/Types";
 import { UnspentTxOutput } from "./response/UnspentTxOutput";
 import { Validator } from "./response/Validator";

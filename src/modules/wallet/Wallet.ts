@@ -19,7 +19,7 @@ import { TxInput } from "../data/TxInput";
 import { OutputType } from "../data/TxOutput";
 import { BOAClient } from "../net/BOAClient";
 import { Balance } from "../net/response/Balance";
-import { TransactionFee } from "../net/response/TrasactionFee";
+import { TransactionFee } from "../net/response/TransactionFee";
 import { BalanceType } from "../net/response/Types";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
 import { LockType } from "../script/Lock";
