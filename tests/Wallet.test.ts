@@ -416,6 +416,7 @@ describe("Wallet", () => {
         assert.ok(balance_res.data !== undefined);
 
         const res = await wallet.getFrozenUTXOs(balance_res.data.frozen);
+        assert.ok(res.data !== undefined);
         assert.deepStrictEqual(res.data.length, 1);
         assert.deepStrictEqual(
             res.data[0].utxo.toString(),

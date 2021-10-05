@@ -85,7 +85,7 @@ export interface IWalletReceiver {
 /**
  * This is the return value that is delivered after processing the wallet function.
  */
-export interface IWalletResult {
+export interface IWalletResult<T> {
     /**
      * The result code
      */
@@ -99,7 +99,7 @@ export interface IWalletResult {
     /**
      * The result data
      */
-    data?: any;
+    data?: T;
 }
 
 /**
@@ -218,7 +218,7 @@ export class Wallet {
      * Perform access tests on servers
      * @private
      */
-    private async checkServer(): Promise<IWalletResult> {
+    private async checkServer(): Promise<IWalletResult<any>> {
         const now = new Date();
         const duration = now.valueOf() - this.checked_time.valueOf();
         this.checked_time = now;
@@ -251,8 +251,8 @@ export class Wallet {
     /**
      * Check the balance
      */
-    public async getBalance(): Promise<IWalletResult> {
-        const check_res: IWalletResult = await this.checkServer();
+    public async getBalance(): Promise<IWalletResult<Balance>> {
+        const check_res: IWalletResult<Balance> = await this.checkServer();
         if (check_res.code !== WalletResultCode.Success) return check_res;
 
         let balance: Balance;
@@ -281,10 +281,10 @@ export class Wallet {
         output_type: OutputType,
         receiver: IWalletReceiver[],
         payload?: Buffer
-    ): Promise<IWalletResult> {
+    ): Promise<IWalletResult<Transaction>> {
         if (receiver.length === 0)
             return { code: WalletResultCode.NotExistReceiver, message: "Not exists any receiver." };
-        const check_res: IWalletResult = await this.checkServer();
+        const check_res: IWalletResult<Transaction> = await this.checkServer();
         if (check_res.code !== WalletResultCode.Success) return check_res;
 
         const payloadLength = payload === undefined ? 0 : payload.length;
@@ -435,7 +435,7 @@ export class Wallet {
      * @param receiver  The array of recipient information
      * @param payload   The data to be stored, not used if not entered.
      */
-    public async transfer(receiver: IWalletReceiver[], payload?: Buffer): Promise<IWalletResult> {
+    public async transfer(receiver: IWalletReceiver[], payload?: Buffer): Promise<IWalletResult<Transaction>> {
         return this._transfer(OutputType.Payment, receiver, payload);
     }
 
@@ -451,7 +451,10 @@ export class Wallet {
      * @param tx Previously sent the transaction to be canceled
      * @param key_finder A function that finds KeyPairs that can consume UTXOs and returns them to an array.
      */
-    public async cancel(tx: Transaction, key_finder?: (addresses: PublicKey[]) => KeyPair[]): Promise<IWalletResult> {
+    public async cancel(
+        tx: Transaction,
+        key_finder?: (addresses: PublicKey[]) => KeyPair[]
+    ): Promise<IWalletResult<Transaction>> {
         if (tx.isCoinbase()) {
             return {
                 code: WalletResultCode.CoinbaseCanNotCancel,
@@ -459,7 +462,7 @@ export class Wallet {
             };
         }
 
-        const check_res: IWalletResult = await this.checkServer();
+        const check_res: IWalletResult<Transaction> = await this.checkServer();
         if (check_res.code !== WalletResultCode.Success) return check_res;
 
         let utxos: UnspentTxOutput[];
@@ -569,8 +572,8 @@ export class Wallet {
     public async cancelWithHash(
         tx_hash: Hash,
         key_finder?: (addresses: PublicKey[]) => KeyPair[]
-    ): Promise<IWalletResult> {
-        const check_res: IWalletResult = await this.checkServer();
+    ): Promise<IWalletResult<Transaction>> {
+        const check_res: IWalletResult<Transaction> = await this.checkServer();
         if (check_res.code !== WalletResultCode.Success) return check_res;
 
         let tx: Transaction;
@@ -586,7 +589,7 @@ export class Wallet {
      * Freeze the funds specified at the specified address.
      * @param receiver It is an object that has a receiving address and amount.
      */
-    public async freeze(receiver: IWalletReceiver): Promise<IWalletResult> {
+    public async freeze(receiver: IWalletReceiver): Promise<IWalletResult<Transaction>> {
         return this._transfer(OutputType.Freeze, [receiver]);
     }
 
@@ -595,8 +598,8 @@ export class Wallet {
      * @param utxos     Hashes of frozen UTXO
      * @param receiver  Public address to receive the unfreeze amount
      */
-    public async unfreeze(utxos: Hash[], receiver: PublicKey): Promise<IWalletResult> {
-        const check_res: IWalletResult = await this.checkServer();
+    public async unfreeze(utxos: Hash[], receiver: PublicKey): Promise<IWalletResult<Transaction>> {
+        const check_res: IWalletResult<Transaction> = await this.checkServer();
         if (check_res.code !== WalletResultCode.Success) return check_res;
 
         let unspentTxOutputs: UnspentTxOutput[];
@@ -662,8 +665,8 @@ export class Wallet {
     /**
      * Returns an array of all frozen UTXOs for addresses already set
      */
-    public async getFrozenUTXOs(amount: Amount | JSBI): Promise<IWalletResult> {
-        const check_res: IWalletResult = await this.checkServer();
+    public async getFrozenUTXOs(amount: Amount | JSBI): Promise<IWalletResult<UnspentTxOutput[]>> {
+        const check_res: IWalletResult<UnspentTxOutput[]> = await this.checkServer();
         if (check_res.code !== WalletResultCode.Success) return check_res;
 
         let frozenUtxos: UnspentTxOutput[];
