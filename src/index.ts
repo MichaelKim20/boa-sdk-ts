@@ -87,6 +87,7 @@ export { WalletBalance } from "./modules/wallet/WalletBalance";
 export { WalletClient } from "./modules/wallet/WalletClient";
 export { WalletTransactionFee } from "./modules/wallet/WalletTransactionFee";
 export { Wallet } from "./modules/wallet/Wallet";
+export { WalletUTXOProvider } from "./modules/wallet/WalletUTXOProvider";
 
 import JSBI from "jsbi";
 export { JSBI };

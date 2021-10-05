@@ -39,6 +39,7 @@ export enum WalletResultCode {
     NotExistReceiver = 1200,
     NotEnoughAmount = 1201,
     ExistNotFrozenUTXO = 1202,
+    NotAvailableAmount = 1300,
     CoinbaseCanNotCancel = 1500,
     InvalidTransaction = 1501,
     UnsupportedUnfreezing = 1502,
