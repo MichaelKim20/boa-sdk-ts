@@ -35,6 +35,7 @@ export enum WalletResultCode {
     FailedRequestPendingTransaction = 1103,
     FailedRequestUTXO = 1104,
     FailedRequestTxFee = 1105,
+    FailedRequest = 1106,
     NotExistReceiver = 1200,
     NotEnoughAmount = 1201,
     ExistNotFrozenUTXO = 1202,
