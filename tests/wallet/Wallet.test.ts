@@ -13,9 +13,9 @@
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { BOASodium } from "boa-sodium-ts";
-import * as sdk from "../lib";
+import * as sdk from "../../lib";
 // @ts-ignore
-import { sample_tx_hash_wallet, sample_tx_wallet, TestAgora, TestStoa } from "./Utils";
+import { sample_tx_hash_wallet, sample_tx_wallet, TestAgora, TestStoa } from "../Utils";
 
 import * as assert from "assert";
 

@@ -6,7 +6,7 @@
     "types": "lib/index.d.ts",
     "scripts": {
         "prepare": "rimraf ./lib && tsc",
-        "test": "rimraf ./lib && tsc && mocha -r ts-node/register tests/**/*.test.ts",
+        "test": "rimraf ./lib && tsc && mocha -r ts-node/register tests/**/**/*.test.ts",
         "testnobuild": "mocha -r ts-node/register tests/**/*.test.ts",
         "build": "rimraf ./lib && tsc",
         "browser": "rimraf ./dist && webpack --config webpack.config.js",

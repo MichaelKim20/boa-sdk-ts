@@ -13,13 +13,13 @@
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { BOASodium } from "boa-sodium-ts";
-import * as sdk from "../lib";
+import * as sdk from "../../lib";
 // @ts-ignore
-import { TestAgora, TestStoa } from "./Utils";
+import { TestAgora, TestStoa } from "../Utils";
 // tslint:disable-next-line:no-duplicate-imports
-import { sample_txs_history_client, sample_txs_pending_client, sample_tx_client } from "./Utils";
+import { sample_txs_history_client, sample_txs_pending_client, sample_tx_client } from "../Utils";
 // tslint:disable-next-line:no-duplicate-imports
-import { sample_tx_hash_client, sample_tx_overview_client, sample_utxo_client } from "./Utils";
+import { sample_tx_hash_client, sample_tx_overview_client, sample_utxo_client } from "../Utils";
 
 import * as assert from "assert";
 import URI from "urijs";
