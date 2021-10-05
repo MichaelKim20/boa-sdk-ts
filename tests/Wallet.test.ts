@@ -56,7 +56,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.getBalance();
@@ -78,7 +78,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.transfer([
@@ -132,7 +132,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6100",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.transfer([
@@ -154,7 +154,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7100",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.transfer([
@@ -176,7 +176,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.transfer([
@@ -198,7 +198,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.transfer([]);
@@ -215,7 +215,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const tx = sdk.Transaction.reviver("", sample_tx_wallet);
@@ -263,7 +263,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.cancelWithHash(sample_tx_hash_wallet);
@@ -307,7 +307,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.freeze({
@@ -359,7 +359,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
         const res = await wallet.unfreeze(
@@ -410,7 +410,7 @@ describe("Wallet", () => {
         const wallet = new sdk.Wallet(keypair, {
             agoraEndpoint: "http://localhost:6000",
             stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletFeeOption.Medium,
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
         const balance_res = await wallet.getBalance();
         assert.ok(balance_res.data !== undefined);

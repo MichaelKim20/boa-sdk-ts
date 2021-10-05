@@ -33,9 +33,9 @@ import {
     IWalletOption,
     IWalletReceiver,
     IWalletResult,
-    WalletFeeOption,
     WalletMessage,
     WalletResultCode,
+    WalletTransactionFeeOption,
 } from "./Types";
 
 import JSBI from "jsbi";
@@ -114,9 +114,9 @@ export class Wallet {
      */
     private getFee(fees: TransactionFee): Amount {
         switch (this.option.fee) {
-            case WalletFeeOption.High:
+            case WalletTransactionFeeOption.High:
                 return Amount.make(fees.high);
-            case WalletFeeOption.Low:
+            case WalletTransactionFeeOption.Low:
                 return Amount.make(fees.low);
             default:
                 return Amount.make(fees.medium);

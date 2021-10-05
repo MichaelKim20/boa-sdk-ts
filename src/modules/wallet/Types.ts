@@ -17,7 +17,7 @@ import { PublicKey } from "../common/KeyPair";
 /**
  * A constant that defines the option of a fee.
  */
-export enum WalletFeeOption {
+export enum WalletTransactionFeeOption {
     High,
     Medium,
     Low,
@@ -102,14 +102,14 @@ export interface IWalletOption {
     /**
      * Fee option to be used when transferring
      */
-    fee: WalletFeeOption;
+    fee: WalletTransactionFeeOption;
 }
 
 export function DefaultWalletOption(): IWalletOption {
     return {
         agoraEndpoint: "http://127.0.0.1:2826",
         stoaEndpoint: "http://127.0.0.1:3836",
-        fee: WalletFeeOption.Medium,
+        fee: WalletTransactionFeeOption.Medium,
     };
 }
 
