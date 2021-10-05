@@ -76,6 +76,7 @@ export { NetworkError, NotFoundError, BadRequestError, handleNetworkError } from
 export {
     DefaultWalletOption,
     WalletFeeOption,
+    WalletMessage,
     WalletResultCode,
     IWalletReceiver,
     IWalletResult,

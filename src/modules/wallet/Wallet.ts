@@ -34,6 +34,7 @@ import {
     IWalletReceiver,
     IWalletResult,
     WalletFeeOption,
+    WalletMessage,
     WalletResultCode,
 } from "./Types";
 
@@ -136,7 +137,7 @@ export class Wallet {
             // Agora Access Test
             try {
                 if (!(await this.client.getAgoraStatus()))
-                    return { code: WalletResultCode.FailedAccessToAgora, message: "Failed access to Agora." };
+                    return { code: WalletResultCode.FailedAccessToAgora, message: WalletMessage.FailedAccessToAgora };
             } catch (e) {
                 return { code: WalletResultCode.FailedAccessToAgora, message: e.message };
             }
@@ -144,7 +145,7 @@ export class Wallet {
             // Stoa Access Test
             try {
                 if (!(await this.client.getStoaStatus()))
-                    return { code: WalletResultCode.FailedAccessToStoa, message: "Failed access to Stoa." };
+                    return { code: WalletResultCode.FailedAccessToStoa, message: WalletMessage.FailedAccessToStoa };
             } catch (e) {
                 return { code: WalletResultCode.FailedAccessToStoa, message: e.message };
             }
@@ -152,7 +153,7 @@ export class Wallet {
 
         return {
             code: WalletResultCode.Success,
-            message: "Success.",
+            message: WalletMessage.Success,
         };
     }
 
@@ -172,7 +173,7 @@ export class Wallet {
 
         return {
             code: WalletResultCode.Success,
-            message: "Success",
+            message: WalletMessage.Success,
             data: balance,
         };
     }
@@ -191,7 +192,7 @@ export class Wallet {
         payload?: Buffer
     ): Promise<IWalletResult<Transaction>> {
         if (receiver.length === 0)
-            return { code: WalletResultCode.NotExistReceiver, message: "Not exists any receiver." };
+            return { code: WalletResultCode.NotExistReceiver, message: WalletMessage.NotExistReceiver };
         const check_res: IWalletResult<Transaction> = await this.checkServer();
         if (check_res.code !== WalletResultCode.Success) return check_res;
 
@@ -217,7 +218,7 @@ export class Wallet {
         }
 
         if (utxosToSpend.length === 0) {
-            return { code: WalletResultCode.NotEnoughAmount, message: "Not enough amount." };
+            return { code: WalletResultCode.NotEnoughAmount, message: WalletMessage.NotEnoughAmount };
         }
 
         let tx: Transaction;
@@ -269,7 +270,7 @@ export class Wallet {
             }
 
             if (moreUtxosToSpend.length === 0) {
-                return { code: WalletResultCode.NotEnoughAmount, message: "Not enough amount." };
+                return { code: WalletResultCode.NotEnoughAmount, message: WalletMessage.NotEnoughAmount };
             }
 
             // region Get the fee of new transaction
@@ -332,7 +333,7 @@ export class Wallet {
 
         return {
             code: WalletResultCode.Success,
-            message: "Success.",
+            message: WalletMessage.Success,
             data: tx,
         };
     }
@@ -366,7 +367,7 @@ export class Wallet {
         if (tx.isCoinbase()) {
             return {
                 code: WalletResultCode.CoinbaseCanNotCancel,
-                message: "Transactions of type Coinbase cannot be canceled.",
+                message: WalletMessage.CoinbaseCanNotCancel,
             };
         }
 
@@ -454,13 +455,13 @@ export class Wallet {
             }
             return {
                 code: WalletResultCode.Success,
-                message: "Success.",
+                message: WalletMessage.Success,
                 data: res.tx,
             };
         } else {
             return {
                 code: WalletResultCode.UnknownError,
-                message: "Unknown error occurred.",
+                message: WalletMessage.UnknownError,
             };
         }
     }
@@ -520,7 +521,7 @@ export class Wallet {
 
         const not_freeze = unspentTxOutputs.some((m) => m.type !== OutputType.Freeze);
         if (not_freeze) {
-            return { code: WalletResultCode.ExistNotFrozenUTXO, message: "UTXO not frozen exists." };
+            return { code: WalletResultCode.ExistNotFrozenUTXO, message: WalletMessage.ExistNotFrozenUTXO };
         }
 
         const payloadFee = Amount.make(0);
@@ -565,7 +566,7 @@ export class Wallet {
 
         return {
             code: WalletResultCode.Success,
-            message: "Success.",
+            message: WalletMessage.Success,
             data: tx,
         };
     }
@@ -586,7 +587,7 @@ export class Wallet {
 
         return {
             code: WalletResultCode.Success,
-            message: "Success.",
+            message: WalletMessage.Success,
             data: frozenUtxos,
         };
     }

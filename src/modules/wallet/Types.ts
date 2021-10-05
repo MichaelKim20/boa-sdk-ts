@@ -112,3 +112,14 @@ export function DefaultWalletOption(): IWalletOption {
         fee: WalletFeeOption.Medium,
     };
 }
+
+export enum WalletMessage {
+    Success = "Success",
+    FailedAccessToAgora = "Failed access to Agora.",
+    FailedAccessToStoa = "Failed access to Stoa.",
+    NotEnoughAmount = "Not enough amount.",
+    NotExistReceiver = "Not exists any receiver.",
+    ExistNotFrozenUTXO = "UTXO not frozen exists.",
+    CoinbaseCanNotCancel = "Transactions of type Coinbase cannot be canceled.",
+    UnknownError = "Unknown error occurred.",
+}
