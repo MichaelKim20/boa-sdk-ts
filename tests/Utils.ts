@@ -527,6 +527,60 @@ export const sample_spv_client = {
     message: "Success",
 };
 
+export const sample_secret_multi_account = [
+    "SDLFMXEPWO5BNB64TUZQJP5JJUET2P4QFMTMDSPYELC2LZ6UXMSAOIKE",
+    "SDLAFDIR6HVSP6AAAY5MH2MGAWZ24EGCHILI4GPAU2BETGNMTFYQKQ6V",
+    "SCTP4PL5V635752FTC546RBNFBRZIWXL3QI34ZRNMY4C2PERCVRQJQYX",
+    "SBTQUF4TQPRE5GKU3A6EICN35BZPSYNNYEYYZ2GNMNY76XQ7ILQALTKP",
+    "SATBAW3HLRCRWA3LJIHFADM5RVWY4RDDG6ZNEXDNSDGC2MD3MBMQLUS5",
+];
+
+export const sample_address_multi_account = [
+    "boa1xzcd00f8jn36mzppkue6w3gpt2ufevulupaa5a8f9uc0st8uh68jyak7p64",
+    "boa1xqam00nfz03mv4jr80c7wr4hd2zqtgezr9kysgjqg3gdz7ygyutvylhhwlx",
+    "boa1xzce00jfyy7jxukasfx8xndpx2l8mcyf2kmcfrvux9800pdj2670q5htf0e",
+    "boa1xpcq00pz4md60d06vukmw8mj7xseslt3spu7sp6daz36dt7eg5q35m8ehhc",
+    "boa1xrap00gy9ttpvhk9hfz5vhwuy430ua7td88exhq2rx9lm3l6sgfeqzaeew9",
+];
+
+export const sample_balance_multi_account = [
+    {
+        address: "boa1xzcd00f8jn36mzppkue6w3gpt2ufevulupaa5a8f9uc0st8uh68jyak7p64",
+        balance: "8472222189351",
+        spendable: "8472222189351",
+        frozen: "0",
+        locked: "0",
+    },
+    {
+        address: "boa1xqam00nfz03mv4jr80c7wr4hd2zqtgezr9kysgjqg3gdz7ygyutvylhhwlx",
+        balance: "14318055500002",
+        spendable: "14318055500002",
+        frozen: "0",
+        locked: "0",
+    },
+    {
+        address: "boa1xzce00jfyy7jxukasfx8xndpx2l8mcyf2kmcfrvux9800pdj2670q5htf0e",
+        balance: "8472222189351",
+        spendable: "8472222189351",
+        frozen: "0",
+        locked: "0",
+    },
+    {
+        address: "boa1xpcq00pz4md60d06vukmw8mj7xseslt3spu7sp6daz36dt7eg5q35m8ehhc",
+        balance: "11437499955623",
+        spendable: "11437499955623",
+        frozen: "0",
+        locked: "0",
+    },
+    {
+        address: "boa1xrap00gy9ttpvhk9hfz5vhwuy430ua7td88exhq2rx9lm3l6sgfeqzaeew9",
+        balance: "5455741082426",
+        spendable: "5455741082426",
+        frozen: "0",
+        locked: "0",
+    },
+];
+
 /**
  * This allows data transfer and reception testing with the server.
  * When this is executed, the local web server is run,
@@ -819,16 +873,22 @@ export class TestStoa {
                 );
                 return;
             } else {
-                res.status(200).send(
-                    JSON.stringify({
-                        address: address.toString(),
-                        balance: "0",
-                        spendable: "0",
-                        frozen: "0",
-                        locked: "0",
-                    })
-                );
-                return;
+                const idx = sample_address_multi_account.findIndex((m) => m === address.toString());
+                if (idx >= 0) {
+                    res.status(200).send(JSON.stringify(sample_balance_multi_account[idx]));
+                    return;
+                } else {
+                    res.status(200).send(
+                        JSON.stringify({
+                            address: address.toString(),
+                            balance: "0",
+                            spendable: "0",
+                            frozen: "0",
+                            locked: "0",
+                        })
+                    );
+                    return;
+                }
             }
         });
 

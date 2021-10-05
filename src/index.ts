@@ -89,5 +89,7 @@ export { WalletTransactionFee } from "./modules/wallet/WalletTransactionFee";
 export { Wallet } from "./modules/wallet/Wallet";
 export { WalletUTXOProvider } from "./modules/wallet/WalletUTXOProvider";
 
+export { Account, AccountContainer, AccountMode } from "./modules/wallet/Account";
+
 import JSBI from "jsbi";
 export { JSBI };
