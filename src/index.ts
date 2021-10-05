@@ -90,6 +90,7 @@ export { Wallet } from "./modules/wallet/Wallet";
 export { WalletUTXOProvider } from "./modules/wallet/WalletUTXOProvider";
 
 export { Account, AccountContainer, AccountMode } from "./modules/wallet/Account";
+export { Event, EventDispatcher, TListener } from "./modules/wallet/EventDispatcher";
 
 import JSBI from "jsbi";
 export { JSBI };
