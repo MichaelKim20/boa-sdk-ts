@@ -28,7 +28,14 @@ import { TxCanceller, TxCancelResultCode } from "../utils/TxCanceller";
 import { TxPayloadFee } from "../utils/TxPayloadFee";
 import { Utils } from "../utils/Utils";
 import { UTXOProvider } from "../utils/UTXOManager";
-import { IWalletOption, IWalletReceiver, IWalletResult, WalletFeeOption, WalletResultCode } from "./Types";
+import {
+    DefaultWalletOption,
+    IWalletOption,
+    IWalletReceiver,
+    IWalletResult,
+    WalletFeeOption,
+    WalletResultCode,
+} from "./Types";
 
 import JSBI from "jsbi";
 
@@ -36,15 +43,6 @@ import JSBI from "jsbi";
  * It is a class that provides balance check, transfer functions for one key pair.
  */
 export class Wallet {
-    /**
-     * The default option of wallet
-     */
-    public static defaultOption: IWalletOption = {
-        agoraEndpoint: "http://127.0.0.1:2826",
-        stoaEndpoint: "http://127.0.0.1:3836",
-        fee: WalletFeeOption.Medium,
-    };
-
     /**
      * A key pair used to perform the functions provided by this class.
      * @private
@@ -98,7 +96,7 @@ export class Wallet {
      * @param owner     The key pair
      * @param option    The option of wallet
      */
-    constructor(owner: KeyPair, option: IWalletOption = Wallet.defaultOption) {
+    constructor(owner: KeyPair, option: IWalletOption = DefaultWalletOption()) {
         this.owner = owner;
         this.option = option;
         this.client = new BOAClient(this.option.stoaEndpoint, this.option.agoraEndpoint);

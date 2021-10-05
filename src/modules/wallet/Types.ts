@@ -104,3 +104,11 @@ export interface IWalletOption {
      */
     fee: WalletFeeOption;
 }
+
+export function DefaultWalletOption(): IWalletOption {
+    return {
+        agoraEndpoint: "http://127.0.0.1:2826",
+        stoaEndpoint: "http://127.0.0.1:3836",
+        fee: WalletFeeOption.Medium,
+    };
+}

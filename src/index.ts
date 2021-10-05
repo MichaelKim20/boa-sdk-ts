@@ -74,6 +74,7 @@ export { Request } from "./modules/net/Request";
 export { NetworkError, NotFoundError, BadRequestError, handleNetworkError } from "./modules/net/error/ErrorTypes";
 
 export {
+    DefaultWalletOption,
     WalletFeeOption,
     WalletResultCode,
     IWalletReceiver,
