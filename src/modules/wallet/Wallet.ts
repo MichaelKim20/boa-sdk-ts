@@ -17,9 +17,6 @@ import { KeyPair, PublicKey } from "../common/KeyPair";
 import { Transaction } from "../data/Transaction";
 import { TxInput } from "../data/TxInput";
 import { OutputType } from "../data/TxOutput";
-import { BOAClient } from "../net/BOAClient";
-import { Balance } from "../net/response/Balance";
-import { TransactionFee } from "../net/response/TransactionFee";
 import { BalanceType } from "../net/response/Types";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
 import { LockType } from "../script/Lock";
@@ -27,7 +24,7 @@ import { TxBuilder } from "../utils/TxBuilder";
 import { TxCanceller, TxCancelResultCode } from "../utils/TxCanceller";
 import { TxPayloadFee } from "../utils/TxPayloadFee";
 import { Utils } from "../utils/Utils";
-import { UTXOProvider } from "../utils/UTXOManager";
+
 import {
     DefaultWalletOption,
     IWalletOption,
@@ -35,8 +32,11 @@ import {
     IWalletResult,
     WalletMessage,
     WalletResultCode,
-    WalletTransactionFeeOption,
 } from "./Types";
+import { WalletBalance } from "./WalletBalance";
+import { WalletClient } from "./WalletClient";
+import { WalletTransactionFee } from "./WalletTransactionFee";
+import { WalletUTXOProvider } from "./WalletUTXOProvider";
 
 import JSBI from "jsbi";
 
@@ -54,19 +54,19 @@ export class Wallet {
      * It is a client to access Agora and Stoa.
      * @private
      */
-    private readonly client: BOAClient;
+    private readonly client: WalletClient;
 
     /**
      * The instance of UTXOProvider
      * @private
      */
-    private spendableUtxoProvider: UTXOProvider;
+    private spendableUtxoProvider: WalletUTXOProvider;
 
     /**
      * The instance of UTXOProvider
      * @private
      */
-    private frozenUtxoProvider: UTXOProvider;
+    private frozenUtxoProvider: WalletUTXOProvider;
 
     /**
      * The instance of TxBuilder
@@ -81,18 +81,6 @@ export class Wallet {
     private option: IWalletOption;
 
     /**
-     * The last time the server status was checked
-     * @private
-     */
-    private checked_time: Date;
-
-    /**
-     * Minimum amount of time the server status should be checked
-     * @private
-     */
-    private static CHECK_PERIOD = 5000;
-
-    /**
      * Constructor
      * @param owner     The key pair
      * @param option    The option of wallet
@@ -100,82 +88,17 @@ export class Wallet {
     constructor(owner: KeyPair, option: IWalletOption = DefaultWalletOption()) {
         this.owner = owner;
         this.option = option;
-        this.client = new BOAClient(this.option.stoaEndpoint, this.option.agoraEndpoint);
+        this.client = new WalletClient(this.option);
         this.txBuilder = new TxBuilder(this.owner);
-        this.spendableUtxoProvider = new UTXOProvider(this.owner.address, this.client, BalanceType.spendable);
-        this.frozenUtxoProvider = new UTXOProvider(this.owner.address, this.client, BalanceType.frozen);
-        this.checked_time = new Date(0);
-    }
-
-    /**
-     * Returns the value specified in option among TransactionFee fees
-     * @param fees      Fees received from Stoa
-     * @private
-     */
-    private getFee(fees: TransactionFee): Amount {
-        switch (this.option.fee) {
-            case WalletTransactionFeeOption.High:
-                return Amount.make(fees.high);
-            case WalletTransactionFeeOption.Low:
-                return Amount.make(fees.low);
-            default:
-                return Amount.make(fees.medium);
-        }
-    }
-
-    /**
-     * Perform access tests on servers
-     * @private
-     */
-    private async checkServer(): Promise<IWalletResult<any>> {
-        const now = new Date();
-        const duration = now.valueOf() - this.checked_time.valueOf();
-        this.checked_time = now;
-
-        // If it has been more than 5 seconds since the previous server health check, re-check.
-        if (duration > Wallet.CHECK_PERIOD) {
-            // Agora Access Test
-            try {
-                if (!(await this.client.getAgoraStatus()))
-                    return { code: WalletResultCode.FailedAccessToAgora, message: WalletMessage.FailedAccessToAgora };
-            } catch (e) {
-                return { code: WalletResultCode.FailedAccessToAgora, message: e.message };
-            }
-
-            // Stoa Access Test
-            try {
-                if (!(await this.client.getStoaStatus()))
-                    return { code: WalletResultCode.FailedAccessToStoa, message: WalletMessage.FailedAccessToStoa };
-            } catch (e) {
-                return { code: WalletResultCode.FailedAccessToStoa, message: e.message };
-            }
-        }
-
-        return {
-            code: WalletResultCode.Success,
-            message: WalletMessage.Success,
-        };
+        this.spendableUtxoProvider = new WalletUTXOProvider(this.owner.address, this.client, BalanceType.spendable);
+        this.frozenUtxoProvider = new WalletUTXOProvider(this.owner.address, this.client, BalanceType.frozen);
     }
 
     /**
      * Check the balance
      */
-    public async getBalance(): Promise<IWalletResult<Balance>> {
-        const check_res: IWalletResult<Balance> = await this.checkServer();
-        if (check_res.code !== WalletResultCode.Success) return check_res;
-
-        let balance: Balance;
-        try {
-            balance = await this.client.getBalance(this.owner.address);
-        } catch (e) {
-            return { code: WalletResultCode.FailedRequestBalance, message: e.message };
-        }
-
-        return {
-            code: WalletResultCode.Success,
-            message: WalletMessage.Success,
-            data: balance,
-        };
+    public getBalance(): Promise<IWalletResult<WalletBalance>> {
+        return this.client.getBalance(this.owner.address);
     }
 
     /**
@@ -193,8 +116,6 @@ export class Wallet {
     ): Promise<IWalletResult<Transaction>> {
         if (receiver.length === 0)
             return { code: WalletResultCode.NotExistReceiver, message: WalletMessage.NotExistReceiver };
-        const check_res: IWalletResult<Transaction> = await this.checkServer();
-        if (check_res.code !== WalletResultCode.Success) return check_res;
 
         const payloadLength = payload === undefined ? 0 : payload.length;
         const payloadFee = TxPayloadFee.getFeeAmount(payloadLength);
@@ -209,10 +130,14 @@ export class Wallet {
         // Extract the UTXO to be spent.
         let utxosToSpend: UnspentTxOutput[];
         try {
-            utxosToSpend = await this.spendableUtxoProvider.getUTXO(
+            const utxo_res = await this.spendableUtxoProvider.getUTXO(
                 totalSpendAmount,
                 Amount.make(Utils.FEE_RATE * TxInput.getEstimatedNumberOfBytes())
             );
+            if (utxo_res.code !== WalletResultCode.Success || utxo_res.data === undefined) {
+                return { code: utxo_res.code, message: utxo_res.message };
+            }
+            utxosToSpend = utxo_res.data;
         } catch (e) {
             return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
         }
@@ -241,17 +166,21 @@ export class Wallet {
 
         // Get the size of the transaction
         let txSize = tx.getNumberOfBytes();
-        let fees: TransactionFee;
+        let fees: WalletTransactionFee;
 
         // Fees based on the transaction size is obtained from Stoa.
         try {
-            fees = await this.client.getTransactionFee(txSize);
+            const fee_res = await this.client.getTransactionFee(txSize);
+            if (fee_res.code !== WalletResultCode.Success || fee_res.data === undefined) {
+                return { code: fee_res.code, message: fee_res.message };
+            }
+            fees = fee_res.data;
         } catch (e) {
             return { code: WalletResultCode.FailedRequestTxFee, message: e.message };
         }
 
         // Set the fee according to the option of the entered fee.
-        let txFee = this.getFee(fees);
+        let txFee = fees.getFee(this.option.fee);
         let sumAmountUtxo = utxosToSpend.reduce<Amount>((sum, n) => Amount.add(sum, n.amount), Amount.make(0));
         totalFee = Amount.add(payloadFee, txFee);
         totalSpendAmount = Amount.add(totalFee, sendBOA);
@@ -261,10 +190,14 @@ export class Wallet {
             // Add additional UTXO for the required amount.
             let moreUtxosToSpend: UnspentTxOutput[];
             try {
-                moreUtxosToSpend = await this.spendableUtxoProvider.getUTXO(
+                const utxo_res = await this.spendableUtxoProvider.getUTXO(
                     Amount.subtract(totalSpendAmount, sumAmountUtxo),
                     Amount.make(Utils.FEE_RATE * TxInput.getEstimatedNumberOfBytes())
                 );
+                if (utxo_res.code !== WalletResultCode.Success || utxo_res.data === undefined) {
+                    return { code: utxo_res.code, message: utxo_res.message };
+                }
+                moreUtxosToSpend = utxo_res.data;
             } catch (e) {
                 return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
             }
@@ -295,13 +228,17 @@ export class Wallet {
 
             // Fees based on the transaction size is obtained from Stoa.
             try {
-                fees = await this.client.getTransactionFee(txSize);
+                const fee_res = await this.client.getTransactionFee(txSize);
+                if (fee_res.code !== WalletResultCode.Success || fee_res.data === undefined) {
+                    return { code: fee_res.code, message: fee_res.message };
+                }
+                fees = fee_res.data;
             } catch (e) {
                 return { code: WalletResultCode.FailedRequestTxFee, message: e.message };
             }
 
             // Select medium
-            txFee = this.getFee(fees);
+            txFee = fees.getFee(this.option.fee);
 
             // endregion
 
@@ -371,13 +308,14 @@ export class Wallet {
             };
         }
 
-        const check_res: IWalletResult<Transaction> = await this.checkServer();
-        if (check_res.code !== WalletResultCode.Success) return check_res;
-
         let utxos: UnspentTxOutput[];
         // Requests the information of the UTXO used in the transaction.
         try {
-            utxos = await this.client.getUTXOInfo(tx.inputs.map((m) => m.utxo));
+            const utxo_res = await this.client.getUTXOInfo(tx.inputs.map((m) => m.utxo));
+            if (utxo_res.code !== WalletResultCode.Success || utxo_res.data === undefined) {
+                return { code: utxo_res.code, message: utxo_res.message };
+            }
+            utxos = utxo_res.data;
         } catch (e) {
             return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
         }
@@ -482,12 +420,13 @@ export class Wallet {
         tx_hash: Hash,
         key_finder?: (addresses: PublicKey[]) => KeyPair[]
     ): Promise<IWalletResult<Transaction>> {
-        const check_res: IWalletResult<Transaction> = await this.checkServer();
-        if (check_res.code !== WalletResultCode.Success) return check_res;
-
         let tx: Transaction;
         try {
-            tx = await this.client.getPendingTransaction(tx_hash);
+            const res = await this.client.getPendingTransaction(tx_hash);
+            if (res.code !== WalletResultCode.Success || res.data === undefined) {
+                return { code: res.code, message: res.message };
+            }
+            tx = res.data;
         } catch (e) {
             return { code: WalletResultCode.FailedRequestPendingTransaction, message: e.message };
         }
@@ -508,13 +447,14 @@ export class Wallet {
      * @param receiver  Public address to receive the unfreeze amount
      */
     public async unfreeze(utxos: Hash[], receiver: PublicKey): Promise<IWalletResult<Transaction>> {
-        const check_res: IWalletResult<Transaction> = await this.checkServer();
-        if (check_res.code !== WalletResultCode.Success) return check_res;
-
         let unspentTxOutputs: UnspentTxOutput[];
         // Requests the information of the UTXO used in the transaction.
         try {
-            unspentTxOutputs = await this.client.getUTXOInfo(utxos.map((m) => m));
+            const utxo_res = await this.client.getUTXOInfo(utxos.map((m) => m));
+            if (utxo_res.code !== WalletResultCode.Success || utxo_res.data === undefined) {
+                return { code: utxo_res.code, message: utxo_res.message };
+            }
+            unspentTxOutputs = utxo_res.data;
         } catch (e) {
             return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
         }
@@ -533,16 +473,20 @@ export class Wallet {
         );
         const txSize = Transaction.getEstimatedNumberOfBytes(unspentTxOutputs.length, outputCount, 0);
 
-        let fees: TransactionFee;
+        let fees: WalletTransactionFee;
         // Fees based on the transaction size is obtained from Stoa.
         try {
-            fees = await this.client.getTransactionFee(txSize);
+            const fee_res = await this.client.getTransactionFee(txSize);
+            if (fee_res.code !== WalletResultCode.Success || fee_res.data === undefined) {
+                return { code: fee_res.code, message: fee_res.message };
+            }
+            fees = fee_res.data;
         } catch (e) {
             return { code: WalletResultCode.FailedRequestTxFee, message: e.message };
         }
 
         // Set the fee according to the option of the entered fee.
-        const txFee = this.getFee(fees);
+        const txFee = fees.getFee(this.option.fee);
         const amount: Amount = Amount.subtract(sumOfUTXO, txFee);
 
         // Build a transaction
@@ -575,12 +519,13 @@ export class Wallet {
      * Returns an array of all frozen UTXOs for addresses already set
      */
     public async getFrozenUTXOs(amount: Amount | JSBI): Promise<IWalletResult<UnspentTxOutput[]>> {
-        const check_res: IWalletResult<UnspentTxOutput[]> = await this.checkServer();
-        if (check_res.code !== WalletResultCode.Success) return check_res;
-
         let frozenUtxos: UnspentTxOutput[];
         try {
-            frozenUtxos = await this.frozenUtxoProvider.getUTXO(amount);
+            const utxo_res = await this.frozenUtxoProvider.getUTXO(amount);
+            if (utxo_res.code !== WalletResultCode.Success || utxo_res.data === undefined) {
+                return { code: utxo_res.code, message: utxo_res.message };
+            }
+            frozenUtxos = utxo_res.data;
         } catch (e) {
             return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
         }

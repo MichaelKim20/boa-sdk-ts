@@ -64,10 +64,10 @@ describe("Wallet", () => {
         assert.ok(res.data !== undefined);
 
         assert.deepStrictEqual(res.data.address, "boa1xza007gllhzdawnr727hds36guc0frnjsqscgf4k08zqesapcg3uujh9g93");
-        assert.deepStrictEqual(res.data.balance, sdk.JSBI.BigInt(20000000000));
-        assert.deepStrictEqual(res.data.spendable, sdk.JSBI.BigInt(18000000000));
-        assert.deepStrictEqual(res.data.frozen, sdk.JSBI.BigInt(2000000000));
-        assert.deepStrictEqual(res.data.locked, sdk.JSBI.BigInt(0));
+        assert.deepStrictEqual(res.data.balance, sdk.Amount.make(20000000000));
+        assert.deepStrictEqual(res.data.spendable, sdk.Amount.make(18000000000));
+        assert.deepStrictEqual(res.data.frozen, sdk.Amount.make(2000000000));
+        assert.deepStrictEqual(res.data.locked, sdk.Amount.make(0));
     });
 
     it("Test the Wallet - transfer", async () => {
