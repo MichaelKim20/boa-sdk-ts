@@ -278,7 +278,16 @@ export class SecretKey {
      * @returns If the seed passes the validation, it returns an empty string or a message.
      */
     public static validate(seed: string): string {
-        const decoded = Buffer.from(base32Decode(seed));
+        let decoded: Buffer;
+        try {
+            decoded = Buffer.from(base32Decode(seed));
+        } catch (err) {
+            if (err instanceof Error) {
+                return err.message;
+            } else {
+                return "Unknown error";
+            }
+        }
 
         if (decoded.length !== 1 + SodiumHelper.sodium.crypto_core_ed25519_SCALARBYTES + 2)
             return "Decoded data size is not normal";
