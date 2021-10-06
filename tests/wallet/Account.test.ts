@@ -142,4 +142,26 @@ describe("AccountContainer", () => {
             done();
         }, 1000);
     });
+
+    it("Test AccountList - Balance use EventHandler", (done) => {
+        const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+        const accounts = new sdk.AccountContainer({
+            agoraEndpoint: "http://localhost:6000",
+            stoaEndpoint: "http://localhost:7000",
+            fee: sdk.WalletTransactionFeeOption.Medium,
+        });
+
+        kps.forEach((value, idx) => {
+            accounts.add("Account" + idx.toString(), value.secret);
+        });
+        assert.strictEqual(accounts.length, kps.length);
+        let count = 0;
+        accounts.addEventListener(sdk.Event.CHANGE_BALANCE, (event: string) => {
+            if (++count === accounts.length) {
+                assert.deepStrictEqual(accounts.balance.balance.toString(), "48155740916753");
+                done();
+            }
+        });
+        accounts.checkBalance();
+    });
 });

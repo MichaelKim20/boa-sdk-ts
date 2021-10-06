@@ -13,6 +13,7 @@
 
 import { Amount } from "../common/Amount";
 import { PublicKey, SecretKey } from "../common/KeyPair";
+import { Event, EventDispatcher } from "./EventDispatcher";
 import { DefaultWalletOption, IWalletOption, WalletResultCode } from "./Types";
 import { WalletBalance } from "./WalletBalance";
 import { WalletClient } from "./WalletClient";
@@ -28,7 +29,7 @@ export enum AccountMode {
 /**
  * Class with account address, secret key and balance.
  */
-export class Account {
+export class Account extends EventDispatcher {
     private readonly owner: AccountContainer;
     private readonly _name: string;
     private readonly _address: PublicKey;
@@ -42,6 +43,7 @@ export class Account {
      * @param key The public key or secret key of account
      */
     constructor(owner: AccountContainer, name: string, key: PublicKey | SecretKey) {
+        super();
         this.owner = owner;
         this._name = name;
         if (key instanceof PublicKey) {
@@ -103,12 +105,16 @@ export class Account {
         const pk = new PublicKey(value.scalar.toPoint());
         if (pk.toString() === this.address.toString()) {
             this._secret = value;
+            this.dispatchEvent(Event.CHANGE, this);
             return true;
         } else {
             return false;
         }
     }
 
+    /**
+     * Check the balance.
+     */
     public async checkBalance(): Promise<void> {
         const res = await this.owner.client.getBalance(this.address);
         if (res.code === WalletResultCode.Success && res.data !== undefined) {
@@ -119,6 +125,7 @@ export class Account {
                 Amount.make(res.data.frozen),
                 Amount.make(res.data.locked)
             );
+            this.dispatchEvent(Event.CHANGE_BALANCE, this);
         }
     }
 }
@@ -126,9 +133,9 @@ export class Account {
 /**
  * Class to manage multiple accounts.
  */
-export class AccountContainer {
+export class AccountContainer extends EventDispatcher {
     private readonly _items: Account[];
-    private readonly _balance: WalletBalance;
+    private _balance: WalletBalance;
     private _selected_index: number;
 
     /**
@@ -146,6 +153,7 @@ export class AccountContainer {
      * Constructor
      */
     constructor(option: IWalletOption = DefaultWalletOption()) {
+        super();
         this.option = option;
         this._items = [];
         this._balance = new WalletBalance("", Amount.make(0), Amount.make(0), Amount.make(0), Amount.make(0));
@@ -220,9 +228,15 @@ export class AccountContainer {
 
         account = new Account(this, name, key);
         this._items.push(account);
+        this.attachEventListener(account);
 
-        if (this.selected_index < 0) this._selected_index = 0;
+        this.dispatchEvent(Event.ADDED, account);
+        this.dispatchEvent(Event.CHANGE);
 
+        if (this.selected_index < 0) {
+            this._selected_index = 0;
+            this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
+        }
         return account;
     }
 
@@ -235,10 +249,17 @@ export class AccountContainer {
         if (findIdx < 0) return undefined;
         const account = this._items[findIdx];
         this._items.splice(findIdx, 1);
+        this.detachEventListener(account);
+
+        this.dispatchEvent(Event.REMOVED, account);
+        this.dispatchEvent(Event.CHANGE);
 
         if (findIdx <= this.selected_index) {
             if (this._items.length === 0) {
                 this._selected_index = -1;
+                this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, null);
+            } else {
+                this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
             }
         }
 
@@ -282,8 +303,14 @@ export class AccountContainer {
      * Clear all accounts
      */
     public clear(): void {
+        this._items.forEach((m) => {
+            this.dispatchEvent(Event.REMOVED, m);
+            this.detachEventListener(m);
+        });
         this._selected_index = -1;
         this._items.length = 0;
+        this.dispatchEvent(Event.CHANGE);
+        this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, null);
     }
 
     /**
@@ -335,5 +362,42 @@ export class AccountContainer {
      */
     public checkBalance(): void {
         this._items.forEach((m) => m.checkBalance());
+    }
+
+    /**
+     * Attach the event listener
+     * @param account
+     */
+    public attachEventListener(account: Account) {
+        account.addEventListener(Event.CHANGE_BALANCE, this.onAccountChangeBalance, this);
+    }
+
+    /**
+     * Detach the event listener
+     * @param account
+     */
+    public detachEventListener(account: Account) {
+        account.removeEventListener(Event.CHANGE_BALANCE, this.onAccountChangeBalance, this);
+    }
+
+    /**
+     * The event listener on changed the balance
+     * @param ev The event type
+     * @param acc The account with changed balance
+     */
+    public onAccountChangeBalance(ev: Event, acc: Account) {
+        let balance = Amount.make(0);
+        let spendable = Amount.make(0);
+        let frozen = Amount.make(0);
+        let locked = Amount.make(0);
+
+        for (const elem of this._items) {
+            balance = Amount.add(balance, elem.balance.balance);
+            spendable = Amount.add(spendable, elem.balance.spendable);
+            frozen = Amount.add(frozen, elem.balance.frozen);
+            locked = Amount.add(locked, elem.balance.locked);
+        }
+        this._balance = new WalletBalance("", balance, spendable, frozen, locked);
+        this.dispatchEvent(Event.CHANGE_BALANCE, this);
     }
 }
