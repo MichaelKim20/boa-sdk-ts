@@ -168,6 +168,17 @@ export class WalletUTXOProvider {
     public clear() {
         this.items.length = 0;
     }
+
+    /**
+     * It is used to give back the previously taken UTXO without using it.
+     * @param unused The array of UnspentTxOutput, previously taken UTXOs
+     */
+    public giveBack(unused: UnspentTxOutput[]) {
+        for (const elem of unused) {
+            const found = this.items.find((m) => m.utxo.data.compare(elem.utxo.data) === 0);
+            if (found !== undefined) found.used = false;
+        }
+    }
 }
 
 /**
