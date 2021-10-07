@@ -13,10 +13,12 @@
 
 import { Amount } from "../common/Amount";
 import { PublicKey, SecretKey } from "../common/KeyPair";
+import { BalanceType } from "../net/response/Types";
 import { Event, EventDispatcher } from "./EventDispatcher";
 import { DefaultWalletOption, IWalletOption, WalletResultCode } from "./Types";
 import { WalletBalance } from "./WalletBalance";
 import { WalletClient } from "./WalletClient";
+import { WalletUTXOProvider } from "./WalletUTXOProvider";
 
 /**
  * Account Mode
@@ -37,6 +39,16 @@ export class Account extends EventDispatcher {
     private _balance: WalletBalance;
 
     /**
+     * The instance of UTXOProvider for the normal UTXO
+     */
+    public spendableUTXOProvider: WalletUTXOProvider;
+
+    /**
+     * The instance of UTXOProvider for the frozen UTXO
+     */
+    public frozenUTXOProvider: WalletUTXOProvider;
+
+    /**
      * Constructor
      * @param owner The instance of AccountContainer
      * @param name The name of account
@@ -54,6 +66,9 @@ export class Account extends EventDispatcher {
             this._address = new PublicKey(this._secret.scalar.toPoint());
         }
         this._balance = new WalletBalance(this._address.toString());
+
+        this.spendableUTXOProvider = new WalletUTXOProvider(this._address, owner.client, BalanceType.spendable);
+        this.frozenUTXOProvider = new WalletUTXOProvider(this._address, owner.client, BalanceType.frozen);
     }
 
     /**
