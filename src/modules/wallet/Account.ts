@@ -53,13 +53,7 @@ export class Account extends EventDispatcher {
             this._secret = key;
             this._address = new PublicKey(this._secret.scalar.toPoint());
         }
-        this._balance = new WalletBalance(
-            this._address.toString(),
-            Amount.make(0),
-            Amount.make(0),
-            Amount.make(0),
-            Amount.make(0)
-        );
+        this._balance = new WalletBalance(this._address.toString());
     }
 
     /**
@@ -123,7 +117,8 @@ export class Account extends EventDispatcher {
                 Amount.make(res.data.balance),
                 Amount.make(res.data.spendable),
                 Amount.make(res.data.frozen),
-                Amount.make(res.data.locked)
+                Amount.make(res.data.locked),
+                true
             );
             this.dispatchEvent(Event.CHANGE_BALANCE, this);
         }
@@ -156,7 +151,7 @@ export class AccountContainer extends EventDispatcher {
         super();
         this.option = option;
         this._items = [];
-        this._balance = new WalletBalance("", Amount.make(0), Amount.make(0), Amount.make(0), Amount.make(0));
+        this._balance = new WalletBalance();
         this._selected_index = -1;
         this.client = new WalletClient(this.option);
     }
@@ -392,12 +387,13 @@ export class AccountContainer extends EventDispatcher {
         let locked = Amount.make(0);
 
         for (const elem of this._items) {
+            if (!elem.balance.enable) continue;
             balance = Amount.add(balance, elem.balance.balance);
             spendable = Amount.add(spendable, elem.balance.spendable);
             frozen = Amount.add(frozen, elem.balance.frozen);
             locked = Amount.add(locked, elem.balance.locked);
         }
-        this._balance = new WalletBalance("", balance, spendable, frozen, locked);
+        this._balance = new WalletBalance("", balance, spendable, frozen, locked, true);
         this.dispatchEvent(Event.CHANGE_BALANCE, this);
     }
 }

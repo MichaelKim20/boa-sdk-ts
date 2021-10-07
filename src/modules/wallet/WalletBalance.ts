@@ -22,12 +22,21 @@ export class WalletBalance {
     public spendable: Amount;
     public frozen: Amount;
     public locked: Amount;
+    public enable: boolean;
 
-    constructor(address: string, balance: Amount, spendable: Amount, frozen: Amount, locked: Amount) {
+    constructor(
+        address: string = "",
+        balance: Amount = Amount.make(0),
+        spendable: Amount = Amount.make(0),
+        frozen: Amount = Amount.make(0),
+        locked: Amount = Amount.make(0),
+        enable: boolean = false
+    ) {
         this.address = address;
         this.balance = balance;
         this.spendable = spendable;
         this.frozen = frozen;
         this.locked = locked;
+        this.enable = enable;
     }
 }

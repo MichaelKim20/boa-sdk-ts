@@ -120,7 +120,8 @@ export class WalletClient {
                 Amount.make(balance.balance),
                 Amount.make(balance.spendable),
                 Amount.make(balance.frozen),
-                Amount.make(balance.locked)
+                Amount.make(balance.locked),
+                true
             ),
         };
     }
