@@ -299,8 +299,8 @@ describe("Wallet Client", () => {
         );
 
         const vote_data = Buffer.from("YXRhZCBldG92", "base64");
-        const payload_fee = sdk.TxPayloadFee.getFee(vote_data.length);
-        const tx_fee = sdk.JSBI.BigInt(0);
+        const payload_fee = sdk.TxPayloadFee.getFeeAmount(vote_data.length);
+        const tx_fee = sdk.Amount.make(0);
 
         const builder = new sdk.TxBuilder(key_pair);
 
@@ -308,7 +308,7 @@ describe("Wallet Client", () => {
         const utxo_provider = new sdk.WalletUTXOProvider(key_pair.address, wallet_client);
         // Get UTXO for the amount to need.
         const utxo_res = await utxo_provider.getUTXO(
-            sdk.JSBI.add(sdk.JSBI.add(payload_fee, tx_fee), sdk.JSBI.BigInt(1))
+            sdk.Amount.add(sdk.Amount.add(payload_fee, tx_fee), sdk.Amount.make(1))
         );
         assert.deepStrictEqual(utxo_res.code, sdk.WalletResultCode.Success);
         assert.ok(utxo_res.data !== undefined);
@@ -374,8 +374,8 @@ describe("Wallet Client", () => {
         );
 
         const vote_data = Buffer.from("YXRhZCBldG92", "base64");
-        const payload_fee = sdk.JSBI.BigInt(200000);
-        const tx_fee = sdk.JSBI.BigInt(0);
+        const payload_fee = sdk.Amount.make(200000);
+        const tx_fee = sdk.Amount.make(0);
 
         const builder = new sdk.TxBuilder(key_pair);
 
@@ -384,7 +384,7 @@ describe("Wallet Client", () => {
         // Get UTXO for the amount to need.
         // There can't be any output. An error occurs because the constraint of
         // the transaction is not satisfied that it must have at least one output.
-        const utxo_res = await utxo_provider.getUTXO(sdk.JSBI.add(payload_fee, tx_fee));
+        const utxo_res = await utxo_provider.getUTXO(sdk.Amount.add(payload_fee, tx_fee));
         assert.deepStrictEqual(utxo_res.code, sdk.WalletResultCode.Success);
         assert.ok(utxo_res.data !== undefined);
         const utxos = utxo_res.data;
@@ -407,8 +407,8 @@ describe("Wallet Client", () => {
         );
 
         const vote_data = Buffer.from("YXRhZCBldG92", "base64");
-        const payload_fee = sdk.JSBI.BigInt(200000);
-        const tx_fee = sdk.JSBI.BigInt(0);
+        const payload_fee = sdk.Amount.make(200000);
+        const tx_fee = sdk.Amount.make(0);
 
         const builder = new sdk.TxBuilder(key_pair);
 
@@ -417,7 +417,7 @@ describe("Wallet Client", () => {
         // Get UTXO for the amount to need.
         // The amount of the UTXO found is one greater than the fee, allowing at least one change output.
         const utxo_res = await utxo_provider.getUTXO(
-            sdk.JSBI.add(sdk.JSBI.add(payload_fee, tx_fee), sdk.JSBI.BigInt(1))
+            sdk.Amount.add(sdk.Amount.add(payload_fee, tx_fee), sdk.Amount.make(1))
         );
         assert.deepStrictEqual(utxo_res.code, sdk.WalletResultCode.Success);
         assert.ok(utxo_res.data !== undefined);
@@ -475,7 +475,7 @@ describe("Wallet Client", () => {
 
         const utxoProvider = new sdk.WalletUTXOProvider(public_key, wallet_client);
         // Request First UTXO
-        const first_res = await utxoProvider.getUTXO(sdk.JSBI.BigInt(300000), sdk.JSBI.BigInt(100000));
+        const first_res = await utxoProvider.getUTXO(sdk.Amount.make(300000), sdk.Amount.make(100000));
         assert.deepStrictEqual(first_res.code, sdk.WalletResultCode.Success);
         assert.ok(first_res.data !== undefined);
         const first_utxos = first_res.data;
@@ -485,7 +485,7 @@ describe("Wallet Client", () => {
         assert.deepStrictEqual(first_utxos[2].utxo.toString(), sample_utxo_client[3].utxo);
 
         // Request Second UTXO
-        const second_res = await utxoProvider.getUTXO(sdk.JSBI.BigInt(300000), sdk.JSBI.BigInt(100000));
+        const second_res = await utxoProvider.getUTXO(sdk.Amount.make(300000), sdk.Amount.make(100000));
         assert.deepStrictEqual(second_res.code, sdk.WalletResultCode.Success);
         assert.ok(second_res.data !== undefined);
         const second_utxos = second_res.data;

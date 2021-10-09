@@ -99,27 +99,15 @@ export class WalletUTXOProvider {
      * is less than the requested amount, the empty array is returned.
      */
     public async getUTXO(
-        amount: Amount | JSBI,
-        estimated_input_fee: Amount | JSBI = Amount.make(0)
+        amount: Amount,
+        estimated_input_fee: Amount = Amount.make(0)
     ): Promise<IWalletResult<UnspentTxOutput[]>> {
-        let req_amount: Amount;
-        let req_fee: Amount;
-        try {
-            req_amount = amount instanceof Amount ? amount : Amount.make(amount);
-            req_fee = estimated_input_fee instanceof Amount ? estimated_input_fee : Amount.make(estimated_input_fee);
-        } catch (e) {
-            return {
-                code: WalletResultCode.NotAvailableAmount,
-                message: e.message,
-            };
-        }
-
         let target_amount: Amount;
         const result: UnspentTxOutput[] = [];
 
-        target_amount = Amount.make(req_amount);
+        target_amount = Amount.make(amount);
         while (true) {
-            target_amount = Amount.add(target_amount, req_fee);
+            target_amount = Amount.add(target_amount, estimated_input_fee);
             let sum = Amount.make(0);
             const utxo = this.items
                 .filter((n) => !n.used)
@@ -128,13 +116,13 @@ export class WalletUTXOProvider {
                     sum = Amount.add(sum, n.amount);
                     n.used = true;
 
-                    target_amount = Amount.add(target_amount, req_fee);
+                    target_amount = Amount.add(target_amount, estimated_input_fee);
                     return true;
                 })
                 .map((n) => new UnspentTxOutput(n.utxo, n.type, n.unlock_height, n.amount, n.height));
             result.push(...utxo);
             const res_sum = result.reduce<Amount>((prev, value) => Amount.add(prev, value.amount), Amount.make(0));
-            const estimated_amount = Amount.add(req_amount, Amount.multiply(req_fee, result.length));
+            const estimated_amount = Amount.add(amount, Amount.multiply(estimated_input_fee, result.length));
             if (Amount.greaterThanOrEqual(res_sum, estimated_amount)) break;
 
             target_amount = Amount.subtract(estimated_amount, res_sum);
@@ -167,6 +155,10 @@ export class WalletUTXOProvider {
 
     public clear() {
         this.items.length = 0;
+    }
+
+    public get length(): number {
+        return this.items.length;
     }
 
     /**

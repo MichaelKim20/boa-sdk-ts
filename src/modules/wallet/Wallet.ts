@@ -38,8 +38,6 @@ import { WalletClient } from "./WalletClient";
 import { WalletTransactionFee } from "./WalletTransactionFee";
 import { WalletUTXOProvider } from "./WalletUTXOProvider";
 
-import JSBI from "jsbi";
-
 /**
  * It is a class that provides balance check, transfer functions for one key pair.
  */
@@ -518,7 +516,7 @@ export class Wallet {
     /**
      * Returns an array of all frozen UTXOs for addresses already set
      */
-    public async getFrozenUTXOs(amount: Amount | JSBI): Promise<IWalletResult<UnspentTxOutput[]>> {
+    public async getFrozenUTXOs(amount: Amount): Promise<IWalletResult<UnspentTxOutput[]>> {
         let frozenUtxos: UnspentTxOutput[];
         try {
             const utxo_res = await this.frozenUtxoProvider.getUTXO(amount);
