@@ -24,6 +24,11 @@ export class Event {
     public static SEND_TX: string = "send_tx";
     public static ACCEPT_TX: string = "accept_tx";
     public static CHANGE_BALANCE: string = "change_balance";
+    public static CHANGE_RECEIVER: string = "change_receiver";
+    public static CHANGE_SENDER: string = "change_sender";
+    public static CHANGE_TX_FEE: string = "change_tx_fee";
+    public static CHANGE_PAYLOAD_FEE: string = "change_payload_fee";
+    public static ERROR: string = "error";
 }
 
 /**

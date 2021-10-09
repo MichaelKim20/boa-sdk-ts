@@ -12,6 +12,7 @@
 *******************************************************************************/
 
 import { Amount } from "../common/Amount";
+import { Hash } from "../common/Hash";
 import { PublicKey } from "../common/KeyPair";
 
 /**
@@ -47,6 +48,10 @@ export enum WalletResultCode {
     UnsupportedLockType = 1504,
     NotFoundKey = 1505,
     NotEnoughFee = 1506,
+    NotAssignedReceiver = 1600,
+    NotAssignedReceiverAmount = 1601,
+    NotAssignedSender = 1601,
+    InsufficientAmount = 1602,
     FailedBuildTransaction = 1800,
     FailedSendTx = 2000,
     UnknownError = 9000,
@@ -67,6 +72,30 @@ export interface IWalletReceiver {
     amount: Amount;
 }
 
+/**
+ * The interface of sender
+ */
+export interface IWalletSender {
+    /**
+     * The address of the receiver
+     */
+    address: PublicKey;
+
+    /**
+     * The amount to be spent
+     */
+    drawn: Amount;
+
+    /**
+     * The amount not enough.
+     */
+    remaining: Amount;
+
+    /**
+     * The amount that can be used in the account.
+     */
+    spendable: Amount;
+}
 /**
  * This is the return value that is delivered after processing the wallet function.
  */
@@ -124,4 +153,27 @@ export enum WalletMessage {
     ExistNotFrozenUTXO = "UTXO not frozen exists.",
     CoinbaseCanNotCancel = "Transactions of type Coinbase cannot be canceled.",
     UnknownError = "Unknown error occurred.",
+    NotAssignedReceiver = "Not assigned any receiver",
+    NotAssignedReceiverAmount = "Not assigned any receiver amount",
+    InsufficientAmount = "Insufficient amount",
+}
+
+export interface ITransactionOverviewReceiver {
+    utxo: Hash;
+    address: PublicKey;
+    amount: Amount;
+}
+
+export interface ITransactionOverviewSender {
+    utxo: Hash;
+    address: PublicKey;
+    amount: Amount;
+}
+
+export interface ITransactionOverview {
+    receivers: ITransactionOverviewReceiver[];
+    senders: ITransactionOverviewSender[];
+    payload: Buffer;
+    fee_tx: Amount;
+    fee_payload: Amount;
 }
