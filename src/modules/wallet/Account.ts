@@ -124,18 +124,26 @@ export class Account extends EventDispatcher {
     /**
      * Check the balance.
      */
-    public async checkBalance(): Promise<void> {
+    public async checkBalance(is_dispatch: boolean = true): Promise<void> {
         const res = await this.owner.client.getBalance(this.address);
         if (res.code === WalletResultCode.Success && res.data !== undefined) {
-            this._balance = new WalletBalance(
-                this._address.toString(),
-                Amount.make(res.data.balance),
-                Amount.make(res.data.spendable),
-                Amount.make(res.data.frozen),
-                Amount.make(res.data.locked),
-                true
-            );
-            this.dispatchEvent(Event.CHANGE_BALANCE, this);
+            if (
+                !Amount.equal(this._balance.balance, res.data.balance) ||
+                !Amount.equal(this._balance.spendable, res.data.spendable) ||
+                !Amount.equal(this._balance.frozen, res.data.frozen) ||
+                !Amount.equal(this._balance.locked, res.data.locked) ||
+                !this._balance.enable
+            ) {
+                this._balance = new WalletBalance(
+                    this._address.toString(),
+                    Amount.make(res.data.balance),
+                    Amount.make(res.data.spendable),
+                    Amount.make(res.data.frozen),
+                    Amount.make(res.data.locked),
+                    true
+                );
+                if (is_dispatch) this.dispatchEvent(Event.CHANGE_BALANCE, this);
+            }
         }
     }
 }
