@@ -1,3 +1,17 @@
+/*******************************************************************************
+
+    Contains a class that builds transactions of a wallet with multiple senders
+        and multiple receivers.
+
+    Copyright:
+        Copyright (c) 2021 BOSAGORA Foundation
+        All rights reserved.
+
+    License:
+        MIT License. See LICENSE for details.
+
+*******************************************************************************/
+
 import { Amount } from "../common/Amount";
 import { hashFull, makeUTXOKey } from "../common/Hash";
 import { KeyPair, PublicKey } from "../common/KeyPair";
