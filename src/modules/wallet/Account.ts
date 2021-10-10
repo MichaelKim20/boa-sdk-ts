@@ -15,7 +15,7 @@ import { Amount } from "../common/Amount";
 import { PublicKey, SecretKey } from "../common/KeyPair";
 import { BalanceType } from "../net/response/Types";
 import { Event, EventDispatcher } from "./EventDispatcher";
-import { DefaultWalletOption, IWalletOption, WalletResultCode } from "./Types";
+import { WalletResultCode } from "./Types";
 import { WalletBalance } from "./WalletBalance";
 import { WalletClient } from "./WalletClient";
 import { WalletUTXOProvider } from "./WalletUTXOProvider";
@@ -157,12 +157,6 @@ export class AccountContainer extends EventDispatcher {
     private _selected_index: number;
 
     /**
-     * The option of wallet
-     * @private
-     */
-    private option: IWalletOption;
-
-    /**
      * The instance of WalletClient
      */
     public client: WalletClient;
@@ -170,13 +164,12 @@ export class AccountContainer extends EventDispatcher {
     /**
      * Constructor
      */
-    constructor(option: IWalletOption = DefaultWalletOption()) {
+    constructor(client: WalletClient) {
         super();
-        this.option = option;
         this._items = [];
         this._balance = new WalletBalance();
         this._selected_index = -1;
-        this.client = new WalletClient(this.option);
+        this.client = client;
     }
 
     /**
@@ -320,15 +313,17 @@ export class AccountContainer extends EventDispatcher {
     /**
      * Clear all accounts
      */
-    public clear(): void {
+    public clear(is_dispatch: boolean = true): void {
         this._items.forEach((m) => {
-            this.dispatchEvent(Event.REMOVED, m);
+            if (is_dispatch) this.dispatchEvent(Event.REMOVED, m);
             this.detachEventListener(m);
         });
         this._selected_index = -1;
         this._items.length = 0;
-        this.dispatchEvent(Event.CHANGE);
-        this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, null);
+        if (is_dispatch) {
+            this.dispatchEvent(Event.CHANGE);
+            this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, null);
+        }
     }
 
     /**
