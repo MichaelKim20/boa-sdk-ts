@@ -177,4 +177,33 @@ describe("AccountContainer", () => {
         });
         accounts.checkBalance();
     });
+
+    it("Test AccountList - toString & fromString", () => {
+        const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+        const option = {
+            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
+            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
+            fee: sdk.WalletTransactionFeeOption.Medium,
+        };
+        const accounts = new sdk.AccountContainer(new sdk.WalletClient(option));
+
+        kps.forEach((value, idx) => {
+            accounts.add("Account" + idx.toString(), value.secret);
+        });
+        assert.strictEqual(accounts.length, kps.length);
+
+        const serialized = accounts.toString();
+        const expected = `[{"name":"Account0","address":"boa1xzcd00f8jn36mzppkue6w3gpt2ufevulupaa5a8f9uc0st8uh68jyak7p64"},{"name":"Account1","address":"boa1xqam00nfz03mv4jr80c7wr4hd2zqtgezr9kysgjqg3gdz7ygyutvylhhwlx"},{"name":"Account2","address":"boa1xzce00jfyy7jxukasfx8xndpx2l8mcyf2kmcfrvux9800pdj2670q5htf0e"},{"name":"Account3","address":"boa1xpcq00pz4md60d06vukmw8mj7xseslt3spu7sp6daz36dt7eg5q35m8ehhc"},{"name":"Account4","address":"boa1xrap00gy9ttpvhk9hfz5vhwuy430ua7td88exhq2rx9lm3l6sgfeqzaeew9"}]`;
+
+        assert.deepStrictEqual(serialized, expected);
+
+        const deserialized = new sdk.AccountContainer(new sdk.WalletClient(option));
+        deserialized.fromString(serialized);
+
+        assert.deepStrictEqual(deserialized.items.length, accounts.items.length);
+        for (let idx = 0; idx < deserialized.items.length; idx++) {
+            assert.deepStrictEqual(deserialized.items[idx].name, accounts.items[idx].name);
+            assert.deepStrictEqual(deserialized.items[idx].address, accounts.items[idx].address);
+        }
+    });
 });

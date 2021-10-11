@@ -417,4 +417,41 @@ export class AccountContainer extends EventDispatcher {
         this._balance = new WalletBalance("", balance, spendable, frozen, locked, true);
         this.dispatchEvent(Event.CHANGE_BALANCE, this);
     }
+
+    /**
+     * Get a string to save it. The secret key is not saved, but only the public key is saved.
+     */
+    public toString(): string {
+        return JSON.stringify(
+            this._items.map((m) => {
+                return {
+                    name: m.name,
+                    address: m.address.toString(),
+                };
+            })
+        );
+    }
+
+    /**
+     * Restores data stored in a string.
+     * @param data
+     */
+    public fromString(data: string): boolean {
+        try {
+            const list: any[] = JSON.parse(data);
+            this._selected_index = -1;
+            this._items.length = 0;
+            for (const elem of list) {
+                if (elem.name !== undefined && elem.address !== undefined) {
+                    const account = new Account(this, elem.name, new PublicKey(elem.address));
+                    this._items.push(account);
+                    this.attachEventListener(account);
+                }
+            }
+            if (this._items.length > 0) this._selected_index = 0;
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
 }
