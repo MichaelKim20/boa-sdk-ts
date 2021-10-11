@@ -34,7 +34,7 @@ export class WalletClient {
      * It is a client to access Agora and Stoa.
      * @private
      */
-    private readonly client: BOAClient;
+    private client: BOAClient;
 
     /**
      * The option of wallet
@@ -65,8 +65,17 @@ export class WalletClient {
     }
 
     /**
+     * Set the option of wallet, Agora's endpoint & Stoa's endpoint
+     * @param option    The option of wallet
+     */
+    public setOption(option: IWalletOption) {
+        this.option = option;
+        this.client = new BOAClient(this.option.stoaEndpoint, this.option.agoraEndpoint);
+        this.checked_time = new Date(0);
+    }
+
+    /**
      * Perform access tests on servers
-     * @private
      */
     public async checkServer(): Promise<IWalletResult<any>> {
         const now = new Date();
