@@ -314,10 +314,6 @@ describe("Wallet Transaction Builder", function () {
     const agora_port: string = "6000";
     const stoa_port: string = "7000";
 
-    let accounts: sdk.AccountContainer;
-    let wallet_client: sdk.WalletClient;
-    let builder: sdk.WalletTxBuilder;
-
     function makeRandomUTXO() {
         const result: any = {};
         for (const kp of key_pairs) {
@@ -393,9 +389,10 @@ describe("Wallet Transaction Builder", function () {
             stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
             fee: sdk.WalletTransactionFeeOption.Medium,
         };
-        wallet_client = new sdk.WalletClient(option);
-        accounts = new sdk.AccountContainer(wallet_client);
-        builder = new sdk.WalletTxBuilder(wallet_client);
+
+        const wallet_client = new sdk.WalletClient(option);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilder(wallet_client);
 
         const max_count = 50;
         for (let count = 0; count < max_count; count++) {
@@ -479,9 +476,10 @@ describe("Wallet Transaction Builder", function () {
             stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
             fee: sdk.WalletTransactionFeeOption.Medium,
         };
-        wallet_client = new sdk.WalletClient(option);
-        accounts = new sdk.AccountContainer(wallet_client);
-        builder = new sdk.WalletTxBuilder(wallet_client);
+
+        const wallet_client = new sdk.WalletClient(option);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilder(wallet_client);
 
         const max_count = 50;
         for (let count = 0; count < max_count; count++) {
@@ -571,9 +569,9 @@ describe("Wallet Transaction Builder", function () {
             stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
             fee: sdk.WalletTransactionFeeOption.Medium,
         };
-        wallet_client = new sdk.WalletClient(option);
-        accounts = new sdk.AccountContainer(wallet_client);
-        builder = new sdk.WalletTxBuilder(wallet_client);
+        const wallet_client = new sdk.WalletClient(option);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilder(wallet_client);
 
         makeRandomUTXO();
         accounts.clear();
@@ -714,9 +712,9 @@ describe("Wallet Transaction Builder", function () {
             stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
             fee: sdk.WalletTransactionFeeOption.Medium,
         };
-        wallet_client = new sdk.WalletClient(option);
-        accounts = new sdk.AccountContainer(wallet_client);
-        builder = new sdk.WalletTxBuilder(wallet_client);
+        const wallet_client = new sdk.WalletClient(option);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilder(wallet_client);
 
         makeRandomUTXO();
         accounts.clear();
@@ -784,9 +782,9 @@ describe("Wallet Transaction Builder", function () {
             stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
             fee: sdk.WalletTransactionFeeOption.Medium,
         };
-        wallet_client = new sdk.WalletClient(option);
-        accounts = new sdk.AccountContainer(wallet_client);
-        builder = new sdk.WalletTxBuilder(wallet_client);
+        const wallet_client = new sdk.WalletClient(option);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilder(wallet_client);
 
         makeRandomUTXO();
         accounts.clear();
@@ -860,5 +858,84 @@ describe("Wallet Transaction Builder", function () {
         if (!sdk.Amount.equal(old_fee_tx2, builder.fee_tx)) expected.push(sdk.Event.CHANGE_TX_FEE);
         expected.push(sdk.Event.CHANGE_RECEIVER);
         assert.deepStrictEqual(component.events, expected);
+    });
+
+    it("Test of EventDispatch for Wallet with Single Receiver", async () => {
+        const option = {
+            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
+            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
+            fee: sdk.WalletTransactionFeeOption.Medium,
+        };
+
+        const wallet_client = new sdk.WalletClient(option);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilderSingleReceiver(wallet_client);
+
+        makeRandomUTXO();
+        accounts.clear();
+        await builder.clear();
+        await builder.setFeeOption(option.fee);
+
+        key_pairs.forEach((value, idx) => {
+            accounts.add("Account" + idx.toString(), value.secret);
+        });
+
+        let spendable = sdk.Amount.make(0);
+        key_pairs.forEach((value, idx) => {
+            const elem = sample_utxos[value.address.toString()];
+            spendable = sdk.Amount.add(spendable, sdk.Amount.make(elem.balance.spendable));
+        });
+
+        const component = new FakeUIComponent(accounts, builder);
+
+        // Add Sender
+        for (const elem of accounts.items) {
+            await builder.addSender(elem, elem.balance.spendable);
+        }
+
+        // Set first receiver address
+        component.events.length = 0;
+        await builder.setReceiverAddress(
+            new sdk.PublicKey("boa1xpr00rxtcprlf99dnceuma0ftm9sv03zhtlwfytd5p0dkvzt4ryp595zpjp")
+        );
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_RECEIVER) !== undefined, true);
+
+        // Set other receiver address
+        component.events.length = 0;
+        await builder.setReceiverAddress(
+            new sdk.PublicKey("boa1xzaq00973gwxst86hm6mxqlgr3vslsywxsfg5j9870r2c7q4kh832mnwxpa")
+        );
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_RECEIVER) !== undefined, true);
+
+        // Set same receiver address
+        component.events.length = 0;
+        await builder.setReceiverAddress(
+            new sdk.PublicKey("boa1xzaq00973gwxst86hm6mxqlgr3vslsywxsfg5j9870r2c7q4kh832mnwxpa")
+        );
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_RECEIVER) !== undefined, false);
+
+        // Set first receiver amount
+        component.events.length = 0;
+        const send_amount1 = sdk.Amount.divide(
+            sdk.Amount.multiply(spendable, 10 + Math.floor(Math.random() * 90)),
+            100
+        );
+        await builder.setReceiverAmount(send_amount1);
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_RECEIVER) !== undefined, true);
+
+        // Set other receiver amount
+        component.events.length = 0;
+        const send_amount2 = sdk.Amount.divide(
+            sdk.Amount.multiply(spendable, 10 + Math.floor(Math.random() * 80)),
+            100
+        );
+        await builder.setReceiverAmount(send_amount2);
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_RECEIVER) !== undefined, true);
+
+        // Set same receiver amount
+        component.events.length = 0;
+        const send_amount3 = sdk.Amount.make(send_amount2);
+        await builder.setReceiverAmount(send_amount3);
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_RECEIVER) !== undefined, false);
     });
 });

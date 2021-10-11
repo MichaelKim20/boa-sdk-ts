@@ -293,7 +293,7 @@ export class WalletTxBuilder extends EventDispatcher {
     /**
      * The storage of the receivers
      */
-    private readonly _receivers: WalletReceiverContainer;
+    protected readonly _receivers: WalletReceiverContainer;
 
     /**
      * The storage of the senders
@@ -1051,5 +1051,87 @@ export class WalletTxBuilder extends EventDispatcher {
      */
     public getReadOnlyAccount(): Account[] {
         return this._senders.readonly_accounts;
+    }
+}
+
+/**
+ * The transaction builder for multi sender, single receiver
+ */
+export class WalletTxBuilderSingleReceiver extends WalletTxBuilder {
+    private _receiver_address: PublicKey | undefined;
+    private _receiver_amount: Amount | undefined;
+
+    /**
+     * Set the address of receiver
+     */
+    public async setReceiverAddress(address: PublicKey) {
+        let changed = false;
+        if (this._receiver_address === undefined || Buffer.compare(this._receiver_address.data, address.data) !== 0) {
+            changed = true;
+        }
+        this._receiver_address = new PublicKey(address.data);
+        if (this._receiver_amount !== undefined) {
+            this._receivers.clear();
+            this._receivers.add({
+                address: this._receiver_address,
+                amount: this._receiver_amount,
+            });
+            if (changed) await this.calculate();
+        }
+        if (changed) this.dispatchEvent(Event.CHANGE_RECEIVER);
+    }
+
+    /**
+     * Set the amount of receiver
+     */
+    public async setReceiverAmount(amount: Amount) {
+        let changed = false;
+        if (this._receiver_amount === undefined || Amount.notEqual(this._receiver_amount, amount)) {
+            changed = true;
+        }
+        if (this._receiver_address !== undefined) {
+            this._receiver_amount = Amount.make(amount);
+            this._receivers.clear();
+            this._receivers.add({
+                address: this._receiver_address,
+                amount: this._receiver_amount,
+            });
+            if (changed) await this.calculate();
+        }
+        if (changed) this.dispatchEvent(Event.CHANGE_RECEIVER);
+    }
+
+    /**
+     * Add a receiver
+     * @param receiver  the receiver to be added
+     * @param replace   Specify whether to change the amount or ignore it when there is one with the same address.
+     * If this value is true, if the same account address exists, it will be changed to a new amount.
+     */
+    public async addReceiver(receiver: IWalletReceiver, replace: boolean = true) {
+        if (this._receivers.length > 0) this._receivers.clear();
+        if (this._receivers.add(receiver, replace)) {
+            await this.calculate();
+            this.dispatchEvent(Event.CHANGE_RECEIVER);
+        }
+    }
+
+    /**
+     * Remove all receivers
+     */
+    public async clearReceiver(is_dispatch: boolean) {
+        if (this._receivers.clear()) {
+            if (is_dispatch) {
+                await this.calculate();
+                this.dispatchEvent(Event.CHANGE_RECEIVER);
+            }
+        }
+    }
+
+    public get receiver_address(): PublicKey | undefined {
+        return this._receiver_address;
+    }
+
+    public get receiver_amount(): Amount | undefined {
+        return this._receiver_amount;
     }
 }
