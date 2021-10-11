@@ -215,8 +215,9 @@ export class AccountContainer extends EventDispatcher {
      * Add one account.
      * @param name The name of the account
      * @param key  The public key or secret key of the account
+     * @param change_select Set whether an event will occur or not. The default value is true.
      */
-    public add(name: string, key: PublicKey | SecretKey): Account | undefined {
+    public add(name: string, key: PublicKey | SecretKey, change_select: boolean = true): Account | undefined {
         let account = this._items.find((m) => m.name === name);
         if (account !== undefined) return undefined;
 
@@ -244,8 +245,10 @@ export class AccountContainer extends EventDispatcher {
         this.dispatchEvent(Event.ADDED, account);
         this.dispatchEvent(Event.CHANGE);
 
-        if (this.selected_index < 0) {
-            this._selected_index = 0;
+        if (this.selected_index < 0) this._selected_index = 0;
+
+        if (change_select) {
+            this._selected_index = this._items.length - 1;
             this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
         }
         return account;
