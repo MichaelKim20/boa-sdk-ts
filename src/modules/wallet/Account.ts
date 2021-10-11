@@ -395,10 +395,10 @@ export class AccountContainer extends EventDispatcher {
 
     /**
      * The event listener on changed the balance
-     * @param ev The event type
-     * @param acc The account with changed balance
+     * @param type The event type
+     * @param account The account with changed balance
      */
-    public onAccountChangeBalance(ev: Event, acc: Account) {
+    public onAccountChangeBalance(type: string, account: Account) {
         let balance = Amount.make(0);
         let spendable = Amount.make(0);
         let frozen = Amount.make(0);
