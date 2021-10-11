@@ -754,4 +754,111 @@ describe("Wallet Transaction Builder", function () {
         assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
         assert.ok(res_overview.data !== undefined);
     });
+
+    class FakeUIComponent {
+        private accounts: sdk.AccountContainer;
+        private builder: sdk.WalletTxBuilder;
+
+        public events: string[] = [];
+
+        constructor(values: sdk.AccountContainer, tx_builder: sdk.WalletTxBuilder) {
+            this.accounts = values;
+            this.builder = tx_builder;
+
+            this.builder.addEventListener(sdk.Event.CHANGE_BALANCE, this.onEvent, this);
+            this.builder.addEventListener(sdk.Event.CHANGE_RECEIVER, this.onEvent, this);
+            this.builder.addEventListener(sdk.Event.CHANGE_SENDER, this.onEvent, this);
+            this.builder.addEventListener(sdk.Event.CHANGE_TX_FEE, this.onEvent, this);
+            this.builder.addEventListener(sdk.Event.CHANGE_PAYLOAD_FEE, this.onEvent, this);
+            this.builder.addEventListener(sdk.Event.ERROR, this.onEvent, this);
+        }
+
+        public onEvent(type: string) {
+            this.events.push(type);
+        }
+    }
+
+    it("Test of EventDispatch", async () => {
+        const option = {
+            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
+            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
+            fee: sdk.WalletTransactionFeeOption.Medium,
+        };
+        wallet_client = new sdk.WalletClient(option);
+        accounts = new sdk.AccountContainer(wallet_client);
+        builder = new sdk.WalletTxBuilder(wallet_client);
+
+        makeRandomUTXO();
+        accounts.clear();
+        await builder.clear();
+        await builder.setFeeOption(option.fee);
+
+        key_pairs.forEach((value, idx) => {
+            accounts.add("Account" + idx.toString(), value.secret);
+        });
+        let spendable = sdk.Amount.make(0);
+        key_pairs.forEach((value, idx) => {
+            const elem = sample_utxos[value.address.toString()];
+            spendable = sdk.Amount.add(spendable, sdk.Amount.make(elem.balance.spendable));
+        });
+
+        const component = new FakeUIComponent(accounts, builder);
+
+        // Add Receiver
+        const send_amount = sdk.Amount.divide(sdk.Amount.multiply(spendable, 10 + Math.floor(Math.random() * 80)), 100);
+        await builder.addReceiver({
+            address: new sdk.PublicKey("boa1xpr00rxtcprlf99dnceuma0ftm9sv03zhtlwfytd5p0dkvzt4ryp595zpjp"),
+            amount: send_amount,
+        });
+
+        const expected = [];
+        expected.push(sdk.Event.CHANGE_RECEIVER);
+        assert.deepStrictEqual(component.events, expected);
+
+        // Add Sender
+        expected.length = 0;
+        component.events.length = 0;
+
+        for (const elem of accounts.items) {
+            const old_fee = builder.fee_tx;
+            await builder.addSender(elem, elem.balance.spendable);
+            expected.push(sdk.Event.CHANGE_SENDER);
+            if (!sdk.Amount.equal(old_fee, builder.fee_tx)) expected.push(sdk.Event.CHANGE_TX_FEE);
+        }
+        assert.deepStrictEqual(component.events, expected);
+
+        // Change Fee
+        expected.length = 0;
+        component.events.length = 0;
+        const new_fee = sdk.Amount.divide(sdk.Amount.multiply(builder.fee_tx, 120), 100);
+        const applied_fee = await builder.setTransactionFee(new_fee);
+        assert.deepStrictEqual(applied_fee.toString(), new_fee.toString());
+        expected.push(...[sdk.Event.CHANGE_SENDER, sdk.Event.CHANGE_TX_FEE]);
+        assert.deepStrictEqual(component.events, expected);
+
+        expected.length = 0;
+        component.events.length = 0;
+        const new_fee2 = sdk.Amount.divide(sdk.Amount.multiply(builder.fee_tx, 20), 100);
+        const applied_fee2 = await builder.setTransactionFee(new_fee);
+        assert.notDeepStrictEqual(applied_fee2.toString(), new_fee2.toString());
+        assert.deepStrictEqual(component.events, expected);
+
+        // Change Receiver Amount
+        expected.length = 0;
+        component.events.length = 0;
+
+        const old_fee_tx2 = builder.fee_tx;
+        const send_amount2 = sdk.Amount.divide(
+            sdk.Amount.multiply(spendable, 10 + Math.floor(Math.random() * 70)),
+            100
+        );
+        await builder.addReceiver({
+            address: new sdk.PublicKey("boa1xpr00rxtcprlf99dnceuma0ftm9sv03zhtlwfytd5p0dkvzt4ryp595zpjp"),
+            amount: send_amount2,
+        });
+        expected.push(sdk.Event.CHANGE_SENDER);
+        if (!sdk.Amount.equal(old_fee_tx2, builder.fee_tx)) expected.push(sdk.Event.CHANGE_TX_FEE);
+        expected.push(sdk.Event.CHANGE_RECEIVER);
+        assert.deepStrictEqual(component.events, expected);
+    });
 });
