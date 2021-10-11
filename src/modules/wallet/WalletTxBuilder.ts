@@ -433,8 +433,7 @@ export class WalletTxBuilder extends EventDispatcher {
                 sender.utxos.push(...res.data);
                 sender.calculateUTXOSum();
                 sender.enable = true;
-                await this.calculate();
-                this.dispatchEvent(Event.CHANGE_SENDER);
+                await this.calculate(true);
             } else {
                 this.dispatchEvent(Event.ERROR, res.code, res.message);
             }
@@ -463,8 +462,7 @@ export class WalletTxBuilder extends EventDispatcher {
         );
         if (this._senders.clear()) {
             if (is_dispatch) {
-                await this.calculate();
-                this.dispatchEvent(Event.CHANGE_SENDER);
+                await this.calculate(true);
             }
         }
     }
@@ -489,7 +487,7 @@ export class WalletTxBuilder extends EventDispatcher {
      * the fee increases. Therefore, the withdrawn amount gradually increases as the used UTXO increases.
      * @private
      */
-    protected async calculate() {
+    protected async calculate(already_changed: boolean = false) {
         let out_count = this.lengthReceiver;
         if (out_count === 0) out_count = 2;
         else out_count++;
@@ -593,7 +591,7 @@ export class WalletTxBuilder extends EventDispatcher {
         }
 
         // If the data has been changed, send an event that it has been changed.
-        if (changed) {
+        if (changed || already_changed) {
             this.dispatchEvent(Event.CHANGE_SENDER);
         }
 
