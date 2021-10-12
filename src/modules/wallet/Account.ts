@@ -143,6 +143,7 @@ export class Account extends EventDispatcher {
                     true
                 );
                 if (is_dispatch) this.dispatchEvent(Event.CHANGE_BALANCE, this);
+                else this.owner.onAccountChangeBalance(Event.CHANGE_BALANCE, this);
             }
         }
     }
@@ -215,9 +216,15 @@ export class AccountContainer extends EventDispatcher {
      * Add one account.
      * @param name The name of the account
      * @param key  The public key or secret key of the account
+     * @param is_dispatch Set whether an event for changes will occur or not.
      * @param change_select Set whether an event will occur or not. The default value is true.
      */
-    public add(name: string, key: PublicKey | SecretKey, change_select: boolean = true): Account | undefined {
+    public add(
+        name: string,
+        key: PublicKey | SecretKey,
+        is_dispatch: boolean = true,
+        change_select: boolean = true
+    ): Account | undefined {
         let account = this._items.find((m) => m.name === name);
         if (account !== undefined) return undefined;
 
@@ -242,14 +249,15 @@ export class AccountContainer extends EventDispatcher {
         this._items.push(account);
         this.attachEventListener(account);
 
-        this.dispatchEvent(Event.ADDED, account);
-        this.dispatchEvent(Event.CHANGE);
+        if (is_dispatch) this.dispatchEvent(Event.ADDED, account);
+        if (is_dispatch) this.dispatchEvent(Event.CHANGE);
 
         if (this.selected_index < 0) this._selected_index = 0;
 
         if (change_select) {
             this._selected_index = this._items.length - 1;
-            this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
+            if (is_dispatch)
+                this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
         }
         return account;
     }
@@ -257,23 +265,25 @@ export class AccountContainer extends EventDispatcher {
     /**
      * Remove one account.
      * @param name Name of the account to be removed.
+     * @param is_dispatch Set whether an event for changes will occur or not.
      */
-    public remove(name: string): Account | undefined {
+    public remove(name: string, is_dispatch: boolean = true): Account | undefined {
         const findIdx = this._items.findIndex((m) => m.name === name);
         if (findIdx < 0) return undefined;
         const account = this._items[findIdx];
         this._items.splice(findIdx, 1);
         this.detachEventListener(account);
 
-        this.dispatchEvent(Event.REMOVED, account);
-        this.dispatchEvent(Event.CHANGE);
+        if (is_dispatch) this.dispatchEvent(Event.REMOVED, account);
+        if (is_dispatch) this.dispatchEvent(Event.CHANGE);
 
         if (findIdx <= this.selected_index) {
             if (this._items.length === 0) {
                 this._selected_index = -1;
-                this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, null);
+                if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, null);
             } else {
-                this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
+                if (is_dispatch)
+                    this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
             }
         }
 
@@ -315,6 +325,7 @@ export class AccountContainer extends EventDispatcher {
 
     /**
      * Clear all accounts
+     * @param is_dispatch Set whether an event for changes will occur or not.
      */
     public clear(is_dispatch: boolean = true): void {
         this._items.forEach((m) => {
@@ -376,7 +387,7 @@ export class AccountContainer extends EventDispatcher {
     /**
      * Check the balance of all accounts.
      */
-    public checkBalance(): void {
+    public checkBalance() {
         this._items.forEach((m) => m.checkBalance());
     }
 
