@@ -74,6 +74,10 @@ export class WalletClient {
         this.checked_time = new Date(0);
     }
 
+    public getOption(): IWalletOption {
+        return this.option;
+    }
+
     /**
      * Perform access tests on servers
      */
