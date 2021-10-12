@@ -435,7 +435,7 @@ export class WalletTxBuilder extends EventDispatcher {
                 sender.enable = true;
                 await this.calculate(true);
             } else {
-                this.dispatchEvent(Event.ERROR, res.code, res.message);
+                this.dispatchEvent(Event.ERROR, res.code);
             }
         }
     }

@@ -200,7 +200,7 @@ export class AccountContainer extends EventDispatcher {
     public set selected_index(value: number) {
         if (value < 0 || value >= this._items.length) return;
         this._selected_index = value;
-        this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
+        this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
     }
 
     /**
@@ -256,8 +256,7 @@ export class AccountContainer extends EventDispatcher {
 
         if (change_select) {
             this._selected_index = this._items.length - 1;
-            if (is_dispatch)
-                this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
+            if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
         }
         return account;
     }
@@ -280,10 +279,9 @@ export class AccountContainer extends EventDispatcher {
         if (findIdx <= this.selected_index) {
             if (this._items.length === 0) {
                 this._selected_index = -1;
-                if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, null);
+                if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
             } else {
-                if (is_dispatch)
-                    this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, this._items[this.selected_index]);
+                if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
             }
         }
 
@@ -336,7 +334,7 @@ export class AccountContainer extends EventDispatcher {
         this._items.length = 0;
         if (is_dispatch) {
             this.dispatchEvent(Event.CHANGE);
-            this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index, null);
+            this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
         }
     }
 

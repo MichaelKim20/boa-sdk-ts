@@ -35,7 +35,7 @@ export class Event {
  * The listener function that processes the event.
  * This function must accept an event object as its only parameter and must return nothing
  */
-export type TListener = (type: string, ...args: any[]) => void;
+export type TListener = (type: string, args?: any) => void;
 
 /**
  * The EventDispatcher class is the base class for all classes that dispatch events.
@@ -52,7 +52,7 @@ export class EventDispatcher {
      * @param type The type of event.
      * @param args The arguments.
      */
-    public dispatchEvent(type: string, ...args: any[]): void {
+    public dispatchEvent(type: string, args?: any): void {
         const listeners = this.listeners.get(type);
         if (listeners !== undefined) listeners.forEach((m) => m(type, args));
     }
