@@ -28,6 +28,8 @@ export class Event {
     public static CHANGE_SENDER: string = "change_sender";
     public static CHANGE_TX_FEE: string = "change_tx_fee";
     public static CHANGE_PAYLOAD_FEE: string = "change_payload_fee";
+    public static NEW_BLOCK: string = "new_block";
+    public static NEW_TRANSACTION: string = "new_transaction";
     public static ERROR: string = "error";
 }
 
