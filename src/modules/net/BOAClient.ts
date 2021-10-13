@@ -24,7 +24,7 @@ import { handleNetworkError } from "./error/ErrorTypes";
 import { Request } from "./Request";
 import { Balance } from "./response/Balance";
 import { TransactionFee } from "./response/TransactionFee";
-import { BalanceType, IPendingTxs, ISPVStatus, ITxHistoryElement, ITxOverview } from "./response/Types";
+import { BalanceType, IPendingTxs, ISPVStatus, ITxDetail, ITxHistoryElement, ITxOverview } from "./response/Types";
 import { UnspentTxOutput } from "./response/UnspentTxOutput";
 import { Validator } from "./response/Validator";
 
@@ -436,6 +436,30 @@ export class BOAClient {
     public getWalletTransactionOverview(tx_hash: Hash): Promise<ITxOverview> {
         return new Promise<ITxOverview>((resolve, reject) => {
             const url = uri(this.server_url).directory("/wallet/transaction/overview").filename(tx_hash.toString());
+
+            Request()
+                .get(url.toString())
+                .then((response: AxiosResponse) => {
+                    if (response.status === 200) {
+                        resolve(response.data);
+                    } else {
+                        // It is not yet defined in Stoa.
+                        reject(handleNetworkError({ response }));
+                    }
+                })
+                .catch((reason: any) => {
+                    reject(handleNetworkError(reason));
+                });
+        });
+    }
+
+    /**
+     * Request a detail of a transaction.
+     * @param tx_hash The hash of the transaction
+     */
+    public getWalletTransactionDetail(tx_hash: Hash): Promise<ITxDetail> {
+        return new Promise<ITxDetail>((resolve, reject) => {
+            const url = uri(this.server_url).directory("/wallet/transaction/detail").filename(tx_hash.toString());
 
             Request()
                 .get(url.toString())

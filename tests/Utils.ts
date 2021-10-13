@@ -503,6 +503,34 @@ export const sample_tx_overview_client = {
     fee: "0",
 };
 
+export const sample_tx_detail_client = {
+    height: "9",
+    time: 1601553600,
+    tx_hash:
+        "0xc2fed6fe6e445328bf363bb2725c23593b5ac43f0e0cd456f22bab77ef7b81a2661b9a07308a909047acf2b886522a50d7dd9195072de2272509963aeec34e52",
+    tx_type: "payment",
+    unlock_height: "10",
+    unlock_time: 1601554200,
+    payload: "",
+    senders: [
+        {
+            address: "boa1xrgq6607dulyra5r9dw0ha6883va0jghdzk67er49h3ysm7k222ruhh7400",
+            amount: 610000000000000,
+            utxo: "0xb0383981111438cf154c7725293009d53462c66d641f76506400f64f55f9cb2e253dafb37af9fafd8b0031e6b9789f96a3a4be06b3a15fa592828ec7f8c489cc",
+        },
+    ],
+    receivers: [
+        {
+            address: "boa1xrq66nug6wnen9sp5cm7xhfw03yea8e9x63ggay3v5dhe6d9jerqz50eld0",
+            amount: 610000000000000,
+            utxo: "0xefed6c1701d1195524d469a3bbb058492a7922ff98e7284a01f14c0a32c31814f4ed0d6666aaf7071ae0f1eb615920173f13a63c8774aa5955a3af77c51e55e9",
+        },
+    ],
+    fee: "0",
+    tx_fee: "0",
+    payload_fee: "0",
+};
+
 export const sample_txs_pending_client = [
     {
         tx_hash:
@@ -974,6 +1002,17 @@ export class TestStoa {
             try {
                 tx_hash = new sdk.Hash(String(req.params.hash));
                 res.status(200).send(JSON.stringify(sample_tx_overview_client));
+            } catch (error) {
+                res.status(400).send(`Invalid value for parameter 'hash': ${String(req.params.hash)}`);
+            }
+        });
+
+        // GET /wallet/transaction/detail/:hash
+        this.app.get("/wallet/transaction/detail/:hash", (req: express.Request, res: express.Response) => {
+            let tx_hash: sdk.Hash;
+            try {
+                tx_hash = new sdk.Hash(String(req.params.hash));
+                res.status(200).send(JSON.stringify(sample_tx_detail_client));
             } catch (error) {
                 res.status(400).send(`Invalid value for parameter 'hash': ${String(req.params.hash)}`);
             }

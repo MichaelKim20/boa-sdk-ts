@@ -15,7 +15,12 @@
 import { BOASodium } from "boa-sodium-ts";
 import * as sdk from "../lib";
 // @ts-ignore
-import { sample_txs_history_client, sample_txs_pending_client, sample_tx_client } from "./Utils";
+import {
+    sample_txs_history_client,
+    sample_txs_pending_client,
+    sample_tx_client,
+    sample_tx_detail_client,
+} from "./Utils";
 // tslint:disable-next-line:no-duplicate-imports
 import { sample_tx_hash_client, sample_tx_overview_client, sample_utxo_client } from "./Utils";
 // tslint:disable-next-line:no-duplicate-imports
@@ -858,6 +863,22 @@ describe("BOA Client", () => {
         );
         const data = await boa_client.getWalletTransactionOverview(tx_hash);
         assert.deepStrictEqual(data, sample_tx_overview_client);
+    });
+
+    it("Test a function of the BOA Client - `getWalletTransactionDetail`", async () => {
+        // Set URL
+        const stoa_uri = URI("http://localhost").port(stoa_port);
+        const agora_uri = URI("http://localhost").port(agora_port);
+
+        // Create BOA Client
+        const boa_client = new sdk.BOAClient(stoa_uri.toString(), agora_uri.toString());
+
+        // Query
+        const tx_hash = new sdk.Hash(
+            "0xf3a013153900f6416af03efc855df3880e3927fff386b3635bf46cd6e2c54769f88bd24128b6b935ab95af803cc41412fe9079b4ed7684538d86840115838814"
+        );
+        const data = await boa_client.getWalletTransactionDetail(tx_hash);
+        assert.deepStrictEqual(data, sample_tx_detail_client);
     });
 
     it("Test a function of the BOA Client - `getWalletTransactionsPending`", async () => {

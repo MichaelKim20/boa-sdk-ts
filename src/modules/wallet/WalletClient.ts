@@ -18,7 +18,7 @@ import { Transaction } from "../data/Transaction";
 import { BOAClient } from "../net/BOAClient";
 import { Balance } from "../net/response/Balance";
 import { TransactionFee } from "../net/response/TransactionFee";
-import { BalanceType, IPendingTxs, ISPVStatus, ITxHistoryElement, ITxOverview } from "../net/response/Types";
+import { BalanceType, IPendingTxs, ISPVStatus, ITxDetail, ITxHistoryElement, ITxOverview } from "../net/response/Types";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
 import { DefaultWalletEndpoint, IWalletEndpoint, IWalletResult, WalletMessage, WalletResultCode } from "./Types";
 import { WalletBalance } from "./WalletBalance";
@@ -226,6 +226,27 @@ export class WalletClient {
         };
     }
 
+    /**
+     * Request a detail of a transaction.
+     * @param tx_hash The hash of the transaction
+     */
+    public async getTransactionDetail(tx_hash: Hash): Promise<IWalletResult<ITxDetail>> {
+        const check_res: IWalletResult<ITxDetail> = await this.checkServer();
+        if (check_res.code !== WalletResultCode.Success) return check_res;
+
+        let value: ITxDetail;
+        try {
+            value = await this.client.getWalletTransactionDetail(tx_hash);
+        } catch (e) {
+            return { code: WalletResultCode.FailedRequest, message: e.message };
+        }
+
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: value,
+        };
+    }
     /**
      * Request pending transactions.
      * @param address The input address of the pending transaction
