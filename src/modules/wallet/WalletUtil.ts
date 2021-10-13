@@ -13,6 +13,8 @@
 
 import { Amount } from "../common/Amount";
 
+import { IWalletResult, WalletMessage, WalletResultCode } from "./Types";
+
 import JSBI from "jsbi";
 
 /**
@@ -55,18 +57,53 @@ export class AmountConverter {
      * Convert a BOA unit string into an amount
      * @param amount    The amount
      */
-    public static fromString(amount: string): Amount {
-        if (!amount || amount === "") return new Amount(JSBI.BigInt(0));
-        const numbers = amount.replace(/,/gi, "").split(".");
-        if (numbers.length === 1) return new Amount(JSBI.multiply(JSBI.BigInt(numbers[0]), Amount.UNIT_PER_COIN_JSBI));
-        else if (numbers.length === 2) {
-            let txRemain = numbers[1];
-            if (txRemain.length > Amount.LENGTH_DECIMAL) txRemain = txRemain.slice(0, Amount.LENGTH_DECIMAL);
-            else if (txRemain.length < Amount.LENGTH_DECIMAL) txRemain = txRemain.padEnd(Amount.LENGTH_DECIMAL, "0");
-            const share = JSBI.multiply(JSBI.BigInt(numbers[0]), Amount.UNIT_PER_COIN_JSBI);
-            return new Amount(JSBI.add(share, JSBI.BigInt(txRemain)));
-        } else {
-            throw new Error("Invalid number format");
+    public static fromString(amount: string): IWalletResult<Amount> {
+        try {
+            if (!amount || amount === "")
+                return {
+                    code: WalletResultCode.Success,
+                    message: WalletMessage.Success,
+                    data: new Amount(JSBI.BigInt(0)),
+                };
+
+            const numbers = amount.replace(/,/gi, "").split(".");
+            if (JSBI.lessThan(JSBI.BigInt(numbers[0]), JSBI.BigInt(0))) {
+                return {
+                    code: WalletResultCode.InvalidAmount,
+                    message: WalletMessage.InvalidAmount,
+                };
+            }
+
+            if (numbers.length === 1) {
+                const value = new Amount(JSBI.multiply(JSBI.BigInt(numbers[0]), Amount.UNIT_PER_COIN_JSBI));
+                return {
+                    code: WalletResultCode.Success,
+                    message: WalletMessage.Success,
+                    data: value,
+                };
+            } else if (numbers.length === 2) {
+                let txRemain = numbers[1];
+                if (txRemain.length > Amount.LENGTH_DECIMAL) txRemain = txRemain.slice(0, Amount.LENGTH_DECIMAL);
+                else if (txRemain.length < Amount.LENGTH_DECIMAL)
+                    txRemain = txRemain.padEnd(Amount.LENGTH_DECIMAL, "0");
+                const share = JSBI.multiply(JSBI.BigInt(numbers[0]), Amount.UNIT_PER_COIN_JSBI);
+                const value = new Amount(JSBI.add(share, JSBI.BigInt(txRemain)));
+                return {
+                    code: WalletResultCode.Success,
+                    message: WalletMessage.Success,
+                    data: value,
+                };
+            } else {
+                return {
+                    code: WalletResultCode.InvalidAmount,
+                    message: WalletMessage.InvalidAmount,
+                };
+            }
+        } catch (e) {
+            return {
+                code: WalletResultCode.InvalidAmount,
+                message: e.message,
+            };
         }
     }
 }

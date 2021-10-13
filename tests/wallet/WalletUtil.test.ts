@@ -18,20 +18,35 @@ import assert from "assert";
 
 describe("Test of AmountConverter", () => {
     it("Test of AmountConverter.fromString()", () => {
-        assert.deepStrictEqual(sdk.AmountConverter.fromString("1").value, sdk.JSBI.BigInt("10000000"));
-        assert.deepStrictEqual(
-            sdk.AmountConverter.fromString("100000000.1234567").value,
-            sdk.JSBI.BigInt("1000000001234567")
-        );
-        assert.deepStrictEqual(sdk.AmountConverter.fromString("100000000").value, sdk.JSBI.BigInt("1000000000000000"));
-        assert.deepStrictEqual(
-            sdk.AmountConverter.fromString("100,000,000.1234567").value,
-            sdk.JSBI.BigInt("1000000001234567")
-        );
-        assert.deepStrictEqual(
-            sdk.AmountConverter.fromString("100,000,000").value,
-            sdk.JSBI.BigInt("1000000000000000")
-        );
+        assert.deepStrictEqual(sdk.AmountConverter.fromString("1"), {
+            code: sdk.WalletResultCode.Success,
+            message: sdk.WalletMessage.Success,
+            data: sdk.Amount.make("10000000"),
+        });
+        assert.deepStrictEqual(sdk.AmountConverter.fromString("100000000.1234567"), {
+            code: sdk.WalletResultCode.Success,
+            message: sdk.WalletMessage.Success,
+            data: sdk.Amount.make("1000000001234567"),
+        });
+        assert.deepStrictEqual(sdk.AmountConverter.fromString("100000000"), {
+            code: sdk.WalletResultCode.Success,
+            message: sdk.WalletMessage.Success,
+            data: sdk.Amount.make("1000000000000000"),
+        });
+        assert.deepStrictEqual(sdk.AmountConverter.fromString("100,000,000.1234567"), {
+            code: sdk.WalletResultCode.Success,
+            message: sdk.WalletMessage.Success,
+            data: sdk.Amount.make("1000000001234567"),
+        });
+        assert.deepStrictEqual(sdk.AmountConverter.fromString("100,000,000"), {
+            code: sdk.WalletResultCode.Success,
+            message: sdk.WalletMessage.Success,
+            data: sdk.Amount.make("1000000000000000"),
+        });
+        assert.deepStrictEqual(sdk.AmountConverter.fromString("-100,000,000"), {
+            code: sdk.WalletResultCode.InvalidAmount,
+            message: sdk.WalletMessage.InvalidAmount,
+        });
     });
 
     it("Test of AmountConverter.toString()", () => {

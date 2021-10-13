@@ -40,7 +40,8 @@ export enum WalletResultCode {
     NotExistReceiver = 1200,
     NotEnoughAmount = 1201,
     ExistNotFrozenUTXO = 1202,
-    NotAvailableAmount = 1300,
+    InvalidAmount = 1301,
+    InvalidAmountFormat = 1302,
     CoinbaseCanNotCancel = 1500,
     InvalidTransaction = 1501,
     UnsupportedUnfreezing = 1502,
@@ -172,6 +173,8 @@ export enum WalletMessage {
     NotAssignedReceiver = "Not assigned any receiver",
     NotAssignedReceiverAmount = "Not assigned any receiver amount",
     InsufficientAmount = "Insufficient amount",
+    InvalidAmount = "This is not a valid amount",
+    InvalidAmountFormat = "This is not a valid amount format",
 }
 
 export interface ITransactionOverviewReceiver {
