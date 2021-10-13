@@ -163,47 +163,49 @@ describe("Hash", () => {
 
     // The test codes below compare with the values calculated in Agora.
     it("Test for hash value of BlockHeader", () => {
-        const pubkey = new sdk.PublicKey("boa1xrr66q4rthn4qvhhsl4y5hptqm366pgarqpk26wfzh6d38wg076tsqqesgg");
+        const pubkey = new sdk.PublicKey("boa1xrra39xpg5q9zwhsq6u7pw508z2let6dj8r5lr4q0d0nff240fvd27yme3h");
 
         const tx = new sdk.Transaction([], [new sdk.TxOutput(sdk.OutputType.Payment, "100", pubkey)], Buffer.alloc(0));
 
         const header: sdk.BlockHeader = new sdk.BlockHeader(
             new sdk.Hash(Buffer.alloc(sdk.Hash.Width)),
-            new sdk.Height("0"),
             sdk.hashFull(tx),
-            sdk.BitMask.fromString("0"),
             new sdk.Signature(Buffer.alloc(sdk.Signature.Width)),
+            sdk.BitMask.fromString("0"),
+            new sdk.Height("0"),
             [],
-            new sdk.Hash(Buffer.alloc(sdk.Hash.Width)),
             [],
             0
         );
         assert.strictEqual(
             sdk.hashFull(header).toString(),
-            "0x3bda4067eef71774dd27557fb838ae5dfcd2198530e60b9c95ebf41f18bc4144040a5bd70cb83e63aefdf45222ec6f6006dfdf6387faf0df07d0da009d543e64"
+            "0xde4132329e5e3d7acb2efc075c0d67f4e29995d49a813445cf7ad74f66140df014f411dc71529142e2f0223578195a6cb22662ee990992b510b74e56a02dae87"
         );
     });
 
     // The test codes below compare with the values calculated in Agora.
-    it("Test for hash value of BlockHeader with missing validators", () => {
-        const pubkey = new sdk.PublicKey("boa1xrr66q4rthn4qvhhsl4y5hptqm366pgarqpk26wfzh6d38wg076tsqqesgg");
+    it("Test for hash value of BlockHeader with preimages", () => {
+        const pubkey = new sdk.PublicKey("boa1xrra39xpg5q9zwhsq6u7pw508z2let6dj8r5lr4q0d0nff240fvd27yme3h");
 
         const tx = new sdk.Transaction([], [new sdk.TxOutput(sdk.OutputType.Payment, "100", pubkey)], Buffer.alloc(0));
 
         const header: sdk.BlockHeader = new sdk.BlockHeader(
             new sdk.Hash(Buffer.alloc(sdk.Hash.Width)),
-            new sdk.Height("0"),
             sdk.hashFull(tx),
-            sdk.BitMask.fromString(""),
             new sdk.Signature(Buffer.alloc(sdk.Signature.Width)),
+            sdk.BitMask.fromString("0"),
+            new sdk.Height("0"),
+            [
+                new sdk.Hash(
+                    "0xe99832a1469beb4830f2faf3a6b8da5d027afe6f3f80098d89c4e6d22b8a22b1074b493041c124c86333891f5c62df8bd2bb0b6a493b6ea0ed276ad03db59b3f"
+                ),
+            ],
             [],
-            new sdk.Hash(Buffer.alloc(sdk.Hash.Width)),
-            [1, 2, 3, 256, 257, 258, 70000, 80000, 90000],
             0
         );
         assert.strictEqual(
             sdk.hashFull(header).toString(),
-            "0xeee57d6bc2833e87910e795a55adc544d883add68576d5144cc74f528eff6a80fe6759c1071a39f30fb0bf201e5312f6d1f3de29a4c69fa480ab4e6092957399"
+            "0xed0982420419abfef6d181d25d871619657d09a9e3e111a3c14ca92c40ab7d97b587c6ec05cd783bedd7b15681dd792a1dcef6c98614513442c00951d2bfb6d0"
         );
     });
 

@@ -61,30 +61,27 @@ export class JSONValidator {
                     prev_block: {
                         type: "string",
                     },
-                    height: {
-                        type: "string",
-                    },
                     merkle_root: {
-                        type: "string",
-                    },
-                    validators: {
                         type: "string",
                     },
                     signature: {
                         type: "string",
                     },
-                    enrollments: {
+                    validators: {
+                        type: "string",
+                    },
+                    height: {
+                        type: "string",
+                    },
+                    preimages: {
                         items: {
-                            type: "object",
+                            type: "string",
                         },
                         type: "array",
                     },
-                    random_seed: {
-                        type: "string",
-                    },
-                    missing_validators: {
+                    enrollments: {
                         items: {
-                            type: "number",
+                            type: "object",
                         },
                         type: "array",
                     },
@@ -95,13 +92,12 @@ export class JSONValidator {
                 additionalProperties: false,
                 required: [
                     "prev_block",
-                    "height",
                     "merkle_root",
-                    "validators",
                     "signature",
+                    "validators",
+                    "height",
+                    "preimages",
                     "enrollments",
-                    "random_seed",
-                    "missing_validators",
                     "time_offset",
                 ],
             },

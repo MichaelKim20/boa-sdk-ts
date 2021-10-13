@@ -37,11 +37,12 @@ describe("Test of Block", () => {
 
         // Test for JSON serialization
         for (let idx = 0; idx < blocks.length; idx++)
-            assert.deepStrictEqual(JSON.stringify(blocks[idx]), JSON.stringify(samples[idx]));
+            assert.deepStrictEqual(JSON.parse(JSON.stringify(blocks[idx])), samples[idx]);
 
         // Test for block header hash
-        for (let idx = 0; idx < blocks.length - 1; idx++)
+        for (let idx = 0; idx < blocks.length - 1; idx++) {
             assert.deepStrictEqual(sdk.hashFull(blocks[idx].header), blocks[idx + 1].header.prev_block);
+        }
     });
 });
 

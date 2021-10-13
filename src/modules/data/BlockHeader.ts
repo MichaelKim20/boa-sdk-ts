@@ -35,19 +35,9 @@ export class BlockHeader {
     public prev_block: Hash;
 
     /**
-     * The block height (genesis is #0)
-     */
-    public height: Height;
-
-    /**
      * The hash of the merkle root of the transactions
      */
     public merkle_root: Hash;
-
-    /**
-     * The bit-field containing the validators' key indices which signed the block
-     */
-    public validators: BitMask;
 
     /**
      * The Schnorr multisig of all validators which signed this block
@@ -55,19 +45,24 @@ export class BlockHeader {
     public signature: Signature;
 
     /**
+     * The bit-field containing the validators' key indices which signed the block
+     */
+    public validators: BitMask;
+
+    /**
+     * The block height (genesis is #0)
+     */
+    public height: Height;
+
+    /**
+     * The pre-images propagated in this block
+     */
+    public preimages: Hash[];
+
+    /**
      * The enrolled validators
      */
     public enrollments: Enrollment[];
-
-    /**
-     * Hash of random seed of the preimages for this this height
-     */
-    public random_seed: Hash;
-
-    /**
-     * List of indices to the validator UTXO set which have not revealed the preimage
-     */
-    public missing_validators: number[];
 
     /**
      * Block seconds offset from Genesis Timestamp in `ConsensusParams`
@@ -77,34 +72,31 @@ export class BlockHeader {
     /**
      * Constructor
      * @param prev_block  The Hash of the previous block in the chain of blocks
-     * @param height      The block height
      * @param merkle_root The hash of the merkle root of the transactions
-     * @param validators  The bit-field containing the validators' key indices which signed the block
      * @param signature   The Schnorr multisig of all validators which signed this block
+     * @param validators  The bit-field containing the validators' key indices which signed the block
+     * @param height      The block height
+     * @param preimages   The pre-images propagated in this block
      * @param enrollments The enrolled validators
-     * @param random_seed Hash of random seed of the preimages for this this height
-     * @param missing_validators List of indices to the validator UTXO set which have not revealed the preimage
      * @param time_offset Block seconds offset from Genesis Timestamp in `ConsensusParams`
      */
     constructor(
         prev_block: Hash,
-        height: Height,
         merkle_root: Hash,
-        validators: BitMask,
         signature: Signature,
+        validators: BitMask,
+        height: Height,
+        preimages: Hash[],
         enrollments: Enrollment[],
-        random_seed: Hash,
-        missing_validators: number[],
         time_offset: number
     ) {
         this.prev_block = prev_block;
-        this.height = height;
         this.merkle_root = merkle_root;
-        this.validators = validators;
         this.signature = signature;
+        this.validators = validators;
+        this.height = height;
+        this.preimages = preimages;
         this.enrollments = enrollments;
-        this.random_seed = random_seed;
-        this.missing_validators = missing_validators;
         this.time_offset = time_offset;
     }
 
@@ -125,13 +117,12 @@ export class BlockHeader {
 
         return new BlockHeader(
             new Hash(value.prev_block),
-            new Height(value.height),
             new Hash(value.merkle_root),
-            BitMask.fromString(value.validators),
             new Signature(value.signature),
+            BitMask.fromString(value.validators),
+            new Height(value.height),
+            value.preimages.map((elem: string) => new Hash(elem)),
             value.enrollments.map((elem: any) => Enrollment.reviver("", elem)),
-            new Hash(value.random_seed),
-            value.missing_validators.map((elem: number) => elem),
             value.time_offset
         );
     }
@@ -142,11 +133,10 @@ export class BlockHeader {
      */
     public computeHash(buffer: SmartBuffer) {
         this.prev_block.computeHash(buffer);
-        this.height.computeHash(buffer);
         this.merkle_root.computeHash(buffer);
+        this.height.computeHash(buffer);
+        for (const elem of this.preimages) hashPart(elem, buffer);
         for (const elem of this.enrollments) elem.computeHash(buffer);
-        this.random_seed.computeHash(buffer);
-        for (const elem of this.missing_validators) buffer.writeUInt32LE(elem);
         hashPart(JSBI.BigInt(this.time_offset), buffer);
     }
 
@@ -157,16 +147,15 @@ export class BlockHeader {
     public serialize(buffer: SmartBuffer) {
         this.prev_block.serialize(buffer);
         this.merkle_root.serialize(buffer);
-        this.random_seed.serialize(buffer);
         this.signature.serialize(buffer);
         this.validators.serialize(buffer);
         this.height.serialize(buffer);
 
+        VarInt.fromNumber(this.preimages.length, buffer);
+        for (const elem of this.preimages) elem.serialize(buffer);
+
         VarInt.fromNumber(this.enrollments.length, buffer);
         for (const elem of this.enrollments) elem.serialize(buffer);
-
-        VarInt.fromNumber(this.missing_validators.length, buffer);
-        for (const elem of this.missing_validators) VarInt.fromNumber(elem, buffer);
 
         VarInt.fromNumber(this.time_offset, buffer);
     }
@@ -178,28 +167,25 @@ export class BlockHeader {
     public static deserialize(buffer: SmartBuffer): BlockHeader {
         const prev_block = Hash.deserialize(buffer);
         const merkle_root = Hash.deserialize(buffer);
-        const random_seed = Hash.deserialize(buffer);
         const signature = Signature.deserialize(buffer);
         const validators = BitMask.deserialize(buffer);
         const height = Height.deserialize(buffer);
 
-        let length = VarInt.toNumber(buffer);
-        const enrollments = iota(length).map(() => Enrollment.deserialize(buffer));
+        const preimages_length = VarInt.toNumber(buffer);
+        const preimages = iota(preimages_length).map(() => Hash.deserialize(buffer));
 
-        length = VarInt.toNumber(buffer);
-        const missing_validators = iota(length).map(() => VarInt.toNumber(buffer));
+        const enroll_length = VarInt.toNumber(buffer);
+        const enrollments = iota(enroll_length).map(() => Enrollment.deserialize(buffer));
 
         const time_offset = VarInt.toNumber(buffer);
-
         return new BlockHeader(
             prev_block,
-            height,
             merkle_root,
-            validators,
             signature,
+            validators,
+            height,
+            preimages,
             enrollments,
-            random_seed,
-            missing_validators,
             time_offset
         );
     }
