@@ -384,13 +384,12 @@ describe("Wallet Transaction Builder", function () {
     });
 
     it("When adding one sender at a time", async () => {
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
 
-        const wallet_client = new sdk.WalletClient(option);
+        const wallet_client = new sdk.WalletClient(endpoint);
         const accounts = new sdk.AccountContainer(wallet_client);
         const builder = new sdk.WalletTxBuilder(wallet_client);
 
@@ -399,7 +398,7 @@ describe("Wallet Transaction Builder", function () {
             makeRandomUTXO();
             accounts.clear();
             await builder.clear();
-            await builder.setFeeOption(option.fee);
+            await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
 
             let spendable = sdk.Amount.make(0);
             key_pairs.forEach((value, idx) => {
@@ -471,13 +470,12 @@ describe("Wallet Transaction Builder", function () {
     });
 
     it("When adding all senders at once, check the final result.", async () => {
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
 
-        const wallet_client = new sdk.WalletClient(option);
+        const wallet_client = new sdk.WalletClient(endpoint);
         const accounts = new sdk.AccountContainer(wallet_client);
         const builder = new sdk.WalletTxBuilder(wallet_client);
 
@@ -486,7 +484,7 @@ describe("Wallet Transaction Builder", function () {
             makeRandomUTXO();
             accounts.clear();
             await builder.clear();
-            await builder.setFeeOption(option.fee);
+            await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
 
             key_pairs.forEach((value, idx) => {
                 accounts.add("Account" + idx.toString(), value.secret);
@@ -564,19 +562,18 @@ describe("Wallet Transaction Builder", function () {
     });
 
     it("When the transaction fee is changed", async () => {
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
-        const wallet_client = new sdk.WalletClient(option);
+        const wallet_client = new sdk.WalletClient(endpoint);
         const accounts = new sdk.AccountContainer(wallet_client);
         const builder = new sdk.WalletTxBuilder(wallet_client);
 
         makeRandomUTXO();
         accounts.clear();
         await builder.clear();
-        await builder.setFeeOption(option.fee);
+        await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
 
         key_pairs.forEach((value, idx) => {
             accounts.add("Account" + idx.toString(), value.secret);
@@ -707,19 +704,18 @@ describe("Wallet Transaction Builder", function () {
     });
 
     it("Build & Get Overview", async () => {
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
-        const wallet_client = new sdk.WalletClient(option);
+        const wallet_client = new sdk.WalletClient(endpoint);
         const accounts = new sdk.AccountContainer(wallet_client);
         const builder = new sdk.WalletTxBuilder(wallet_client);
 
         makeRandomUTXO();
         accounts.clear();
         await builder.clear();
-        await builder.setFeeOption(option.fee);
+        await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
 
         key_pairs.forEach((value, idx) => {
             accounts.add("Account" + idx.toString(), value.secret);
@@ -777,19 +773,19 @@ describe("Wallet Transaction Builder", function () {
     }
 
     it("Test of EventDispatch", async () => {
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
             fee: sdk.WalletTransactionFeeOption.Medium,
         };
-        const wallet_client = new sdk.WalletClient(option);
+        const wallet_client = new sdk.WalletClient(endpoint);
         const accounts = new sdk.AccountContainer(wallet_client);
         const builder = new sdk.WalletTxBuilder(wallet_client);
 
         makeRandomUTXO();
         accounts.clear();
         await builder.clear();
-        await builder.setFeeOption(option.fee);
+        await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
 
         key_pairs.forEach((value, idx) => {
             accounts.add("Account" + idx.toString(), value.secret);
@@ -861,20 +857,19 @@ describe("Wallet Transaction Builder", function () {
     });
 
     it("Test of EventDispatch for Wallet with Single Receiver", async () => {
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
 
-        const wallet_client = new sdk.WalletClient(option);
+        const wallet_client = new sdk.WalletClient(endpoint);
         const accounts = new sdk.AccountContainer(wallet_client);
         const builder = new sdk.WalletTxBuilderSingleReceiver(wallet_client);
 
         makeRandomUTXO();
         accounts.clear();
         await builder.clear();
-        await builder.setFeeOption(option.fee);
+        await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
 
         key_pairs.forEach((value, idx) => {
             accounts.add("Account" + idx.toString(), value.secret);

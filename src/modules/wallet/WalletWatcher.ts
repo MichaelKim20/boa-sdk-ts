@@ -44,7 +44,7 @@ export class WalletWatcher extends EventDispatcher {
         this.client = client;
         this.interval = undefined;
         this.duration = duration;
-        this.socket = io(client.getOption().stoaEndpoint);
+        this.socket = io(this.client.getEndpoint().stoa);
         this.socket.on("new_block", this.onNewBlock.bind(this));
         this.socket.on("new_tx_acc", this.onNewTransaction.bind(this));
         this.initialize();
@@ -175,7 +175,7 @@ export class WalletWatcher extends EventDispatcher {
         } catch (e) {
             //
         }
-        this.socket = io(this.client.getOption().stoaEndpoint);
+        this.socket = io(this.client.getEndpoint().stoa);
         this.socket.on("new_block", this.onNewBlock.bind(this));
         this.socket.on("new_tx_acc", this.onNewTransaction.bind(this));
         this.socket.emit("subscribe", { address: "block" });

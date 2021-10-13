@@ -86,7 +86,7 @@ export class Wallet {
     constructor(owner: KeyPair, option: IWalletOption = DefaultWalletOption()) {
         this.owner = owner;
         this.option = option;
-        this.client = new WalletClient(this.option);
+        this.client = new WalletClient(this.option.endpoint);
         this.txBuilder = new TxBuilder(this.owner);
         this.spendableUtxoProvider = new WalletUTXOProvider(this.owner.address, this.client, BalanceType.spendable);
         this.frozenUtxoProvider = new WalletUTXOProvider(this.owner.address, this.client, BalanceType.frozen);

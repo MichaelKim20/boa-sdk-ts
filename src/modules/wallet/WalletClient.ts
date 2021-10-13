@@ -20,7 +20,7 @@ import { Balance } from "../net/response/Balance";
 import { TransactionFee } from "../net/response/TransactionFee";
 import { BalanceType, IPendingTxs, ISPVStatus, ITxHistoryElement, ITxOverview } from "../net/response/Types";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
-import { DefaultWalletOption, IWalletOption, IWalletResult, WalletMessage, WalletResultCode } from "./Types";
+import { DefaultWalletEndpoint, IWalletEndpoint, IWalletResult, WalletMessage, WalletResultCode } from "./Types";
 import { WalletBalance } from "./WalletBalance";
 import { WalletTransactionFee } from "./WalletTransactionFee";
 
@@ -37,10 +37,10 @@ export class WalletClient {
     private client: BOAClient;
 
     /**
-     * The option of wallet
+     * The endpoints of wallet
      * @private
      */
-    private option: IWalletOption;
+    private endpoint: IWalletEndpoint;
 
     /**
      * The last time the server status was checked
@@ -56,26 +56,26 @@ export class WalletClient {
 
     /**
      * Constructor
-     * @param option    The option of wallet
+     * @param endpoint    The endpoints of wallet
      */
-    constructor(option: IWalletOption = DefaultWalletOption()) {
-        this.option = option;
-        this.client = new BOAClient(this.option.stoaEndpoint, this.option.agoraEndpoint);
+    constructor(endpoint: IWalletEndpoint = DefaultWalletEndpoint()) {
+        this.endpoint = endpoint;
+        this.client = new BOAClient(this.endpoint.stoa, this.endpoint.agora);
         this.checked_time = new Date(0);
     }
 
     /**
-     * Set the option of wallet, Agora's endpoint & Stoa's endpoint
-     * @param option    The option of wallet
+     * Set the endpoints of wallet, Agora's endpoint & Stoa's endpoint
+     * @param endpoint    The endpoints of wallet
      */
-    public setOption(option: IWalletOption) {
-        this.option = option;
-        this.client = new BOAClient(this.option.stoaEndpoint, this.option.agoraEndpoint);
+    public setEndpoint(endpoint: IWalletEndpoint) {
+        this.endpoint = endpoint;
+        this.client = new BOAClient(this.endpoint.stoa, this.endpoint.agora);
         this.checked_time = new Date(0);
     }
 
-    public getOption(): IWalletOption {
-        return this.option;
+    public getEndpoint(): IWalletEndpoint {
+        return this.endpoint;
     }
 
     /**

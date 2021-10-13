@@ -12,6 +12,8 @@
 
 *******************************************************************************/
 
+import { IWalletEndpoint } from "./modules/wallet/Types";
+
 export { IBOASodium } from "boa-sodium-base-ts";
 export { Amount, BOA } from "./modules/common/Amount";
 export {
@@ -75,12 +77,14 @@ export { NetworkError, NotFoundError, BadRequestError, handleNetworkError } from
 
 export {
     DefaultWalletOption,
+    DefaultWalletEndpoint,
     WalletTransactionFeeOption,
     WalletMessage,
     WalletResultCode,
     IWalletReceiver,
     IWalletResult,
     IWalletOption,
+    IWalletEndpoint,
 } from "./modules/wallet/Types";
 
 export { WalletBalance } from "./modules/wallet/WalletBalance";

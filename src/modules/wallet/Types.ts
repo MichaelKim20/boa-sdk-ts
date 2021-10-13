@@ -117,18 +117,28 @@ export interface IWalletResult<T> {
 }
 
 /**
- * An interface that defines the options used in a wallet.
+ * An interface that defines the endpoints used in a wallet.
  */
-export interface IWalletOption {
+export interface IWalletEndpoint {
     /**
      * The address of Agora
      */
-    agoraEndpoint: string;
+    agora: string;
 
     /**
      * The address of Stoa
      */
-    stoaEndpoint: string;
+    stoa: string;
+}
+
+/**
+ * An interface that defines the options used in a wallet.
+ */
+export interface IWalletOption {
+    /**
+     * The endpoints of wallet
+     */
+    endpoint: IWalletEndpoint;
 
     /**
      * Fee option to be used when transferring
@@ -138,9 +148,15 @@ export interface IWalletOption {
 
 export function DefaultWalletOption(): IWalletOption {
     return {
-        agoraEndpoint: "http://127.0.0.1:2826",
-        stoaEndpoint: "http://127.0.0.1:3836",
+        endpoint: DefaultWalletEndpoint(),
         fee: WalletTransactionFeeOption.Medium,
+    };
+}
+
+export function DefaultWalletEndpoint(): IWalletEndpoint {
+    return {
+        agora: "http://127.0.0.1:2826",
+        stoa: "http://127.0.0.1:3836",
     };
 }
 

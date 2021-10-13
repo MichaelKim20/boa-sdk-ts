@@ -55,9 +55,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getBlockHeight`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         // Query
@@ -69,9 +68,8 @@ describe("Wallet Client", () => {
 
     it("Test calculating fees of the transaction", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         let fees_res = await wallet_client.getTransactionFee(0);
@@ -105,9 +103,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getTransactionsHistory`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const public_key = new sdk.PublicKey("boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9");
@@ -119,9 +116,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getTransactionOverview`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const tx_hash = new sdk.Hash(
@@ -135,9 +131,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getTransactionsPending`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const public_key = new sdk.PublicKey("boa1xrzwvvw6l6d9k84ansqgs9yrtsetpv44wfn8zm9a7lehuej3ssskxth867s");
@@ -149,9 +144,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getPendingTransaction`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const tx_hash = sample_tx_hash_client;
@@ -163,9 +157,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getTransaction`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const tx_hash = sample_tx_hash_client;
@@ -177,9 +170,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getVotingFee`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const res = await wallet_client.getVotingFee(273);
@@ -190,9 +182,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `verifyPayment`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const tx_hash = sample_tx_hash_client;
@@ -207,9 +198,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getUTXOInfo`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const utxo_hash = [
@@ -235,9 +225,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getBalance`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const public_key = new sdk.PublicKey("boa1xrq66nug6wnen9sp5cm7xhfw03yea8e9x63ggay3v5dhe6d9jerqz50eld0");
@@ -253,9 +242,8 @@ describe("Wallet Client", () => {
 
     it("Test a function of the Wallet Client - `getWalletUTXO`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         // Query
@@ -289,9 +277,8 @@ describe("Wallet Client", () => {
 
     it("Test saving a vote data with `WalletUTXOProvider`", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const key_pair = sdk.KeyPair.fromSeed(
@@ -364,9 +351,8 @@ describe("Wallet Client", () => {
 
     it("Test saving a vote data with `WalletUTXOProvider` - There is no output", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const key_pair = sdk.KeyPair.fromSeed(
@@ -397,9 +383,8 @@ describe("Wallet Client", () => {
 
     it("Test saving a vote data - There is at least one output", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const key_pair = sdk.KeyPair.fromSeed(
@@ -466,9 +451,8 @@ describe("Wallet Client", () => {
 
     it("Test the WalletUTXOProvider", async () => {
         const wallet_client = new sdk.WalletClient({
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         });
 
         const public_key = new sdk.PublicKey("boa1xrq66nug6wnen9sp5cm7xhfw03yea8e9x63ggay3v5dhe6d9jerqz50eld0");

@@ -54,8 +54,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -76,8 +78,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -130,8 +134,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6100",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6100",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -152,8 +158,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7100",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7100",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -174,8 +182,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -196,8 +206,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -213,8 +225,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -261,8 +275,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -305,8 +321,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -357,8 +375,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
 
@@ -408,8 +428,10 @@ describe("Wallet", () => {
         );
 
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://localhost:6000",
-            stoaEndpoint: "http://localhost:7000",
+            endpoint: {
+                agora: "http://localhost:6000",
+                stoa: "http://localhost:7000",
+            },
             fee: sdk.WalletTransactionFeeOption.Medium,
         });
         const balance_res = await wallet.getBalance();

@@ -57,12 +57,11 @@ describe("AccountContainer", () => {
         const seed2 = `SDNGO67J7UKBZ2TZIGOZNPMTGZXEJUWPYMTJK4FX3GBDVZNNXVVAW3WR`;
         const kp2 = sdk.KeyPair.fromSeed(new sdk.SecretKey(seed2));
 
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
-        const temp = new sdk.AccountContainer(new sdk.WalletClient(option));
+        const temp = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
         const account1 = new sdk.Account(temp, "My Account", kp1.address);
         assert.strictEqual(account1.name, "My Account");
         assert.strictEqual(account1.address.toString(), kp1.address.toString());
@@ -91,12 +90,11 @@ describe("AccountContainer", () => {
             "SCXE6LI5SNOSHAGD7K5LJD4GODHEHOQ7JFKHJZSEHBLVPJ4Q2MSQGTFL",
         ];
         const kps = seeds.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
-        const accounts = new sdk.AccountContainer(new sdk.WalletClient(option));
+        const accounts = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
 
         accounts.add("Account1", kps[0].secret);
         accounts.add("Account2", kps[1].secret);
@@ -137,12 +135,11 @@ describe("AccountContainer", () => {
 
     it("Test AccountContainer - Balance", (done) => {
         const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
-        const accounts = new sdk.AccountContainer(new sdk.WalletClient(option));
+        const accounts = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
 
         kps.forEach((value, idx) => {
             accounts.add("Account" + idx.toString(), value.secret);
@@ -157,12 +154,11 @@ describe("AccountContainer", () => {
 
     it("Test AccountList - Balance use EventHandler", (done) => {
         const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
-        const accounts = new sdk.AccountContainer(new sdk.WalletClient(option));
+        const accounts = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
 
         kps.forEach((value, idx) => {
             accounts.add("Account" + idx.toString(), value.secret);
@@ -180,12 +176,11 @@ describe("AccountContainer", () => {
 
     it("Test AccountList - toString & fromString", () => {
         const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
-        const option = {
-            agoraEndpoint: URI("http://localhost").port(agora_port).toString(),
-            stoaEndpoint: URI("http://localhost").port(stoa_port).toString(),
-            fee: sdk.WalletTransactionFeeOption.Medium,
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
         };
-        const accounts = new sdk.AccountContainer(new sdk.WalletClient(option));
+        const accounts = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
 
         kps.forEach((value, idx) => {
             accounts.add("Account" + idx.toString(), value.secret);
@@ -197,7 +192,7 @@ describe("AccountContainer", () => {
 
         assert.deepStrictEqual(serialized, expected);
 
-        const deserialized = new sdk.AccountContainer(new sdk.WalletClient(option));
+        const deserialized = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
         deserialized.fromString(serialized);
 
         assert.deepStrictEqual(deserialized.items.length, accounts.items.length);
