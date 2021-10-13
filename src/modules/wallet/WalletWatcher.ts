@@ -27,7 +27,8 @@ import { io, Socket } from "socket.io-client";
 export class WalletWatcher extends EventDispatcher {
     public accounts: AccountContainer;
     public client: WalletClient;
-    private interval: any;
+    private pullingTimer: any;
+    private pingTimer: any;
     private readonly duration: number;
     private height = 0;
     private socket: Socket;
@@ -42,33 +43,38 @@ export class WalletWatcher extends EventDispatcher {
         super();
         this.accounts = accounts;
         this.client = client;
-        this.interval = undefined;
+        this.pullingTimer = undefined;
+        this.pingTimer = undefined;
         this.duration = duration;
         this.socket = io(this.client.getEndpoint().stoa);
-        this.socket.on("new_block", this.onNewBlock.bind(this));
-        this.socket.on("new_tx_acc", this.onNewTransaction.bind(this));
-        this.initialize();
     }
 
     /**
      * It is the tasks to be done at the beginning of the creation of this class. This is called from the constructor.
      */
     public initialize() {
-        this.accounts.addEventListener(Event.ADDED, this.onChangedAccount, this);
-        this.accounts.addEventListener(Event.REMOVED, this.onChangedAccount, this);
+        this.socket.on("new_block", this.onNewBlock.bind(this));
+        this.socket.on("new_tx_acc", this.onNewTransaction.bind(this));
 
         this.socket.emit("subscribe", { address: "block" });
         for (const account of this.accounts.items) {
             this.subscribe(account.address);
         }
+        this.accounts.addEventListener(Event.ADDED, this.onChangedAccount, this);
+        this.accounts.addEventListener(Event.REMOVED, this.onChangedAccount, this);
 
         this.startPulling();
+
+        if (this.pingTimer !== undefined) clearInterval(this.pingTimer);
+        this.pingTimer = setInterval(this.ping.bind(this), 30000);
     }
 
     /**
      * It is the tasks to be done before they are destroyed. It should be called when an instance of it is no longer needed.
      */
     public finalize() {
+        if (this.pingTimer !== undefined) clearInterval(this.pingTimer);
+
         this.accounts.removeEventListener(Event.ADDED, this.onChangedAccount, this);
         this.accounts.removeEventListener(Event.REMOVED, this.onChangedAccount, this);
 
@@ -138,11 +144,17 @@ export class WalletWatcher extends EventDispatcher {
         }
     }
 
+    /**
+     * Start pulling the block height
+     */
     public startPulling() {
-        if (this.interval !== undefined) clearInterval(this.interval);
-        this.interval = setInterval(this.pulling.bind(this), this.duration);
+        if (this.pullingTimer !== undefined) clearInterval(this.pullingTimer);
+        this.pullingTimer = setInterval(this.pulling.bind(this), this.duration);
     }
 
+    /**
+     * Periodically pull in case of failure in real-time notification.
+     */
     public async pulling() {
         try {
             const res = await this.client.getBlockHeight();
@@ -156,19 +168,31 @@ export class WalletWatcher extends EventDispatcher {
         } catch (e) {
             //
         }
+    }
 
+    /**
+     * Stop pulling the block height
+     */
+    public stopPulling() {
+        if (this.pullingTimer !== undefined) clearInterval(this.pullingTimer);
+        this.pullingTimer = undefined;
+    }
+
+    /**
+     * Periodically notify the server that the client is alive.
+     * The server forcibly shuts down if it does not reach for one minute.
+     */
+    public ping() {
         try {
-            this.socket.emit("ping", "{}");
+            this.socket.emit("ping", "");
         } catch (e) {
             this.reconnect();
         }
     }
 
-    public stopPulling() {
-        if (this.interval !== undefined) clearInterval(this.interval);
-        this.interval = undefined;
-    }
-
+    /**
+     * When the connection is terminated, the connection is re-connected.
+     */
     public reconnect() {
         try {
             this.socket.disconnect();
@@ -176,11 +200,11 @@ export class WalletWatcher extends EventDispatcher {
             //
         }
         this.socket = io(this.client.getEndpoint().stoa);
-        this.socket.on("new_block", this.onNewBlock.bind(this));
-        this.socket.on("new_tx_acc", this.onNewTransaction.bind(this));
-        this.socket.emit("subscribe", { address: "block" });
-        for (const account of this.accounts.items) {
-            this.subscribe(account.address);
-        }
+        this.socket.on(
+            "connect",
+            (() => {
+                this.initialize();
+            }).bind(this)
+        );
     }
 }
