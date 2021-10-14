@@ -27,7 +27,7 @@ export {
     hashPart,
 } from "./modules/common/Hash";
 export { Height } from "./modules/common/Height";
-export { KeyPair, PublicKey, SecretKey } from "./modules/common/KeyPair";
+export { KeyPair, PublicKey, SecretKey, VersionByte } from "./modules/common/KeyPair";
 export { Signature } from "./modules/common/Signature";
 export { Scalar, Point } from "./modules/common/ECC";
 export { Pair, Schnorr, Message } from "./modules/common/Schnorr";
@@ -97,7 +97,7 @@ export { Account, AccountContainer, AccountMode } from "./modules/wallet/Account
 export { Event, EventDispatcher, TListener } from "./modules/wallet/EventDispatcher";
 export { WalletTxBuilder, WalletTxBuilderSingleReceiver } from "./modules/wallet/WalletTxBuilder";
 export { WalletWatcher } from "./modules/wallet/WalletWatcher";
-export { AmountConverter } from "./modules/wallet/WalletUtil";
+export { AmountConverter, WalletValidator } from "./modules/wallet/WalletUtil";
 
 import JSBI from "jsbi";
 export { JSBI };

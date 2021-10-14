@@ -100,7 +100,7 @@ export class KeyPair {
  * Define the public key / address
  */
 export class PublicKey {
-    private static HumanReadablePart = "boa";
+    public static HumanReadablePart = "boa";
 
     /**
      * The instance of the Point
@@ -330,7 +330,7 @@ export class SecretKey {
  * @ignore
  * Discriminant for Stellar binary-encoded user-facing data
  */
-enum VersionByte {
+export enum VersionByte {
     /**
      * Used for encoded stellar addresses
      * Base32-encodes to 'G...'

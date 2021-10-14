@@ -12,6 +12,7 @@
 *******************************************************************************/
 
 // tslint:disable-next-line:no-implicit-dependencies
+import { BOASodium } from "boa-sodium-ts";
 import * as sdk from "../../lib";
 
 import assert from "assert";
@@ -129,6 +130,134 @@ describe("Test of AmountConverter", () => {
         assert.deepStrictEqual(
             sdk.AmountConverter.toString(new sdk.Amount(sdk.JSBI.BigInt("1000000000000000")), true, 8),
             "100,000,000.00000000"
+        );
+    });
+});
+
+describe("Test of WalletValidator", () => {
+    before("Wait for the package libsodium to finish loading", () => {
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
+        return sdk.SodiumHelper.init();
+    });
+
+    it("Test of WalletValidator.isValidPublicKey()", () => {
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidPublicKey("bob1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssuz4lg0"),
+            {
+                code: sdk.WalletResultCode.InvalidPublicKeyFormat,
+                message: "Invalid in the human-readable part",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidPublicKey("boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssu34lg0"),
+            {
+                code: sdk.WalletResultCode.InvalidPublicKey,
+                message: "Invalid checksum for boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssu34lg0",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidPublicKey("boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssuz4lg"),
+            {
+                code: sdk.WalletResultCode.InvalidPublicKeyLength,
+                message: "Invalid public key length",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidPublicKey("boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssuz4lg0"),
+            {
+                code: sdk.WalletResultCode.Success,
+                message: sdk.WalletMessage.Success,
+            }
+        );
+    });
+
+    it("Test of WalletValidator.isValidSecretKey()", () => {
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidSecretKey("SDV3GLVZ6W7R7UFB2EMMY4BBFJWNCQB5FTCXUMD5ZCFTDEVZZ3RQ2BZ"),
+            {
+                code: sdk.WalletResultCode.InvalidSecretKeyLength,
+                message: "Invalid secret key length",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidSecretKey("SDV3GLVZ6W7R7UFB2EMMY4BBFJWNCQB5FTCXUMD5ZCFTDEVZZ3RQ2BZ_"),
+            {
+                code: sdk.WalletResultCode.InvalidSecretKeyFormat,
+                message: "This is not a valid secret key format",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidSecretKey("GDD5RFGBIUAFCOXQA246BOUPHCK7ZL2NSHDU7DVAPNPTJJKVPJMNLQFW"),
+            {
+                code: sdk.WalletResultCode.InvalidSecretKey,
+                message: "This is not a valid secret key type",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidSecretKey("SDV3GLVZ6W7R7UFB2EMMY4BBFJWNCQB5FTCXUMD5ZCFTDEVZZ3RQ2BZI"),
+            {
+                code: sdk.WalletResultCode.Success,
+                message: sdk.WalletMessage.Success,
+            }
+        );
+    });
+
+    it("Test of WalletValidator.isValidSecretKeyAgainstPublicKey()", () => {
+        const kp1 = sdk.KeyPair.random();
+        const kp2 = sdk.KeyPair.random();
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidSecretKeyAgainstPublicKey(kp1.secret.toString(false), kp2.address.toString()),
+            {
+                code: sdk.WalletResultCode.InvalidKeyPair,
+                message: "This is not a valid key pair",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidSecretKeyAgainstPublicKey(kp1.secret.toString(false), kp1.address.toString()),
+            {
+                code: sdk.WalletResultCode.Success,
+                message: sdk.WalletMessage.Success,
+            }
+        );
+    });
+
+    it("Test of WalletValidator.isValidHash()", () => {
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidHash(
+                "a0ad987cffcf2e3f96af64dd197d95d4e8e41be4448f6abebd8953b3c37b3132a1a1917c2046f6d3550cac70299110b28f23454d6124892ab2b8a6508f2bfe4700"
+            ),
+            {
+                code: sdk.WalletResultCode.InvalidHashFormat,
+                message: "Invalid hash format",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidHash(
+                "0xa0ad987cffcf2e3f96af64dd197d95d4e8e41be4448f6abebd8953b3c37b3132a1a1917c2046f6d3550cac70299110b28f23454d6124892ab2b8a6508f2bfe"
+            ),
+            {
+                code: sdk.WalletResultCode.InvalidHashLength,
+                message: "Invalid hash length",
+            }
+        );
+
+        assert.deepStrictEqual(
+            sdk.WalletValidator.isValidHash(
+                "0xa0ad987cffcf2e3f96af64dd197d95d4e8e41be4448f6abebd8953b3c37b3132a1a1917c2046f6d3550cac70299110b28f23454d6124892ab2b8a6508f2bfe47"
+            ),
+            {
+                code: sdk.WalletResultCode.Success,
+                message: sdk.WalletMessage.Success,
+            }
         );
     });
 });
