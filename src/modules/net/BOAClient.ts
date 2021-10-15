@@ -402,6 +402,7 @@ export class BOAClient {
      * @param peer      This is used when users want to look up only specific
      * Peer is the withdrawal address in the inbound transaction and a deposit address
      * in the outbound transaction address of their counterparts.
+     * @deprecated Use getWalletTransactionHistory
      */
     public getWalletTransactionsHistory(
         address: PublicKey,
@@ -486,6 +487,7 @@ export class BOAClient {
     /**
      * Request a overview of a transaction.
      * @param tx_hash The hash of the transaction
+     * @deprecated Use getWalletTransactionDetail
      */
     public getWalletTransactionOverview(tx_hash: Hash): Promise<ITxOverview> {
         return new Promise<ITxOverview>((resolve, reject) => {
