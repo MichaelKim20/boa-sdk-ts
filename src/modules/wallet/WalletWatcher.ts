@@ -163,6 +163,7 @@ export class WalletWatcher extends EventDispatcher {
                 if (height > this.height) {
                     this.height = height;
                     this.accounts.checkBalance();
+                    this.dispatchEvent(Event.NEW_BLOCK, this.height);
                 }
             }
         } catch (e) {
