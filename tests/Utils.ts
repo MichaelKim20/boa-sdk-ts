@@ -477,6 +477,144 @@ export const sample_txs_history_client = [
     },
 ];
 
+export const sample_tx_history_client = {
+    header: {
+        address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+        page_size: 10,
+        page: 1,
+        total_page: 1,
+        type: ["inbound", "outbound", "freeze", "payload"],
+    },
+    items: [
+        {
+            display_tx_type: "inbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e",
+            peer_count: 1,
+            height: "9",
+            time: 1601553600,
+            tx_hash:
+                "0xf3a013153900f6416af03efc855df3880e3927fff386b3635bf46cd6e2c54769f88bd24128b6b935ab95af803cc41412fe9079b4ed7684538d86840115838814",
+            tx_type: "payment",
+            amount: "610000000000000",
+            unlock_height: "10",
+            unlock_time: 1601554200,
+        },
+        {
+            display_tx_type: "outbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e",
+            peer_count: 1,
+            height: "8",
+            time: 1600953600,
+            tx_hash:
+                "0x63341a4502434e2c89d0f4e46cb9cbd27dfa8a6d244685bb5eb6635d634b2179b49108e949f176906a13b8685254b1098ebf1adf44033f5c9dd6b4362c14b020",
+            tx_type: "payment",
+            amount: "-610000000000000",
+            unlock_height: "9",
+            unlock_time: 1600954200,
+        },
+        {
+            display_tx_type: "inbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e",
+            peer_count: 1,
+            height: "7",
+            time: 1600353600,
+            tx_hash:
+                "0xcf3ca7b3d5c8f6bac821a7812318eb2ab89a6b9345c5e8dbf41d5e69067c3e38642cf8679187d9c0a5ae11477f0e9d632ed950fb25baf4bcfd9b397a4a611d01",
+            tx_type: "payment",
+            amount: "610000000000000",
+            unlock_height: "8",
+            unlock_time: 1600354200,
+        },
+        {
+            display_tx_type: "outbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e",
+            peer_count: 1,
+            height: "6",
+            time: 1599753600,
+            tx_hash:
+                "0xb14c45657f4fd6ff7dc0a64c08c29304704c4c0c54096a8d3cdcff9a33d31ccfe64b3fe5d26527e90d53519189497b1c602b84db659f90d58f9d8ec10088f572",
+            tx_type: "payment",
+            amount: "-610000000000000",
+            unlock_height: "7",
+            unlock_time: 1599754200,
+        },
+        {
+            display_tx_type: "inbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e",
+            peer_count: 1,
+            height: "5",
+            time: 1599153600,
+            tx_hash:
+                "0x22152566c7d705f419752bb7907984f8071ecce51368774b42980b150cd967a72ca38bc4d3b2c6d94989458f17fcf365820f656d9bbdf2091f13c24947509fe2",
+            tx_type: "payment",
+            amount: "610000000000000",
+            unlock_height: "6",
+            unlock_time: 1599154200,
+        },
+        {
+            display_tx_type: "outbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e",
+            peer_count: 1,
+            height: "4",
+            time: 1598553600,
+            tx_hash:
+                "0x85f160d6018473ee4e38dbcb784d7e7e69ae8db77d8ab6de27e373feeb6d0e6e35d1d4952063e7a0efec3a2a7aad8b72399fecc0655b1920cfb6fc9403e5c72a",
+            tx_type: "payment",
+            amount: "-610000000000000",
+            unlock_height: "5",
+            unlock_time: 1598554200,
+        },
+        {
+            display_tx_type: "inbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e",
+            peer_count: 1,
+            height: "3",
+            time: 1597953600,
+            tx_hash:
+                "0x148891ad8dfaa13276434bfbc9525111dea803de185afe4dd12e5564b23163399e9f37bfdba4e9041ea189377f184cc25533e3361479e2e0c8dc461abe86bbfa",
+            tx_type: "payment",
+            amount: "610000000000000",
+            unlock_height: "4",
+            unlock_time: 1597954200,
+        },
+        {
+            display_tx_type: "outbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "boa1xrw66w303s5x05ej9uu6djc54kue29j72kah22xqqcrtqj57ztwm5uh524e",
+            peer_count: 1,
+            height: "2",
+            time: 1597353600,
+            tx_hash:
+                "0x2ff28f6f890be85fe2d23ff0e42bd7e5c8626cb7749e00978dd7296b28583effdb038db5a1922b06eddb5c7b23bc67e9db8d3ce3ee9b701854ab05a8cc313caa",
+            tx_type: "payment",
+            amount: "-610000000000000",
+            unlock_height: "3",
+            unlock_time: 1597354200,
+        },
+        {
+            display_tx_type: "inbound",
+            address: "boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9",
+            peer: "GDAZW22V4WVQ6Y6ILIKY3BNODEWBXXK5VY2B3HACFM6VWV4JEEAPDHCC",
+            peer_count: 1,
+            height: "1",
+            time: 1596753600,
+            tx_hash:
+                "0x520d6766f3142d391d80ac1a47d63d7978476415030f9ff61eea2374dda1b85e7f699364d7f8db8993dd078de6f95f525c5e2d66cd20fea2ed34c340b44db9f3",
+            tx_type: "payment",
+            amount: "610000000000000",
+            unlock_height: "2",
+            unlock_time: 1596754200,
+        },
+    ],
+};
+
 export const sample_tx_overview_client = {
     height: "9",
     time: 1601553600,
@@ -1005,6 +1143,16 @@ export class TestStoa {
             } catch (error) {
                 res.status(400).send(`Invalid value for parameter 'hash': ${String(req.params.hash)}`);
             }
+        });
+
+        // GET /wallet/transaction/history/:address
+        this.app.get("/wallet/transaction/history/:address", (req: express.Request, res: express.Response) => {
+            const address: string = String(req.params.address);
+            if (sdk.PublicKey.validate(address) !== "") {
+                res.status(400).send(`Invalid value for parameter 'address': ${address}`);
+                return;
+            }
+            res.status(200).send(JSON.stringify(sample_tx_history_client));
         });
 
         // GET /wallet/transaction/detail/:hash

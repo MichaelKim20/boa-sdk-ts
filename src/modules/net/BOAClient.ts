@@ -24,7 +24,15 @@ import { handleNetworkError } from "./error/ErrorTypes";
 import { Request } from "./Request";
 import { Balance } from "./response/Balance";
 import { TransactionFee } from "./response/TransactionFee";
-import { BalanceType, IPendingTxs, ISPVStatus, ITxDetail, ITxHistoryElement, ITxOverview } from "./response/Types";
+import {
+    BalanceType,
+    IPendingTxs,
+    ISPVStatus,
+    ITxDetail,
+    ITxHistory,
+    ITxHistoryElement,
+    ITxOverview,
+} from "./response/Types";
 import { UnspentTxOutput } from "./response/UnspentTxOutput";
 import { Validator } from "./response/Validator";
 
@@ -407,6 +415,52 @@ export class BOAClient {
         return new Promise<ITxHistoryElement[]>((resolve, reject) => {
             const url = uri(this.server_url)
                 .directory("/wallet/transactions/history/")
+                .filename(address.toString())
+                .addSearch("pageSize", page_size.toString())
+                .addSearch("page", page.toString())
+                .addSearch("type", type.join(","));
+
+            if (begin !== undefined) url.addSearch("beginDate", begin.toString());
+
+            if (end !== undefined) url.addSearch("endDate", end.toString());
+
+            if (peer !== undefined) url.addSearch("peer", peer);
+
+            Request()
+                .get(url.toString())
+                .then((response: AxiosResponse) => {
+                    resolve(response.data);
+                })
+                .catch((reason: any) => {
+                    reject(handleNetworkError(reason));
+                });
+        });
+    }
+
+    /**
+     * Request a history of transactions.
+     * @param address   An address that want to be inquired.
+     * @param page_size Maximum record count that can be obtained from one query
+     * @param page      The number on the page, this value begins with 1
+     * @param type      The parameter `type` is the type of transaction to query. ("inbound", "outbound")
+     * @param begin     The start date of the range of dates to look up.
+     * @param end       The end date of the range of dates to look up.
+     * @param peer      This is used when users want to look up only specific
+     * Peer is the withdrawal address in the inbound transaction and a deposit address
+     * in the outbound transaction address of their counterparts.
+     */
+    public getWalletTransactionHistory(
+        address: PublicKey,
+        page_size: number,
+        page: number,
+        type: string[],
+        begin?: number,
+        end?: number,
+        peer?: string
+    ): Promise<ITxHistory> {
+        return new Promise<ITxHistory>((resolve, reject) => {
+            const url = uri(this.server_url)
+                .directory("/wallet/transaction/history/")
                 .filename(address.toString())
                 .addSearch("pageSize", page_size.toString())
                 .addSearch("page", page.toString())

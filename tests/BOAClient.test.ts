@@ -20,6 +20,7 @@ import {
     sample_txs_pending_client,
     sample_tx_client,
     sample_tx_detail_client,
+    sample_tx_history_client,
 } from "./Utils";
 // tslint:disable-next-line:no-duplicate-imports
 import { sample_tx_hash_client, sample_tx_overview_client, sample_utxo_client } from "./Utils";
@@ -845,8 +846,22 @@ describe("BOA Client", () => {
 
         // Query
         const public_key = new sdk.PublicKey("boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9");
-        const data = await boa_client.getWalletTransactionsHistory(public_key, 10, 1, ["payment", "freeze"]);
+        const data = await boa_client.getWalletTransactionsHistory(public_key, 10, 1, ["inbound", "outbound"]);
         assert.deepStrictEqual(data, sample_txs_history_client);
+    });
+
+    it("Test a function of the BOA Client - `getWalletTransactionHistory`", async () => {
+        // Set URL
+        const stoa_uri = URI("http://localhost").port(stoa_port);
+        const agora_uri = URI("http://localhost").port(agora_port);
+
+        // Create BOA Client
+        const boa_client = new sdk.BOAClient(stoa_uri.toString(), agora_uri.toString());
+
+        // Query
+        const public_key = new sdk.PublicKey("boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9");
+        const data = await boa_client.getWalletTransactionHistory(public_key, 10, 1, ["inbound", "outbound"]);
+        assert.deepStrictEqual(data, sample_tx_history_client);
     });
 
     it("Test a function of the BOA Client - `getWalletTransactionOverview`", async () => {

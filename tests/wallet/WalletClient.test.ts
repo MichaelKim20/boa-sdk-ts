@@ -22,6 +22,7 @@ import {
     sample_txs_pending_client,
     sample_tx_client,
     sample_tx_detail_client,
+    sample_tx_history_client,
 } from "../Utils";
 // tslint:disable-next-line:no-duplicate-imports
 import { sample_tx_hash_client, sample_tx_overview_client, sample_utxo_client } from "../Utils";
@@ -117,6 +118,19 @@ describe("Wallet Client", () => {
         assert.deepStrictEqual(res.code, sdk.WalletResultCode.Success);
         assert.ok(res.data !== undefined);
         assert.deepStrictEqual(res.data, sample_txs_history_client);
+    });
+
+    it("Test a function of the Wallet Client - `getTransactionHistory`", async () => {
+        const wallet_client = new sdk.WalletClient({
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        });
+
+        const public_key = new sdk.PublicKey("boa1xrx66ezhd6uzx2s0plpgtwwmwmv4tfzvgp5sswqcg8z6m79s05pactt2yc9");
+        const res = await wallet_client.getTransactionHistory(public_key, 10, 1, ["inbound", "outbound"]);
+        assert.deepStrictEqual(res.code, sdk.WalletResultCode.Success);
+        assert.ok(res.data !== undefined);
+        assert.deepStrictEqual(res.data, sample_tx_history_client);
     });
 
     it("Test a function of the Wallet Client - `getTransactionOverview`", async () => {

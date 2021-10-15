@@ -18,7 +18,15 @@ import { Transaction } from "../data/Transaction";
 import { BOAClient } from "../net/BOAClient";
 import { Balance } from "../net/response/Balance";
 import { TransactionFee } from "../net/response/TransactionFee";
-import { BalanceType, IPendingTxs, ISPVStatus, ITxDetail, ITxHistoryElement, ITxOverview } from "../net/response/Types";
+import {
+    BalanceType,
+    IPendingTxs,
+    ISPVStatus,
+    ITxDetail,
+    ITxHistory,
+    ITxHistoryElement,
+    ITxOverview,
+} from "../net/response/Types";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
 import { DefaultWalletEndpoint, IWalletEndpoint, IWalletResult, WalletMessage, WalletResultCode } from "./Types";
 import { WalletBalance } from "./WalletBalance";
@@ -193,6 +201,44 @@ export class WalletClient {
         let value: ITxHistoryElement[];
         try {
             value = await this.client.getWalletTransactionsHistory(address, page_size, page, type, begin, end, peer);
+        } catch (e) {
+            return { code: WalletResultCode.FailedRequest, message: e.message };
+        }
+
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: value,
+        };
+    }
+
+    /**
+     * Request a history of transactions.
+     * @param address   An address that want to be inquired.
+     * @param page_size Maximum record count that can be obtained from one query
+     * @param page      The number on the page, this value begins with 1
+     * @param type      The parameter `type` is the type of transaction to query. ("payment", "freeze")
+     * @param begin     The start date of the range of dates to look up.
+     * @param end       The end date of the range of dates to look up.
+     * @param peer      This is used when users want to look up only specific
+     * Peer is the withdrawal address in the inbound transaction and a deposit address
+     * in the outbound transaction address of their counterparts.
+     */
+    public async getTransactionHistory(
+        address: PublicKey,
+        page_size: number,
+        page: number,
+        type: string[],
+        begin?: number,
+        end?: number,
+        peer?: string
+    ): Promise<IWalletResult<ITxHistory>> {
+        const check_res: IWalletResult<ITxHistory> = await this.checkServer();
+        if (check_res.code !== WalletResultCode.Success) return check_res;
+
+        let value: ITxHistory;
+        try {
+            value = await this.client.getWalletTransactionHistory(address, page_size, page, type, begin, end, peer);
         } catch (e) {
             return { code: WalletResultCode.FailedRequest, message: e.message };
         }
