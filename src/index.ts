@@ -98,6 +98,7 @@ export { Event, EventDispatcher, TListener } from "./modules/wallet/EventDispatc
 export { WalletTxBuilder, WalletTxBuilderSingleReceiver } from "./modules/wallet/WalletTxBuilder";
 export { WalletWatcher } from "./modules/wallet/WalletWatcher";
 export { AmountConverter, WalletValidator } from "./modules/wallet/WalletUtil";
+export { WalletMA } from "./modules/wallet/WalletMA";
 
 import JSBI from "jsbi";
 export { JSBI };

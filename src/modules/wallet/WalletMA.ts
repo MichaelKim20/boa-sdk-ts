@@ -19,26 +19,24 @@ import { WalletTxBuilder } from "./WalletTxBuilder";
 import { WalletWatcher } from "./WalletWatcher";
 
 /**
+ * It is a Wallet with Multi Accounts
  * It is a class that enables integrated management of necessary classes in a wallet with multiple accounts.
  */
 export class WalletMA {
     /**
      * The instance of the WalletClient
-     * @private
      */
-    private _client: WalletClient;
+    public client: WalletClient;
 
     /**
      * The instance of the AccountContainer
-     * @private
      */
-    private _accounts: AccountContainer;
+    public accounts: AccountContainer;
 
     /**
      * The instance of the WalletWatcher
-     * @private
      */
-    private _watcher: WalletWatcher;
+    public watcher: WalletWatcher;
 
     /**
      * The instances of the WalletTxBuilder
@@ -48,52 +46,23 @@ export class WalletMA {
     public builders: Map<string, WalletTxBuilder>;
 
     /**
-     * The endpoints of wallet
-     * @private
-     */
-    private _endpoint: IWalletEndpoint;
-
-    /**
      * Constructor
      * @param endpoint The endpoints of wallet
      */
     constructor(endpoint: IWalletEndpoint) {
-        this._endpoint = endpoint;
-        this._client = new WalletClient(this._endpoint);
-        this._accounts = new AccountContainer(this._client);
-        this._watcher = new WalletWatcher(this._accounts, this._client, 10000);
+        this.client = new WalletClient(endpoint);
+        this.accounts = new AccountContainer(this.client);
+        this.watcher = new WalletWatcher(this.accounts, this.client, 10000);
         this.builders = new Map<string, WalletTxBuilder>();
         this.watcher.initialize();
     }
 
     /**
-     * The instance of the WalletClient
-     */
-    public get client() {
-        return this._client;
-    }
-
-    /**
-     * The instance of the AccountContainer
-     */
-    public get accounts() {
-        return this._accounts;
-    }
-
-    /**
-     * The instance of the WalletWatcher
-     */
-    public get watcher() {
-        return this._watcher;
-    }
-
-    /**
      * Set the endpoints of wallet, Agora's endpoint & Stoa's endpoint
-     * @param endpoint    The endpoints of wallet
+     * @param endpoint The endpoints of wallet
      */
     public setEndpoint(endpoint: IWalletEndpoint) {
-        this._endpoint = endpoint;
-        this._client = new WalletClient(this._endpoint);
+        this.client.setEndpoint(endpoint);
     }
 
     /**
@@ -101,7 +70,7 @@ export class WalletMA {
      * @return The endpoints of wallet
      */
     public getEndpoint(): IWalletEndpoint {
-        return this._endpoint;
+        return this.client.getEndpoint();
     }
 
     private static _instance: WalletMA | null = null;
