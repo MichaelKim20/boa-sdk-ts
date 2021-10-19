@@ -273,16 +273,24 @@ export class AccountContainer extends EventDispatcher {
         this._items.splice(findIdx, 1);
         this.detachEventListener(account);
 
-        if (is_dispatch) this.dispatchEvent(Event.REMOVED, account);
-        if (is_dispatch) this.dispatchEvent(Event.CHANGE);
-
+        let change_selected = false;
         if (findIdx <= this.selected_index) {
             if (this._items.length === 0) {
                 this._selected_index = -1;
-                if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
+                change_selected = true;
             } else {
-                if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
+                if (this.selected_index > 0) {
+                    this.selected_index--;
+                    change_selected = true;
+                }
             }
+        }
+
+        if (is_dispatch) this.dispatchEvent(Event.REMOVED, account);
+        if (is_dispatch) this.dispatchEvent(Event.CHANGE);
+
+        if (change_selected) {
+            if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
         }
 
         return account;

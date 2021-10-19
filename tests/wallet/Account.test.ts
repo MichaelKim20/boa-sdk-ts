@@ -201,4 +201,27 @@ describe("AccountContainer", () => {
             assert.deepStrictEqual(deserialized.items[idx].address, accounts.items[idx].address);
         }
     });
+
+    it("Test AccountList - remove", () => {
+        const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+        const accounts = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
+
+        kps.forEach((value, idx) => {
+            accounts.add("Account" + idx.toString(), value.secret);
+        });
+        assert.strictEqual(accounts.length, kps.length);
+
+        accounts.selected_index = accounts.length - 1;
+        accounts.addEventListener(sdk.Event.REMOVED, () => {
+            assert.strictEqual(accounts.selected_index, 3);
+        });
+        if (accounts.selected_account) {
+            accounts.remove(accounts.selected_account.name);
+            assert.strictEqual(accounts.selected_index, 3);
+        }
+    });
 });
