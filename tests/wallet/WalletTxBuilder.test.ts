@@ -307,7 +307,7 @@ class TestAgora {
 }
 
 describe("Wallet Transaction Builder", function () {
-    this.timeout(12000);
+    this.timeout(20000);
 
     let agora_server: TestAgora;
     let stoa_server: TestStoa;

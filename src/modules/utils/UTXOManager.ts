@@ -283,7 +283,7 @@ export class UTXOProvider {
             // Not Enough Amount
             if (additional.length === 0) {
                 this.items.forEach((m) => {
-                    if (result.find((n) => m.utxo.data.compare(n.utxo.data) !== undefined)) {
+                    if (result.find((n) => Buffer.compare(m.utxo.data, n.utxo.data) === 0) !== undefined) {
                         m.used = false;
                     }
                 });
