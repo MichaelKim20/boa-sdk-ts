@@ -245,17 +245,25 @@ export class AccountContainer extends EventDispatcher {
             if (account !== undefined) return undefined;
         }
 
+        let changed = false;
         account = new Account(this, name, key);
         this._items.push(account);
         this.attachEventListener(account);
 
-        if (is_dispatch) this.dispatchEvent(Event.ADDED, account);
-        if (is_dispatch) this.dispatchEvent(Event.CHANGE);
-
-        if (this.selected_index < 0) this._selected_index = 0;
+        if (this.selected_index < 0) {
+            this._selected_index = 0;
+            changed = true;
+        }
 
         if (change_select) {
             this._selected_index = this._items.length - 1;
+            changed = true;
+        }
+
+        if (is_dispatch) this.dispatchEvent(Event.ADDED, account);
+        if (is_dispatch) this.dispatchEvent(Event.CHANGE);
+
+        if (changed) {
             if (is_dispatch) this.dispatchEvent(Event.CHANGE_SELECTED, this.selected_index);
         }
         return account;
