@@ -340,6 +340,12 @@ export class WalletTxBuilder extends EventDispatcher {
     protected _fee_rate: number;
 
     /**
+     * The size of transaction
+     * @private
+     */
+    private _size_tx: number;
+
+    /**
      * Constructor
      * @param client The wallet client to request
      */
@@ -358,6 +364,7 @@ export class WalletTxBuilder extends EventDispatcher {
         this._remaining = Amount.make(0);
 
         this._fee_rate = Utils.FEE_RATE;
+        this._size_tx = Transaction.getEstimatedNumberOfBytes(1, 2, 0);
     }
 
     /**
@@ -634,6 +641,9 @@ export class WalletTxBuilder extends EventDispatcher {
             let sender_drawn = Amount.make(0);
 
             // Calculate the size of the transaction.
+            this._size_tx = this.getEstimatedSize(in_count + sender.utxos.length, out_count, this._payload.length);
+
+            // Calculate the fee of the transaction.
             fee = this.getEstimatedFee(in_count + sender.utxos.length, out_count, this._payload.length);
 
             // Calculate the total fee.
@@ -767,13 +777,21 @@ export class WalletTxBuilder extends EventDispatcher {
      * @private
      */
     private getEstimatedFee(num_input: number, num_output: number, num_bytes_payload: number): Amount {
-        return Amount.make(
-            this._fee_rate *
-                Transaction.getEstimatedNumberOfBytes(
-                    Math.max(num_input, 1),
-                    Math.max(num_output, 2),
-                    num_bytes_payload
-                )
+        return Amount.make(this._fee_rate * this.getEstimatedSize(num_input, num_output, num_bytes_payload));
+    }
+
+    /**
+     * Get the estimated transaction size
+     * @param num_input         The number of the transaction inputs
+     * @param num_output        The number of the transaction outputs
+     * @param num_bytes_payload The size of the transaction _payload
+     * @private
+     */
+    private getEstimatedSize(num_input: number, num_output: number, num_bytes_payload: number): number {
+        return Transaction.getEstimatedNumberOfBytes(
+            Math.max(num_input, 1),
+            Math.max(num_output, 2),
+            num_bytes_payload
         );
     }
 
@@ -805,15 +823,10 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param value The option value  (High, Medium, Low)
      */
     public async setFeeOption(value: WalletTransactionFeeOption) {
-        let num_input = 0;
-        for (const sender of this._senders.items) {
-            num_input += sender.utxos.length;
-        }
-        const tx_size = Transaction.getEstimatedNumberOfBytes(Math.max(num_input, 1), 2, 0);
-        const fee_res = await this._client.getTransactionFee(tx_size);
+        const fee_res = await this._client.getTransactionFee(this._size_tx);
         if (fee_res.code === WalletResultCode.Success && fee_res.data !== undefined) {
             this._fee_option = value;
-            this._fee_rate = JSBI.toNumber(Amount.divide(fee_res.data.getFee(this._fee_option), tx_size).value);
+            this._fee_rate = JSBI.toNumber(Amount.divide(fee_res.data.getFee(this._fee_option), this._size_tx).value);
             if (this._fee_rate < Utils.FEE_RATE) this._fee_rate = Utils.FEE_RATE;
         } else {
             this._fee_rate = Utils.FEE_RATE;
@@ -831,8 +844,7 @@ export class WalletTxBuilder extends EventDispatcher {
         for (const sender of this._senders.items) {
             num_input += sender.utxos.length;
         }
-        const tx_size = Transaction.getEstimatedNumberOfBytes(Math.max(num_input, 1), 2, 0);
-        const _fee_rate = JSBI.toNumber(Amount.divide(tx_fee, tx_size).value);
+        const _fee_rate = JSBI.toNumber(Amount.divide(tx_fee, this._size_tx).value);
         if (_fee_rate < Utils.FEE_RATE) {
             this._fee_rate = Utils.FEE_RATE;
         } else {
@@ -840,7 +852,7 @@ export class WalletTxBuilder extends EventDispatcher {
         }
         await this.calculate();
 
-        return Amount.multiply(Amount.make(this._fee_rate), tx_size);
+        return Amount.multiply(Amount.make(this._fee_rate), this._size_tx);
     }
 
     /**
@@ -858,6 +870,7 @@ export class WalletTxBuilder extends EventDispatcher {
         this._remaining = Amount.make(0);
         this._total_spendable = Amount.make(0);
         this._payload = Buffer.alloc(0);
+        this._size_tx = Transaction.getEstimatedNumberOfBytes(1, 2, 0);
     }
 
     /**
