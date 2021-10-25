@@ -162,7 +162,7 @@ export class TxBuilder {
 
         const _unlocker = unlocker !== undefined ? unlocker : this.keyUnlocker;
         tx.inputs.forEach((value, idx) => {
-            const raw = this.inputs.find((m) => Buffer.compare(m.utxo.data, value.utxo.data) === 0);
+            const raw = this.inputs.find((m) => Hash.equal(m.utxo, value.utxo));
             if (raw !== undefined) value.unlock = _unlocker(tx, raw, idx);
         });
 

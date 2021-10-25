@@ -59,7 +59,7 @@ export class TxCanceller {
      * @param utxo The hash of UTXO
      */
     private findUTXO(utxo: Hash): UnspentTxOutput | undefined {
-        return this.utxos.find((m) => Buffer.compare(m.utxo.data, utxo.data) === 0);
+        return this.utxos.find((m) => Hash.equal(m.utxo, utxo));
     }
 
     /**
@@ -67,7 +67,7 @@ export class TxCanceller {
      * @param address The public key
      */
     private findKey(address: PublicKey): KeyPair | undefined {
-        return this.key_pairs.find((m) => Buffer.compare(m.address.data, address.data) === 0);
+        return this.key_pairs.find((m) => PublicKey.equal(m.address, address));
     }
 
     /**

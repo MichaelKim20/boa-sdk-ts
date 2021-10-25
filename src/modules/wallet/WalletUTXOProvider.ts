@@ -133,7 +133,7 @@ export class WalletUTXOProvider {
             if (res.data.length === 0) {
                 // Not Enough Amount
                 this.items.forEach((m) => {
-                    if (result.find((n) => Buffer.compare(m.utxo.data, n.utxo.data) === 0) !== undefined) {
+                    if (result.find((n) => Hash.equal(m.utxo, n.utxo)) !== undefined) {
                         m.used = false;
                     }
                 });

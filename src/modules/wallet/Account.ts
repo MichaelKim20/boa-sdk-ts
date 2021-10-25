@@ -229,7 +229,7 @@ export class AccountContainer extends EventDispatcher {
         if (account !== undefined) return undefined;
 
         if (key instanceof PublicKey) {
-            account = this._items.find((m) => Buffer.compare(m.address.data, key.data) === 0);
+            account = this._items.find((m) => PublicKey.equal(m.address, key));
             if (account !== undefined) return undefined;
         }
 
@@ -237,9 +237,9 @@ export class AccountContainer extends EventDispatcher {
             const pk = new PublicKey(key.scalar.toPoint());
             account = this._items.find((m) => {
                 if (m.secret !== undefined) {
-                    return Buffer.compare(m.secret.data, key.data) === 0;
+                    return SecretKey.equal(m.secret, key);
                 } else {
-                    return Buffer.compare(m.address.data, pk.data) === 0;
+                    return PublicKey.equal(m.address, pk);
                 }
             });
             if (account !== undefined) return undefined;
@@ -314,7 +314,7 @@ export class AccountContainer extends EventDispatcher {
 
         if (PublicKey.validate(key) === "") {
             const public_key = new PublicKey(key);
-            account = this._items.find((m) => Buffer.compare(m.address.data, public_key.data) === 0);
+            account = this._items.find((m) => PublicKey.equal(m.address, public_key));
             if (account !== undefined) return account;
         }
 
@@ -323,9 +323,9 @@ export class AccountContainer extends EventDispatcher {
             const public_key = new PublicKey(secret_key.scalar.toPoint());
             account = this._items.find((m) => {
                 if (m.secret !== undefined) {
-                    return Buffer.compare(m.secret.data, secret_key.data) === 0;
+                    return SecretKey.equal(m.secret, secret_key);
                 } else {
-                    return Buffer.compare(m.address.data, public_key.data) === 0;
+                    return PublicKey.equal(m.address, public_key);
                 }
             });
             if (account !== undefined) return account;

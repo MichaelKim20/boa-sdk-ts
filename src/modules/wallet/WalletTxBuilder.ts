@@ -13,7 +13,7 @@
 *******************************************************************************/
 
 import { Amount } from "../common/Amount";
-import { hashFull, makeUTXOKey } from "../common/Hash";
+import { Hash, hashFull, makeUTXOKey } from "../common/Hash";
 import { KeyPair, PublicKey } from "../common/KeyPair";
 import { Transaction } from "../data/Transaction";
 import { TxInput } from "../data/TxInput";
@@ -142,7 +142,7 @@ export class WalletReceiverContainer extends EventDispatcher {
      */
     public add(receiver: IWalletReceiver, replace: boolean = true): boolean {
         if (replace) {
-            const elem = this.items.find((m) => Buffer.compare(m.address.data, receiver.address.data) === 0);
+            const elem = this.items.find((m) => PublicKey.equal(m.address, receiver.address));
             if (elem !== undefined) elem.amount = receiver.amount;
             else this.items.push(new WalletReceiver(receiver.address, receiver.amount));
         } else {
@@ -157,8 +157,7 @@ export class WalletReceiverContainer extends EventDispatcher {
      */
     public remove(receiver: IWalletReceiver): boolean {
         const idx = this.items.findIndex(
-            (m) =>
-                Buffer.compare(m.address.data, receiver.address.data) === 0 && Amount.equal(m.amount, receiver.amount)
+            (m) => PublicKey.equal(m.address, receiver.address) && Amount.equal(m.amount, receiver.amount)
         );
         if (idx < 0) return false;
         this.items.splice(idx, 1);
@@ -172,7 +171,7 @@ export class WalletReceiverContainer extends EventDispatcher {
     public removeAddress(address: PublicKey): boolean {
         let changed = false;
         while (true) {
-            const idx = this.items.findIndex((m) => Buffer.compare(m.address.data, address.data) === 0);
+            const idx = this.items.findIndex((m) => PublicKey.equal(m.address, address));
             if (idx < 0) break;
             this.items.splice(idx, 1);
             changed = true;
@@ -212,7 +211,7 @@ export class WalletSenderContainer extends EventDispatcher {
      * @param drawn The amount to be withdrawn.
      */
     public add(account: Account, drawn: Amount): WalletSender | undefined {
-        const elem = this.items.find((m) => Buffer.compare(m.account.address.data, account.address.data) === 0);
+        const elem = this.items.find((m) => PublicKey.equal(m.account.address, account.address));
         if (elem !== undefined) return undefined;
         const sender = new WalletSender(account);
         sender.drawn = Amount.make(drawn);
@@ -225,7 +224,7 @@ export class WalletSenderContainer extends EventDispatcher {
      * @param account The account of the sender to be removed
      */
     public remove(account: Account): WalletSender | undefined {
-        const idx = this.items.findIndex((m) => Buffer.compare(m.account.address.data, account.address.data) === 0);
+        const idx = this.items.findIndex((m) => PublicKey.equal(m.account.address, account.address));
         if (idx < 0) return undefined;
         const sender = this.items[idx];
         this.items.splice(idx, 1);
@@ -1021,7 +1020,7 @@ export class WalletTxBuilder extends EventDispatcher {
         for (const input of tx.inputs) {
             let found;
             for (const sender of this._senders.items) {
-                found = sender.utxos.find((utxo) => Buffer.compare(utxo.utxo.data, input.utxo.data) === 0);
+                found = sender.utxos.find((utxo) => Hash.equal(utxo.utxo, input.utxo));
                 if (found !== undefined) {
                     s.push({
                         utxo: found.utxo,
@@ -1066,7 +1065,7 @@ export class WalletTxBuilderSingleReceiver extends WalletTxBuilder {
      */
     public async setReceiverAddress(address: PublicKey) {
         let changed = false;
-        if (this._receiver_address === undefined || Buffer.compare(this._receiver_address.data, address.data) !== 0) {
+        if (this._receiver_address === undefined || !PublicKey.equal(this._receiver_address, address)) {
             changed = true;
         }
         this._receiver_address = new PublicKey(address.data);
