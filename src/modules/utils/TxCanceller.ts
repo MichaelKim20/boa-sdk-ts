@@ -76,32 +76,33 @@ export class TxCanceller {
     private validate(): ITxCancelResult {
         if (this.tx.inputs.length === 0)
             return {
-                code: TxCancelResultCode.InvalidTransaction,
+                code: TxCancelResultCode.Cancel_InvalidTransaction,
                 message: "This transaction is invalid and cannot be canceled.",
             };
 
         if (this.key_pairs.length === 0)
-            return { code: TxCancelResultCode.NotFoundKey, message: "Secret key not found." };
+            return { code: TxCancelResultCode.Cancel_NotFoundKey, message: "Secret key not found." };
 
         for (const input of this.tx.inputs) {
             const u = this.findUTXO(input.utxo);
             if (u === undefined)
-                return { code: TxCancelResultCode.NotFoundUTXO, message: "UTXO information not found." };
+                return { code: TxCancelResultCode.Cancel_NotFoundUTXO, message: "UTXO information not found." };
 
             if (u.lock_type !== LockType.Key)
                 return {
-                    code: TxCancelResultCode.UnsupportedLockType,
+                    code: TxCancelResultCode.Cancel_UnsupportedLockType,
                     message: "This LockType not supported by cancel feature.",
                 };
 
             const pk = new PublicKey(Buffer.from(u.lock_bytes, "base64"));
             const found = this.findKey(pk);
-            if (found === undefined) return { code: TxCancelResultCode.NotFoundKey, message: "Secret key not found." };
+            if (found === undefined)
+                return { code: TxCancelResultCode.Cancel_NotFoundKey, message: "Secret key not found." };
 
             // Unfreezing transactions cannot be canceled.
             if (u.type === OutputType.Freeze)
                 return {
-                    code: TxCancelResultCode.UnsupportedUnfreezing,
+                    code: TxCancelResultCode.Cancel_NotAllowUnfreezing,
                     message: "Unfreeze transactions cannot be canceled.",
                 };
         }
@@ -118,7 +119,7 @@ export class TxCanceller {
         // Fees for cancellation transactions can be set larger than existing fees.
         // Make sure it's big enough to work it out.
         if (Amount.lessThan(amount_info.sum_input, Amount.add(total_fee, Amount.make(this.tx.inputs.length))))
-            return { code: TxCancelResultCode.NotEnoughFee, message: "Not enough fees are needed to cancel." };
+            return { code: TxCancelResultCode.Cancel_NotEnoughFee, message: "Not enough fees are needed to cancel." };
 
         return { code: TxCancelResultCode.Success, message: "Success." };
     }
@@ -248,12 +249,12 @@ interface ITxAmountInfo {
 
 export enum TxCancelResultCode {
     Success,
-    InvalidTransaction,
-    UnsupportedUnfreezing,
-    NotFoundUTXO,
-    UnsupportedLockType,
-    NotFoundKey,
-    NotEnoughFee,
+    Cancel_InvalidTransaction,
+    Cancel_NotAllowUnfreezing,
+    Cancel_NotFoundUTXO,
+    Cancel_UnsupportedLockType,
+    Cancel_NotFoundKey,
+    Cancel_NotEnoughFee,
     FailedBuildTransaction,
 }
 

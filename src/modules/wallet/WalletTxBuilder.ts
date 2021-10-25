@@ -979,6 +979,10 @@ export class WalletTxBuilder extends EventDispatcher {
         const res_valid: IWalletResult<Transaction> = this.validate();
         if (res_valid.code !== WalletResultCode.Success) return res_valid;
 
+        if (this.getReadOnlyAccount().length > 0) {
+            return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
+        }
+
         const key_pair = KeyPair.random();
         const builder = new TxBuilder(key_pair);
 
@@ -997,7 +1001,7 @@ export class WalletTxBuilder extends EventDispatcher {
         try {
             tx = builder.sign(type, this._fee_tx, this._fee_payload);
         } catch (e) {
-            return { code: WalletResultCode.FailedBuildTransaction, message: e.message };
+            return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
 
         return {

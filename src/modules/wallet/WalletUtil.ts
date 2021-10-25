@@ -13,14 +13,9 @@
 
 import { Amount } from "../common/Amount";
 import { Hash } from "../common/Hash";
-import { KeyPair, PublicKey, SecretKey, VersionByte } from "../common/KeyPair";
-import { validate } from "../utils/CRC16";
-import { SodiumHelper } from "../utils/SodiumHelper";
-import { Utils } from "../utils/Utils";
+import { KeyPair, PublicKey, SecretKey } from "../common/KeyPair";
 import { IWalletResult, WalletMessage, WalletResultCode } from "./Types";
 
-import { base32Decode } from "@ctrl/ts-base32";
-import { bech32m } from "bech32";
 import JSBI from "jsbi";
 
 /**
@@ -108,7 +103,7 @@ export class AmountConverter {
         } catch (e) {
             return {
                 code: WalletResultCode.InvalidAmount,
-                message: e.message,
+                message: WalletMessage.InvalidAmount,
             };
         }
     }
@@ -127,57 +122,9 @@ export class WalletValidator {
         if (key.length !== 63) {
             return {
                 code: WalletResultCode.InvalidPublicKeyLength,
-                message: "Invalid public key length",
+                message: WalletMessage.InvalidPublicKeyLength,
             };
         }
-
-        if (key.length < PublicKey.HumanReadablePart.length || key.slice(0, 3) !== PublicKey.HumanReadablePart)
-            return {
-                code: WalletResultCode.InvalidPublicKeyFormat,
-                message: "Invalid in the human-readable part",
-            };
-
-        let decoded;
-        try {
-            decoded = bech32m.decode(key);
-        } catch (e) {
-            return {
-                code: WalletResultCode.InvalidPublicKey,
-                message: e.message,
-            };
-        }
-
-        if (decoded.prefix !== PublicKey.HumanReadablePart)
-            return {
-                code: WalletResultCode.InvalidPublicKeyFormat,
-                message: "Differ in the human-readable part",
-            };
-
-        const dec_data: number[] = [];
-        if (!Utils.convertBits(dec_data, decoded.words, 5, 8, false))
-            return {
-                code: WalletResultCode.InvalidPublicKeyFormat,
-                message: "Bech32 conversion of base failed",
-            };
-
-        if (dec_data.length !== 1 + SodiumHelper.sodium.crypto_core_ed25519_BYTES)
-            return {
-                code: WalletResultCode.InvalidPublicKey,
-                message: "Decoded data size is not normal",
-            };
-
-        if (dec_data[0] !== VersionByte.AccountID)
-            return {
-                code: WalletResultCode.InvalidPublicKey,
-                message: "This is not a valid address type",
-            };
-
-        const key_data = Buffer.from(dec_data.slice(1));
-        if (!SodiumHelper.sodium.crypto_core_ed25519_is_valid_point(key_data))
-            return {
-                code: WalletResultCode.InvalidPublicKey,
-                message: "This is not a valid Point",
-            };
 
         try {
             const pk = new PublicKey(key);
@@ -188,7 +135,7 @@ export class WalletValidator {
         } catch (e) {
             return {
                 code: WalletResultCode.InvalidPublicKey,
-                message: "This key is not valid",
+                message: WalletMessage.InvalidPublicKey,
             };
         }
     }
@@ -202,39 +149,9 @@ export class WalletValidator {
         if (key.length !== 56) {
             return {
                 code: WalletResultCode.InvalidSecretKeyLength,
-                message: "Invalid secret key length",
+                message: WalletMessage.InvalidSecretKeyLength,
             };
         }
-
-        let decoded: Buffer;
-        try {
-            decoded = Buffer.from(base32Decode(key.trim()));
-        } catch (err) {
-            return {
-                code: WalletResultCode.InvalidSecretKeyFormat,
-                message: "This is not a valid secret key format",
-            };
-        }
-
-        if (decoded.length !== 1 + SodiumHelper.sodium.crypto_core_ed25519_SCALARBYTES + 2)
-            return {
-                code: WalletResultCode.InvalidSecretKey,
-                message: "Decoded data size is not normal",
-            };
-
-        if (decoded[0] !== VersionByte.Seed)
-            return {
-                code: WalletResultCode.InvalidSecretKey,
-                message: "This is not a valid secret key type",
-            };
-
-        const body = decoded.slice(0, -2);
-        const check_sum = decoded.slice(-2);
-        if (!validate(body, check_sum))
-            return {
-                code: WalletResultCode.InvalidSecretKey,
-                message: "Checksum result do not match",
-            };
 
         try {
             const sk = new SecretKey(key);
@@ -244,8 +161,8 @@ export class WalletValidator {
             };
         } catch (e) {
             return {
-                code: WalletResultCode.InvalidPublicKey,
-                message: "This key is not valid",
+                code: WalletResultCode.InvalidSecretKey,
+                message: WalletMessage.InvalidSecretKey,
             };
         }
     }
@@ -274,13 +191,13 @@ export class WalletValidator {
             } else {
                 return {
                     code: WalletResultCode.InvalidKeyPair,
-                    message: "This is not a valid key pair",
+                    message: WalletMessage.InvalidKeyPair,
                 };
             }
         } catch (e) {
             return {
                 code: WalletResultCode.InvalidKeyPair,
-                message: "This is not a valid key pair",
+                message: WalletMessage.InvalidKeyPair,
             };
         }
     }
@@ -294,13 +211,13 @@ export class WalletValidator {
         if (h.length !== 130)
             return {
                 code: WalletResultCode.InvalidHashLength,
-                message: "Invalid hash length",
+                message: WalletMessage.InvalidHashLength,
             };
 
         if (h.substring(0, 2) !== "0x")
             return {
                 code: WalletResultCode.InvalidHashFormat,
-                message: "Invalid hash format",
+                message: WalletMessage.InvalidHashFormat,
             };
 
         try {
@@ -312,7 +229,7 @@ export class WalletValidator {
         } catch (e) {
             return {
                 code: WalletResultCode.InvalidHash,
-                message: "This is not a valid hash",
+                message: WalletMessage.InvalidHash,
             };
         }
     }

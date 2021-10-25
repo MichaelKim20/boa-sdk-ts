@@ -99,23 +99,23 @@ export class WalletClient {
             // Agora Access Test
             try {
                 if (!(await this.client.getAgoraStatus()))
-                    return { code: WalletResultCode.FailedAccessToAgora, message: "Failed access to Agora." };
+                    return { code: WalletResultCode.FailedAccessToAgora, message: WalletMessage.FailedAccessToAgora };
             } catch (e) {
-                return { code: WalletResultCode.FailedAccessToAgora, message: e.message };
+                return { code: WalletResultCode.FailedAccessToAgora, message: WalletMessage.FailedAccessToAgora };
             }
 
             // Stoa Access Test
             try {
                 if (!(await this.client.getStoaStatus()))
-                    return { code: WalletResultCode.FailedAccessToStoa, message: "Failed access to Stoa." };
+                    return { code: WalletResultCode.FailedAccessToStoa, message: WalletMessage.FailedAccessToStoa };
             } catch (e) {
-                return { code: WalletResultCode.FailedAccessToStoa, message: e.message };
+                return { code: WalletResultCode.FailedAccessToStoa, message: WalletMessage.FailedAccessToStoa };
             }
         }
 
         return {
             code: WalletResultCode.Success,
-            message: "Success.",
+            message: WalletMessage.Success,
         };
     }
 
@@ -130,7 +130,7 @@ export class WalletClient {
         try {
             balance = await this.client.getBalance(address);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequestBalance, message: e.message };
+            return { code: WalletResultCode.FailedRequestBalance, message: WalletMessage.FailedRequestBalance };
         }
 
         return {
@@ -159,7 +159,7 @@ export class WalletClient {
         try {
             value = await this.client.getTransactionFee(tx_size);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return { code: WalletResultCode.FailedRequestTxFee, message: WalletMessage.FailedRequestTxFee };
         }
 
         return {
@@ -203,7 +203,10 @@ export class WalletClient {
         try {
             value = await this.client.getWalletTransactionsHistory(address, page_size, page, type, begin, end, peer);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return {
+                code: WalletResultCode.FailedRequestTransactionHistory,
+                message: WalletMessage.FailedRequestTransactionHistory,
+            };
         }
 
         return {
@@ -241,7 +244,10 @@ export class WalletClient {
         try {
             value = await this.client.getWalletTransactionHistory(address, page_size, page, type, begin, end, peer);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return {
+                code: WalletResultCode.FailedRequestTransactionHistory,
+                message: WalletMessage.FailedRequestTransactionHistory,
+            };
         }
 
         return {
@@ -264,7 +270,10 @@ export class WalletClient {
         try {
             value = await this.client.getWalletTransactionOverview(tx_hash);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return {
+                code: WalletResultCode.FailedRequestTransactionOverview,
+                message: WalletMessage.FailedRequestTransactionOverview,
+            };
         }
 
         return {
@@ -286,7 +295,10 @@ export class WalletClient {
         try {
             value = await this.client.getWalletTransactionDetail(tx_hash);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return {
+                code: WalletResultCode.FailedRequestTransactionDetail,
+                message: WalletMessage.FailedRequestTransactionDetail,
+            };
         }
 
         return {
@@ -307,7 +319,10 @@ export class WalletClient {
         try {
             value = await this.client.getWalletTransactionsPending(address);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return {
+                code: WalletResultCode.FailedRequestTransactionPending,
+                message: WalletMessage.FailedRequestTransactionPending,
+            };
         }
 
         return {
@@ -331,7 +346,10 @@ export class WalletClient {
         try {
             value = await this.client.getPendingTransaction(tx_hash);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return {
+                code: WalletResultCode.FailedRequestPendingTransaction,
+                message: WalletMessage.FailedRequestPendingTransaction,
+            };
         }
 
         return {
@@ -353,7 +371,7 @@ export class WalletClient {
         try {
             value = await this.client.getTransaction(tx_hash);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return { code: WalletResultCode.FailedRequestTransaction, message: WalletMessage.FailedRequestTransaction };
         }
 
         return {
@@ -375,7 +393,7 @@ export class WalletClient {
         try {
             value = await this.client.sendTransaction(tx);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return { code: WalletResultCode.FailedSendTx, message: WalletMessage.FailedSendTx };
         }
 
         return {
@@ -396,7 +414,7 @@ export class WalletClient {
         try {
             value = await this.client.getBlockHeight();
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return { code: WalletResultCode.FailedRequestHeight, message: WalletMessage.FailedRequestHeight };
         }
 
         return {
@@ -417,7 +435,7 @@ export class WalletClient {
         try {
             value = await this.client.getVotingFee(payload_size);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return { code: WalletResultCode.FailedRequestVotingFee, message: WalletMessage.FailedRequestVotingFee };
         }
 
         return {
@@ -450,7 +468,7 @@ export class WalletClient {
         try {
             value = await this.client.getWalletUTXOs(address, amount, type, last);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return { code: WalletResultCode.FailedRequestUTXO, message: WalletMessage.FailedRequestUTXO };
         }
 
         return {
@@ -472,7 +490,7 @@ export class WalletClient {
         try {
             value = await this.client.getUTXOInfo(hashes);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return { code: WalletResultCode.FailedRequestUTXOInfo, message: WalletMessage.FailedRequestUTXOInfo };
         }
 
         return {
@@ -496,7 +514,7 @@ export class WalletClient {
         try {
             value = await this.client.verifyPayment(tx_hash);
         } catch (e) {
-            return { code: WalletResultCode.FailedRequest, message: e.message };
+            return { code: WalletResultCode.FailedVerifyPayment, message: WalletMessage.FailedVerifyPayment };
         }
 
         return {

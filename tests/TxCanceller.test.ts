@@ -101,7 +101,7 @@ describe("TxCanceller", () => {
         );
         const canceller = new sdk.TxCanceller(tx, utxos, key_pairs);
         const res = canceller.build();
-        assert.strictEqual(res.code, sdk.TxCancelResultCode.UnsupportedUnfreezing);
+        assert.strictEqual(res.code, sdk.TxCancelResultCode.Cancel_NotAllowUnfreezing);
         assert.ok(res.tx === undefined);
     });
 
@@ -118,7 +118,7 @@ describe("TxCanceller", () => {
         );
         const canceller = new sdk.TxCanceller(tx, utxos, key_pairs);
         const res = canceller.build();
-        assert.strictEqual(res.code, sdk.TxCancelResultCode.NotFoundUTXO);
+        assert.strictEqual(res.code, sdk.TxCancelResultCode.Cancel_NotFoundUTXO);
         assert.ok(res.tx === undefined);
     });
 
@@ -135,7 +135,7 @@ describe("TxCanceller", () => {
         );
         const canceller = new sdk.TxCanceller(tx, utxos, key_pairs);
         const res = canceller.build();
-        assert.strictEqual(res.code, sdk.TxCancelResultCode.UnsupportedLockType);
+        assert.strictEqual(res.code, sdk.TxCancelResultCode.Cancel_UnsupportedLockType);
         assert.ok(res.tx === undefined);
     });
 
@@ -154,7 +154,7 @@ describe("TxCanceller", () => {
         );
         const canceller = new sdk.TxCanceller(tx, utxos, keys);
         const res = canceller.build();
-        assert.strictEqual(res.code, sdk.TxCancelResultCode.NotFoundKey);
+        assert.strictEqual(res.code, sdk.TxCancelResultCode.Cancel_NotFoundKey);
         assert.ok(res.tx === undefined);
     });
 
@@ -168,7 +168,7 @@ describe("TxCanceller", () => {
         const tx = makeOriginalTransaction(key_pairs[0], sdk.JSBI.BigInt(152880), sdk.JSBI.BigInt(10000));
         const canceller = new sdk.TxCanceller(tx, utxos, key_pairs);
         const res = canceller.build();
-        assert.strictEqual(res.code, sdk.TxCancelResultCode.NotEnoughFee);
+        assert.strictEqual(res.code, sdk.TxCancelResultCode.Cancel_NotEnoughFee);
         assert.ok(res.tx === undefined);
     });
 

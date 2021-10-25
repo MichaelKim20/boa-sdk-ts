@@ -145,8 +145,8 @@ describe("Test of WalletValidator", () => {
         assert.deepStrictEqual(
             sdk.WalletValidator.isValidPublicKey("bob1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssuz4lg0"),
             {
-                code: sdk.WalletResultCode.InvalidPublicKeyFormat,
-                message: "Invalid in the human-readable part",
+                code: sdk.WalletResultCode.InvalidPublicKey,
+                message: sdk.WalletMessage.InvalidPublicKey,
             }
         );
 
@@ -154,7 +154,7 @@ describe("Test of WalletValidator", () => {
             sdk.WalletValidator.isValidPublicKey("boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssu34lg0"),
             {
                 code: sdk.WalletResultCode.InvalidPublicKey,
-                message: "Invalid checksum for boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssu34lg0",
+                message: sdk.WalletMessage.InvalidPublicKey,
             }
         );
 
@@ -162,7 +162,7 @@ describe("Test of WalletValidator", () => {
             sdk.WalletValidator.isValidPublicKey("boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssuz4lg"),
             {
                 code: sdk.WalletResultCode.InvalidPublicKeyLength,
-                message: "Invalid public key length",
+                message: sdk.WalletMessage.InvalidPublicKeyLength,
             }
         );
 
@@ -180,15 +180,15 @@ describe("Test of WalletValidator", () => {
             sdk.WalletValidator.isValidSecretKey("SDV3GLVZ6W7R7UFB2EMMY4BBFJWNCQB5FTCXUMD5ZCFTDEVZZ3RQ2BZ"),
             {
                 code: sdk.WalletResultCode.InvalidSecretKeyLength,
-                message: "Invalid secret key length",
+                message: sdk.WalletMessage.InvalidSecretKeyLength,
             }
         );
 
         assert.deepStrictEqual(
             sdk.WalletValidator.isValidSecretKey("SDV3GLVZ6W7R7UFB2EMMY4BBFJWNCQB5FTCXUMD5ZCFTDEVZZ3RQ2BZ_"),
             {
-                code: sdk.WalletResultCode.InvalidSecretKeyFormat,
-                message: "This is not a valid secret key format",
+                code: sdk.WalletResultCode.InvalidSecretKey,
+                message: sdk.WalletMessage.InvalidSecretKey,
             }
         );
 
@@ -196,7 +196,7 @@ describe("Test of WalletValidator", () => {
             sdk.WalletValidator.isValidSecretKey("GDD5RFGBIUAFCOXQA246BOUPHCK7ZL2NSHDU7DVAPNPTJJKVPJMNLQFW"),
             {
                 code: sdk.WalletResultCode.InvalidSecretKey,
-                message: "This is not a valid secret key type",
+                message: sdk.WalletMessage.InvalidSecretKey,
             }
         );
 
@@ -217,7 +217,7 @@ describe("Test of WalletValidator", () => {
             sdk.WalletValidator.isValidSecretKeyAgainstPublicKey(kp1.secret.toString(false), kp2.address.toString()),
             {
                 code: sdk.WalletResultCode.InvalidKeyPair,
-                message: "This is not a valid key pair",
+                message: sdk.WalletMessage.InvalidKeyPair,
             }
         );
 
@@ -237,7 +237,7 @@ describe("Test of WalletValidator", () => {
             ),
             {
                 code: sdk.WalletResultCode.InvalidHashFormat,
-                message: "Invalid hash format",
+                message: sdk.WalletMessage.InvalidHashFormat,
             }
         );
 
@@ -247,7 +247,7 @@ describe("Test of WalletValidator", () => {
             ),
             {
                 code: sdk.WalletResultCode.InvalidHashLength,
-                message: "Invalid hash length",
+                message: sdk.WalletMessage.InvalidHashLength,
             }
         );
 

@@ -137,7 +137,7 @@ export class Wallet {
             }
             utxosToSpend = utxo_res.data;
         } catch (e) {
-            return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
+            return { code: WalletResultCode.FailedRequestUTXO, message: WalletMessage.FailedRequestUTXO };
         }
 
         if (utxosToSpend.length === 0) {
@@ -159,7 +159,7 @@ export class Wallet {
             receiver.forEach((m) => this.txBuilder.addOutput(m.address, m.amount));
             tx = this.txBuilder.sign(output_type, estimatedTxFee, payloadFee);
         } catch (e) {
-            return { code: WalletResultCode.FailedBuildTransaction, message: e.message };
+            return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
 
         // Get the size of the transaction
@@ -174,7 +174,7 @@ export class Wallet {
             }
             fees = fee_res.data;
         } catch (e) {
-            return { code: WalletResultCode.FailedRequestTxFee, message: e.message };
+            return { code: WalletResultCode.FailedRequestTxFee, message: WalletMessage.FailedRequestTxFee };
         }
 
         // Set the fee according to the option of the entered fee.
@@ -197,7 +197,7 @@ export class Wallet {
                 }
                 moreUtxosToSpend = utxo_res.data;
             } catch (e) {
-                return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
+                return { code: WalletResultCode.FailedRequestUTXO, message: WalletMessage.FailedRequestUTXO };
             }
 
             if (moreUtxosToSpend.length === 0) {
@@ -218,7 +218,7 @@ export class Wallet {
                 receiver.forEach((m) => this.txBuilder.addOutput(m.address, m.amount));
                 tx = this.txBuilder.sign(output_type, txFee, payloadFee);
             } catch (e) {
-                return { code: WalletResultCode.FailedBuildTransaction, message: e.message };
+                return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
             }
 
             // Get the size of the transaction
@@ -232,7 +232,7 @@ export class Wallet {
                 }
                 fees = fee_res.data;
             } catch (e) {
-                return { code: WalletResultCode.FailedRequestTxFee, message: e.message };
+                return { code: WalletResultCode.FailedRequestTxFee, message: WalletMessage.FailedRequestTxFee };
             }
 
             // Select medium
@@ -254,7 +254,7 @@ export class Wallet {
             receiver.forEach((m) => this.txBuilder.addOutput(m.address, m.amount));
             tx = this.txBuilder.sign(output_type, txFee, payloadFee);
         } catch (e) {
-            return { code: WalletResultCode.FailedBuildTransaction, message: e.message };
+            return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
 
         try {
@@ -262,7 +262,7 @@ export class Wallet {
         } catch (e) {
             return {
                 code: WalletResultCode.FailedSendTx,
-                message: e.message,
+                message: WalletMessage.FailedSendTx,
             };
         }
 
@@ -301,8 +301,8 @@ export class Wallet {
     ): Promise<IWalletResult<Transaction>> {
         if (tx.isCoinbase()) {
             return {
-                code: WalletResultCode.CoinbaseCanNotCancel,
-                message: WalletMessage.CoinbaseCanNotCancel,
+                code: WalletResultCode.Cancel_NotAllowCoinbase,
+                message: WalletMessage.Cancel_NotAllowCoinbase,
             };
         }
 
@@ -335,46 +335,46 @@ export class Wallet {
 
         // Check for errors that occurred during the cancellation transaction creation process.
         switch (res.code) {
-            case TxCancelResultCode.UnsupportedUnfreezing:
+            case TxCancelResultCode.Cancel_NotAllowUnfreezing:
                 return {
-                    code: WalletResultCode.UnsupportedUnfreezing,
-                    message: res.message,
+                    code: WalletResultCode.Cancel_NotAllowUnfreezing,
+                    message: WalletMessage.Cancel_NotAllowUnfreezing,
                     data: res.tx,
                 };
-            case TxCancelResultCode.InvalidTransaction:
+            case TxCancelResultCode.Cancel_InvalidTransaction:
                 return {
-                    code: WalletResultCode.InvalidTransaction,
-                    message: res.message,
+                    code: WalletResultCode.Cancel_InvalidTransaction,
+                    message: WalletMessage.Cancel_InvalidTransaction,
                     data: res.tx,
                 };
-            case TxCancelResultCode.NotFoundUTXO:
+            case TxCancelResultCode.Cancel_NotFoundUTXO:
                 return {
-                    code: WalletResultCode.NotFoundUTXO,
-                    message: res.message,
+                    code: WalletResultCode.Cancel_NotFoundUTXO,
+                    message: WalletMessage.Cancel_NotFoundUTXO,
                     data: res.tx,
                 };
-            case TxCancelResultCode.UnsupportedLockType:
+            case TxCancelResultCode.Cancel_UnsupportedLockType:
                 return {
-                    code: WalletResultCode.UnsupportedLockType,
-                    message: res.message,
+                    code: WalletResultCode.Cancel_UnsupportedLockType,
+                    message: WalletMessage.Cancel_UnsupportedLockType,
                     data: res.tx,
                 };
-            case TxCancelResultCode.NotFoundKey:
+            case TxCancelResultCode.Cancel_NotFoundKey:
                 return {
-                    code: WalletResultCode.NotFoundKey,
-                    message: res.message,
+                    code: WalletResultCode.Cancel_NotFoundKey,
+                    message: WalletMessage.Cancel_NotFoundKey,
                     data: res.tx,
                 };
-            case TxCancelResultCode.NotEnoughFee:
+            case TxCancelResultCode.Cancel_NotEnoughFee:
                 return {
-                    code: WalletResultCode.NotEnoughFee,
-                    message: res.message,
+                    code: WalletResultCode.Cancel_NotEnoughFee,
+                    message: WalletMessage.Cancel_NotEnoughFee,
                     data: res.tx,
                 };
             case TxCancelResultCode.FailedBuildTransaction:
                 return {
                     code: WalletResultCode.FailedBuildTransaction,
-                    message: res.message,
+                    message: WalletMessage.FailedBuildTransaction,
                     data: res.tx,
                 };
         }
@@ -386,7 +386,7 @@ export class Wallet {
             } catch (e) {
                 return {
                     code: WalletResultCode.FailedSendTx,
-                    message: e.message,
+                    message: WalletMessage.FailedSendTx,
                 };
             }
             return {
@@ -426,7 +426,10 @@ export class Wallet {
             }
             tx = res.data;
         } catch (e) {
-            return { code: WalletResultCode.FailedRequestPendingTransaction, message: e.message };
+            return {
+                code: WalletResultCode.FailedRequestPendingTransaction,
+                message: WalletMessage.FailedRequestPendingTransaction,
+            };
         }
         return this.cancel(tx, key_finder);
     }
@@ -454,7 +457,7 @@ export class Wallet {
             }
             unspentTxOutputs = utxo_res.data;
         } catch (e) {
-            return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
+            return { code: WalletResultCode.FailedRequestUTXO, message: WalletMessage.FailedRequestUTXO };
         }
 
         const not_freeze = unspentTxOutputs.some((m) => m.type !== OutputType.Freeze);
@@ -480,7 +483,7 @@ export class Wallet {
             }
             fees = fee_res.data;
         } catch (e) {
-            return { code: WalletResultCode.FailedRequestTxFee, message: e.message };
+            return { code: WalletResultCode.FailedRequestTxFee, message: WalletMessage.FailedRequestTxFee };
         }
 
         // Set the fee according to the option of the entered fee.
@@ -494,7 +497,7 @@ export class Wallet {
             this.txBuilder.addOutput(receiver, amount);
             tx = this.txBuilder.sign(OutputType.Payment, txFee, payloadFee);
         } catch (e) {
-            return { code: WalletResultCode.FailedBuildTransaction, message: e.message };
+            return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
 
         try {
@@ -502,7 +505,7 @@ export class Wallet {
         } catch (e) {
             return {
                 code: WalletResultCode.FailedSendTx,
-                message: e.message,
+                message: WalletMessage.FailedSendTx,
             };
         }
 
@@ -525,7 +528,7 @@ export class Wallet {
             }
             frozenUtxos = utxo_res.data;
         } catch (e) {
-            return { code: WalletResultCode.FailedRequestUTXO, message: e.message };
+            return { code: WalletResultCode.FailedRequestUTXO, message: WalletMessage.FailedRequestUTXO };
         }
 
         return {

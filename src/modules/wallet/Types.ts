@@ -33,24 +33,37 @@ export enum WalletResultCode {
     FailedAccessToStoa = 1002,
     FailedRequestHeight = 1100,
     FailedRequestBalance = 1101,
-    FailedRequestPendingTransaction = 1103,
     FailedRequestUTXO = 1104,
-    FailedRequestTxFee = 1105,
-    FailedRequest = 1106,
+    FailedRequestUTXOInfo = 1105,
+    FailedRequestTransactionHistory = 1106,
+    FailedRequestTransactionPending = 1107,
+    FailedRequestTransactionDetail = 1108,
+    FailedRequestTransactionOverview = 1109,
+    FailedRequestTransaction = 1110,
+    FailedRequestPendingTransaction = 1111,
+    FailedRequestTxFee = 1112,
+    FailedRequestVotingFee = 1113,
+    FailedVerifyPayment = 1114,
+
     NotExistReceiver = 1200,
     NotEnoughAmount = 1201,
+
+    // Unfreezing
     ExistNotFrozenUTXO = 1202,
-    CoinbaseCanNotCancel = 1500,
-    InvalidTransaction = 1501,
-    UnsupportedUnfreezing = 1502,
-    NotFoundUTXO = 1503,
-    UnsupportedLockType = 1504,
-    NotFoundKey = 1505,
-    NotEnoughFee = 1506,
+
+    // Cancellation of Transaction
+    Cancel_NotAllowCoinbase = 1500,
+    Cancel_InvalidTransaction = 1501,
+    Cancel_NotAllowUnfreezing = 1502,
+    Cancel_NotFoundUTXO = 1503,
+    Cancel_UnsupportedLockType = 1504,
+    Cancel_NotFoundKey = 1505,
+    Cancel_NotEnoughFee = 1506,
+
     NotAssignedReceiver = 1600,
     NotAssignedReceiverAmount = 1601,
-    NotAssignedSender = 1601,
     InsufficientAmount = 1602,
+    ExistUnknownSecretKey = 1603,
     FailedBuildTransaction = 1800,
     FailedSendTx = 2000,
 
@@ -81,6 +94,73 @@ export enum WalletResultCode {
 
     // System
     SystemError = 9100,
+}
+
+export enum WalletMessage {
+    Success = "Success",
+    FailedAccessToAgora = "Failed access to Agora.",
+    FailedAccessToStoa = "Failed access to Stoa.",
+    FailedRequestHeight = "Failed to process a request for block height.",
+    FailedRequestBalance = "Failed to process a request for the balance of the account.",
+    FailedRequestUTXO = "Failed to process a request for UTXOs.",
+    FailedRequestUTXOInfo = "Failed to process a request for UTXO information.",
+    FailedRequestTransactionHistory = "Failed to process a request for the history of the transactions.",
+    FailedRequestTransactionPending = "Failed to process a request for the list of the pending transactions.",
+    FailedRequestTransactionDetail = "Failed to process a request for the detail of a transaction.",
+    FailedRequestTransactionOverview = "Failed to process a request for the overview of a transaction.",
+    FailedRequestTransaction = "Failed to process a request for a transaction.",
+    FailedRequestPendingTransaction = "Failed to process a request for a pending transaction.",
+    FailedRequestTxFee = "Failed to process a request for the fee of the transaction.",
+    FailedRequestVotingFee = "Failed to process a request for voting fee.",
+    FailedVerifyPayment = "Failed to process a request for verify payment of the transaction.",
+
+    NotExistReceiver = "Not exists any receiver.",
+    NotEnoughAmount = "Not enough amount.",
+
+    // Unfreezing
+    ExistNotFrozenUTXO = "UTXO not frozen exists.",
+
+    // Cancellation of Transaction
+    Cancel_NotAllowCoinbase = "Transactions of type Coinbase cannot be canceled.",
+    Cancel_InvalidTransaction = "This is not a valid transaction.",
+    Cancel_NotAllowUnfreezing = "Unfreeze transactions cannot be canceled.",
+    Cancel_NotFoundUTXO = "UTXO information not found.",
+    Cancel_UnsupportedLockType = "This LockType not supported by cancel feature.",
+    Cancel_NotFoundKey = "Secret key not found.",
+    Cancel_NotEnoughFee = "Not enough fees are needed to cancel.",
+
+    NotAssignedReceiver = "Not assigned any receiver.",
+    NotAssignedReceiverAmount = "Not assigned any receiver amount.",
+    InsufficientAmount = "Insufficient amount.",
+    ExistUnknownSecretKey = "An account exists where the secret key is unknown.",
+    FailedBuildTransaction = "An exception occurred in the process of building a transaction.",
+    FailedSendTx = "Failed to process a transfer transaction.",
+
+    // Valid Public Key
+    InvalidPublicKey = "This is not a valid public key.",
+    InvalidPublicKeyLength = "This is not a valid public key length.",
+    InvalidPublicKeyFormat = "This is not a valid public key format.",
+
+    // Valid Secret Key
+    InvalidSecretKey = "This is not a valid secret key.",
+    InvalidSecretKeyLength = "This is not a valid secret key length.",
+    InvalidSecretKeyFormat = "This is not a valid secret key format.",
+
+    // Valid KeyPair
+    InvalidKeyPair = "This is not a valid key pair.",
+
+    // Valid Hash
+    InvalidHash = "This is not a valid hash.",
+    InvalidHashLength = "This is not a valid hash length.",
+    InvalidHashFormat = "This is not a valid hash format.",
+
+    // Valid Amount
+    InvalidAmount = "This is not a valid amount.",
+    InvalidAmountFormat = "This is not a valid amount format.",
+
+    UnknownError = "Unknown error occurred.",
+
+    SystemError = "System error occurred.",
 }
 
 /**
@@ -122,6 +202,7 @@ export interface IWalletSender {
      */
     spendable: Amount;
 }
+
 /**
  * This is the return value that is delivered after processing the wallet function.
  */
@@ -184,23 +265,6 @@ export function DefaultWalletEndpoint(): IWalletEndpoint {
         agora: "http://127.0.0.1:2826",
         stoa: "http://127.0.0.1:3836",
     };
-}
-
-export enum WalletMessage {
-    Success = "Success",
-    FailedAccessToAgora = "Failed access to Agora.",
-    FailedAccessToStoa = "Failed access to Stoa.",
-    NotEnoughAmount = "Not enough amount.",
-    NotExistReceiver = "Not exists any receiver.",
-    ExistNotFrozenUTXO = "UTXO not frozen exists.",
-    CoinbaseCanNotCancel = "Transactions of type Coinbase cannot be canceled.",
-    UnknownError = "Unknown error occurred.",
-    SystemError = "System error occurred.",
-    NotAssignedReceiver = "Not assigned any receiver",
-    NotAssignedReceiverAmount = "Not assigned any receiver amount",
-    InsufficientAmount = "Insufficient amount",
-    InvalidAmount = "This is not a valid amount",
-    InvalidAmountFormat = "This is not a valid amount format",
 }
 
 export interface ITransactionOverviewReceiver {
