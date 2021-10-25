@@ -78,6 +78,36 @@ describe("Hash", () => {
         assert.strictEqual(h3.toString(), h2.toString());
     });
 
+    it("Test of Hash.equal", () => {
+        const bytes1 = Buffer.from(sdk.iota(sdk.Hash.Width).map((m) => m));
+        const bytes2 = Buffer.from(sdk.iota(sdk.Hash.Width).map((m) => m));
+        const bytes3 = Buffer.from(sdk.iota(sdk.Hash.Width).map((m) => m));
+        bytes3[sdk.Hash.Width - 1] = 0;
+
+        const h1 = new sdk.Hash(bytes1);
+        const h2 = new sdk.Hash(bytes2);
+        const h3 = new sdk.Hash(bytes3);
+        assert.strictEqual(sdk.Hash.equal(h1, h2), true);
+        assert.strictEqual(sdk.Hash.equal(h1, h3), false);
+    });
+
+    it("Test of Hash.compare", () => {
+        const bytes1 = Buffer.from(sdk.iota(sdk.Hash.Width).map((m) => m));
+        const bytes2 = Buffer.from(sdk.iota(sdk.Hash.Width).map((m) => m));
+        const bytes3 = Buffer.from(sdk.iota(sdk.Hash.Width).map((m) => m));
+        bytes1[sdk.Hash.Width - 1] = 0;
+        bytes2[sdk.Hash.Width - 1] = 1;
+        bytes3[sdk.Hash.Width - 1] = 2;
+
+        const h1 = new sdk.Hash(bytes1);
+        const h2 = new sdk.Hash(bytes2);
+        const h3 = new sdk.Hash(bytes3);
+        assert.strictEqual(sdk.Hash.compare(h1, h2) < 0, true);
+        assert.strictEqual(sdk.Hash.compare(h2, h3) < 0, true);
+        assert.strictEqual(sdk.Hash.compare(h3, h1) > 0, true);
+        assert.strictEqual(sdk.Hash.compare(h2, h1) > 0, true);
+    });
+
     it("Test of multi hash of string", () => {
         const pre_image = new sdk.Hash(
             "0x76c481db1ebcc0dbd463115b2f1d66e012c62725eee4b266498657f2d6b9a236f5606384b06fca25f8c2eb6d68885878a09902ec6d01ed1b47cb4b725a672584"

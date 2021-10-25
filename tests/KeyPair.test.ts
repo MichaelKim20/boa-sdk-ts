@@ -240,4 +240,30 @@ describe("KeyPair", () => {
         random_bytes = Buffer.from("1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ec", "hex").reverse();
         assert.ok(sdk.KeyPair.isValidRandomBytes(random_bytes));
     });
+
+    it("Test of PublicKey.equal, SecretKey.equal", () => {
+        const key1 = sdk.KeyPair.random();
+        const key2 = sdk.KeyPair.random();
+        const key3 = sdk.KeyPair.fromSeed(key1.secret);
+
+        assert.strictEqual(sdk.PublicKey.equal(key1.address, key2.address), false);
+        assert.strictEqual(sdk.PublicKey.equal(key1.address, key3.address), true);
+
+        assert.strictEqual(sdk.SecretKey.equal(key1.secret, key2.secret), false);
+        assert.strictEqual(sdk.SecretKey.equal(key1.secret, key3.secret), true);
+    });
+
+    it("Test of PublicKey.compare, SecretKey.compare", () => {
+        const bytes1 = Buffer.from("ecd3f55c1a631258d69cf7a2def9de0410000000000000000000000000000000", "hex");
+        const bytes2 = Buffer.from("ecd3f55c1a631258d69cf7a2def9de0410000000000000000000000000000001", "hex");
+
+        bytes1[sdk.Utils.SIZE_OF_SECRET_KEY - 1] = 0;
+        bytes2[sdk.Utils.SIZE_OF_SECRET_KEY - 1] = 1;
+
+        const key1 = sdk.KeyPair.fromSeed(new sdk.SecretKey(bytes1));
+        const key2 = sdk.KeyPair.fromSeed(new sdk.SecretKey(bytes2));
+
+        assert.strictEqual(sdk.PublicKey.compare(key1.address, key2.address) < 0, true);
+        assert.strictEqual(sdk.SecretKey.compare(key1.secret, key2.secret) < 0, true);
+    });
 });

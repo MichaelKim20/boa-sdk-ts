@@ -128,6 +128,24 @@ export class Hash {
     public clone(): Hash {
         return new Hash(this.data);
     }
+
+    /**
+     * Compare whether the two hash are the same.
+     * If it is the same, the true is returned. If different, false is returned.
+     */
+    public static equal(a: Hash, b: Hash): boolean {
+        return Buffer.compare(a.data, b.data) === 0;
+    }
+
+    /**
+     * Compare whether the two hash are the same.
+     * If a is greater than b, it returns a positive number,
+     * if a is less than b, it returns a negative number,
+     * and if a and b are equal, it returns zero.
+     */
+    public static compare(a: Hash, b: Hash): number {
+        return Utils.compareBuffer(a.data, b.data);
+    }
 }
 
 /**

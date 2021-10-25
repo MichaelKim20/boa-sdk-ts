@@ -226,6 +226,24 @@ export class PublicKey {
     public toJSON(): string {
         return this.toString();
     }
+
+    /**
+     * Compare whether the two public keys are the same.
+     * If it is the same, the true is returned. If different, false is returned.
+     */
+    public static equal(a: PublicKey, b: PublicKey): boolean {
+        return Buffer.compare(a.data, b.data) === 0;
+    }
+
+    /**
+     * Compare whether the two public keys are the same.
+     * If a is greater than b, it returns a positive number,
+     * if a is less than b, it returns a negative number,
+     * and if a and b are equal, it returns zero.
+     */
+    public static compare(a: PublicKey, b: PublicKey): number {
+        return Utils.compareBuffer(a.data, b.data);
+    }
 }
 
 /**
@@ -323,6 +341,24 @@ export class SecretKey {
         const cs = checksum(body);
         const decoded = Buffer.concat([body, cs]);
         return base32Encode(decoded);
+    }
+
+    /**
+     * Compare whether the two secret keys are the same.
+     * If it is the same, the true is returned. If different, false is returned.
+     */
+    public static equal(a: SecretKey, b: SecretKey): boolean {
+        return Buffer.compare(a.data, b.data) === 0;
+    }
+
+    /**
+     * Compare whether the two secret keys are the same.
+     * If a is greater than b, it returns a positive number,
+     * if a is less than b, it returns a negative number,
+     * and if a and b are equal, it returns zero.
+     */
+    public static compare(a: SecretKey, b: SecretKey): number {
+        return Utils.compareBuffer(a.data, b.data);
     }
 }
 
