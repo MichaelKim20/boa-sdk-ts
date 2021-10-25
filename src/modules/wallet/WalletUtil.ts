@@ -13,7 +13,7 @@
 
 import { Amount } from "../common/Amount";
 import { Hash } from "../common/Hash";
-import { PublicKey, SecretKey, VersionByte } from "../common/KeyPair";
+import { KeyPair, PublicKey, SecretKey, VersionByte } from "../common/KeyPair";
 import { validate } from "../utils/CRC16";
 import { SodiumHelper } from "../utils/SodiumHelper";
 import { Utils } from "../utils/Utils";
@@ -197,7 +197,7 @@ export class WalletValidator {
      * Validate the secret key string.
      * @param secretKey The string of secret key
      */
-    public static isValidSecretKey(secretKey: string): IWalletResult<void> {
+    public static isValidSecretKey(secretKey: string): IWalletResult<any> {
         const key = secretKey.trim();
         if (key.length !== 56) {
             return {
@@ -255,7 +255,7 @@ export class WalletValidator {
      * @param secretKey the string of the secret key
      * @param publicKey the string of the public key
      */
-    public static isValidSecretKeyAgainstPublicKey(secretKey: string, publicKey: string): IWalletResult<void> {
+    public static isValidSecretKeyAgainstPublicKey(secretKey: string, publicKey: string): IWalletResult<any> {
         const validPublicKey: IWalletResult<void> = this.isValidPublicKey(publicKey);
         const validSecretKey: IWalletResult<void> = this.isValidSecretKey(secretKey);
 
@@ -289,7 +289,7 @@ export class WalletValidator {
      * Validate the hash string
      * @param value The string of the hash
      */
-    public static isValidHash(value: string): IWalletResult<void> {
+    public static isValidHash(value: string): IWalletResult<any> {
         const h = value.trim();
         if (h.length !== 130)
             return {
@@ -315,5 +315,54 @@ export class WalletValidator {
                 message: "This is not a valid hash",
             };
         }
+    }
+}
+
+/**
+ * This class contains utility for the wallet
+ */
+export class WalletUtils {
+    /**
+     * Create a new keypair
+     */
+    public static createKeyPair(): IWalletResult<KeyPair> {
+        let key: KeyPair;
+        try {
+            key = KeyPair.random();
+        } catch (e) {
+            return {
+                code: WalletResultCode.SystemError,
+                message: WalletMessage.SystemError,
+            };
+        }
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: key,
+        };
+    }
+
+    /**
+     * Restore a keypair using the secret key.
+     */
+    public static createKeyPairFromSecretKey(secret: string): IWalletResult<KeyPair> {
+        const res: IWalletResult<KeyPair> = WalletValidator.isValidSecretKey(secret);
+        if (res.code !== WalletResultCode.Success) return res;
+
+        let key: KeyPair;
+        try {
+            const secretKey = new SecretKey(secret);
+            key = KeyPair.fromSeed(secretKey);
+        } catch (e) {
+            return {
+                code: WalletResultCode.SystemError,
+                message: WalletMessage.SystemError,
+            };
+        }
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: key,
+        };
     }
 }

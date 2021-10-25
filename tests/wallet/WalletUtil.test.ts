@@ -16,6 +16,7 @@ import { BOASodium } from "boa-sodium-ts";
 import * as sdk from "../../lib";
 
 import assert from "assert";
+import { WalletResultCode } from "../../src";
 
 describe("Test of AmountConverter", () => {
     it("Test of AmountConverter.fromString()", () => {
@@ -259,5 +260,34 @@ describe("Test of WalletValidator", () => {
                 message: sdk.WalletMessage.Success,
             }
         );
+    });
+});
+
+describe("Test of WalletUtils", () => {
+    before("Wait for the package libsodium to finish loading", () => {
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
+        return sdk.SodiumHelper.init();
+    });
+
+    it("Test of WalletUtils.createKeyPair(), WalletUtils.createKeyPairFromSecretKey()", () => {
+        const res = sdk.WalletUtils.createKeyPair();
+
+        assert.strictEqual(res.code, WalletResultCode.Success);
+        assert.ok(res.data !== undefined);
+
+        const random_kp_signature = res.data.secret.sign<Buffer>(Buffer.from("Hello World"));
+        assert.ok(res.data.address.verify<Buffer>(random_kp_signature, Buffer.from("Hello World")));
+
+        // Test whether randomly generated key-pair are reproducible.
+        const secret_string = res.data.secret.toString(false);
+        const reproduced_res = sdk.WalletUtils.createKeyPairFromSecretKey(secret_string);
+        assert.strictEqual(reproduced_res.code, WalletResultCode.Success);
+        assert.ok(reproduced_res.data !== undefined);
+
+        const reproduced_kp_signature = reproduced_res.data.secret.sign<Buffer>(Buffer.from("Hello World"));
+        assert.ok(reproduced_res.data.address.verify<Buffer>(reproduced_kp_signature, Buffer.from("Hello World")));
+
+        assert.deepStrictEqual(res.data.secret, reproduced_res.data.secret);
+        assert.deepStrictEqual(res.data.address, reproduced_res.data.address);
     });
 });

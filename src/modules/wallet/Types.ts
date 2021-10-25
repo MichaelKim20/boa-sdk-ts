@@ -78,6 +78,9 @@ export enum WalletResultCode {
 
     // Other
     UnknownError = 9000,
+
+    // System
+    SystemError = 9100,
 }
 
 /**
@@ -192,6 +195,7 @@ export enum WalletMessage {
     ExistNotFrozenUTXO = "UTXO not frozen exists.",
     CoinbaseCanNotCancel = "Transactions of type Coinbase cannot be canceled.",
     UnknownError = "Unknown error occurred.",
+    SystemError = "System error occurred.",
     NotAssignedReceiver = "Not assigned any receiver",
     NotAssignedReceiverAmount = "Not assigned any receiver amount",
     InsufficientAmount = "Insufficient amount",
