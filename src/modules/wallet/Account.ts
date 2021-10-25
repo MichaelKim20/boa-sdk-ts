@@ -14,8 +14,9 @@
 import { Amount } from "../common/Amount";
 import { PublicKey, SecretKey } from "../common/KeyPair";
 import { BalanceType } from "../net/response/Types";
+import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
 import { Event, EventDispatcher } from "./EventDispatcher";
-import { WalletResultCode } from "./Types";
+import { IWalletResult, WalletMessage, WalletResultCode } from "./Types";
 import { WalletBalance } from "./WalletBalance";
 import { WalletClient } from "./WalletClient";
 import { WalletUTXOProvider } from "./WalletUTXOProvider";
@@ -146,6 +147,30 @@ export class Account extends EventDispatcher {
                 else this.owner.onAccountChangeBalance(Event.CHANGE_BALANCE, this);
             }
         }
+    }
+
+    /**
+     * Returns an array of all frozen UTXOs for addresses already set
+     */
+    public async getFrozenUTXOs(): Promise<IWalletResult<UnspentTxOutput[]>> {
+        let frozenUtxos: UnspentTxOutput[];
+        try {
+            await this.checkBalance();
+            this.frozenUTXOProvider.clear();
+            const utxo_res = await this.frozenUTXOProvider.getUTXO(this.balance.frozen);
+            if (utxo_res.code !== WalletResultCode.Success || utxo_res.data === undefined) {
+                return { code: utxo_res.code, message: utxo_res.message };
+            }
+            frozenUtxos = utxo_res.data;
+        } catch (e) {
+            return { code: WalletResultCode.FailedRequestUTXO, message: WalletMessage.FailedRequestUTXO };
+        }
+
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: frozenUtxos,
+        };
     }
 }
 
