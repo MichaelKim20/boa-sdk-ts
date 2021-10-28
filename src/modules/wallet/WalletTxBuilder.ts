@@ -983,8 +983,24 @@ export class WalletTxBuilder extends EventDispatcher {
             return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
         }
 
-        const key_pair = KeyPair.random();
-        const builder = new TxBuilder(key_pair);
+        const refund_account = this._senders.items
+            .filter((m) => m.enable)
+            .find((m, idx, obj) => {
+                return Amount.equal(m.remaining, Amount.ZERO_BOA) || idx === obj.length - 1;
+            });
+
+        if (refund_account === undefined) {
+            return { code: WalletResultCode.NotAssignedSender, message: WalletMessage.NotAssignedSender };
+        }
+
+        let refund_keypair: KeyPair;
+        if (refund_account.account.secret !== undefined) {
+            refund_keypair = KeyPair.fromSeed(refund_account.account.secret);
+        } else {
+            return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
+        }
+
+        const builder = new TxBuilder(refund_keypair);
 
         if (this._payload.length > 0) builder.assignPayload(this._payload);
         this._senders.items.forEach((s) => {

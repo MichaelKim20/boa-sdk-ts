@@ -726,9 +726,10 @@ describe("Wallet Transaction Builder", function () {
             spendable = sdk.Amount.add(spendable, sdk.Amount.make(elem.balance.spendable));
         });
 
+        const receiver_address = new sdk.PublicKey("boa1xpr00rxtcprlf99dnceuma0ftm9sv03zhtlwfytd5p0dkvzt4ryp595zpjp");
         const send_amount = sdk.Amount.divide(sdk.Amount.multiply(spendable, 10 + Math.floor(Math.random() * 80)), 100);
         await builder.addReceiver({
-            address: new sdk.PublicKey("boa1xpr00rxtcprlf99dnceuma0ftm9sv03zhtlwfytd5p0dkvzt4ryp595zpjp"),
+            address: receiver_address,
             amount: send_amount,
         });
 
@@ -747,6 +748,20 @@ describe("Wallet Transaction Builder", function () {
         const res_overview = builder.getTransactionOverview();
         assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
         assert.ok(res_overview.data !== undefined);
+
+        const receiver = res_overview.data.receivers.find((m) => sdk.PublicKey.equal(m.address, receiver_address));
+        assert.ok(receiver !== undefined);
+        assert.deepStrictEqual(receiver.amount, send_amount);
+
+        const refund_receiver = res_overview.data.receivers.find(
+            (m) => !sdk.PublicKey.equal(m.address, receiver_address)
+        );
+        assert.ok(refund_receiver !== undefined);
+
+        const refund_sender = res_overview.data.senders.find((m) =>
+            sdk.PublicKey.equal(m.address, refund_receiver.address)
+        );
+        assert.ok(refund_sender !== undefined);
     });
 
     class FakeUIComponent {
