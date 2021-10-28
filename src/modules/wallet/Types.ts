@@ -65,6 +65,15 @@ export enum WalletResultCode {
     InsufficientAmount = 1602,
     ExistUnknownSecretKey = 1603,
     NotAssignedSender = 1604,
+
+    Unfreeze_ExistNotFrozenUTXO = 1700,
+    Unfreeze_UnsupportedLockType = 1701,
+    Unfreeze_NotUTXOOwnedAccount = 1702,
+    Unfreeze_NotFrozenUTXO = 1703,
+    Unfreeze_NotFoundUTXO = 1704,
+    Unfreeze_AlreadyAdded = 1705,
+    Unfreeze_NotAssignedUTXO = 1706,
+
     FailedBuildTransaction = 1800,
     FailedSendTx = 2000,
 
@@ -118,9 +127,6 @@ export enum WalletMessage {
     NotExistReceiver = "Not exists any receiver.",
     NotEnoughAmount = "Not enough amount.",
 
-    // Unfreezing
-    ExistNotFrozenUTXO = "UTXO not frozen exists.",
-
     // Cancellation of Transaction
     Cancel_NotAllowCoinbase = "Transactions of type Coinbase cannot be canceled.",
     Cancel_InvalidTransaction = "This is not a valid transaction.",
@@ -137,6 +143,15 @@ export enum WalletMessage {
     NotAssignedSender = "Not assigned any sender.",
     FailedBuildTransaction = "An exception occurred in the process of building a transaction.",
     FailedSendTx = "Failed to process a transfer transaction.",
+
+    // Unfreezing of UTXO
+    Unfreeze_UnsupportedLockType = "The key type of the entered UTXO is not supported by this function.",
+    Unfreeze_NotUTXOOwnedAccount = "This is not UTXO owned by a registered account.",
+    Unfreeze_NotFrozenUTXO = "The entered UTXO is not frozen.",
+    Unfreeze_NotFoundUTXO = "The information on the entered UTXO could not be found on the server. Please check if it's already been used.",
+    Unfreeze_AlreadyAdded = "The entered UTXO has already been added.",
+    Unfreeze_NotAssignedUTXO = "No frozen UTXO has been added.",
+    Unfreeze_ExistNotFrozenUTXO = "Among the entered UTXOs, there are some that are not frozen.",
 
     // Valid Public Key
     InvalidPublicKey = "This is not a valid public key.",

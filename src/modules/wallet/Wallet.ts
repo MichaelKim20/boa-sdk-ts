@@ -462,7 +462,10 @@ export class Wallet {
 
         const not_freeze = unspentTxOutputs.some((m) => m.type !== OutputType.Freeze);
         if (not_freeze) {
-            return { code: WalletResultCode.ExistNotFrozenUTXO, message: WalletMessage.ExistNotFrozenUTXO };
+            return {
+                code: WalletResultCode.Unfreeze_ExistNotFrozenUTXO,
+                message: WalletMessage.Unfreeze_ExistNotFrozenUTXO,
+            };
         }
 
         const payloadFee = Amount.make(0);

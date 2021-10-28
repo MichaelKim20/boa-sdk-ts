@@ -19,6 +19,7 @@ import { Transaction } from "../data/Transaction";
 import { TxInput } from "../data/TxInput";
 import { OutputType } from "../data/TxOutput";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
+import { LockType } from "../script/Lock";
 import { TxBuilder } from "../utils/TxBuilder";
 import { TxPayloadFee } from "../utils/TxPayloadFee";
 import { Utils } from "../utils/Utils";
@@ -1177,5 +1178,408 @@ export class WalletTxBuilderSingleReceiver extends WalletTxBuilder {
 
     public get receiver_amount(): Amount | undefined {
         return this._receiver_amount;
+    }
+}
+
+/**
+ *
+ */
+export class WalletUnfreeze extends EventDispatcher {
+    /**
+     * The account to release frozen UTXO.
+     */
+    private readonly _account: Account;
+
+    /**
+     * The instance of the WalletClient
+     */
+    private readonly _client: WalletClient;
+
+    /**
+     * The UTXOs to be unfrozen
+     */
+    private readonly _utxos: UnspentTxOutput[];
+
+    /**
+     * The option of fee
+     */
+    private _fee_option: WalletTransactionFeeOption;
+
+    /**
+     * The fee of the transaction
+     */
+    private _fee_tx: Amount;
+
+    /**
+     * The amount to be unfrozen, The amount excluding the fee from the frozen amount
+     */
+    private _unfreeze_amount: Amount;
+
+    /**
+     * The ratio of fees to the size of the transaction
+     */
+    private _fee_rate: number;
+
+    /**
+     * Construction
+     * @param owner The account to release frozen UTXO.
+     * @param client The instance of the WalletClient
+     */
+    constructor(owner: Account, client: WalletClient) {
+        super();
+        this._account = owner;
+        this._client = client;
+        this._utxos = [];
+        this._fee_option = WalletTransactionFeeOption.Medium;
+        this._unfreeze_amount = Amount.make(0);
+        this._fee_rate = Utils.FEE_RATE;
+        this._fee_tx = this.getEstimatedFee(1, 1, 0);
+
+        const tx_size = this.getEstimatedSize(1, 1, 0);
+        this._client.getTransactionFee(tx_size).then((res) => {
+            if (res.code === WalletResultCode.Success && res.data !== undefined) {
+                this._fee_rate = JSBI.toNumber(Amount.divide(res.data.getFee(this._fee_option), tx_size).value);
+                if (this._fee_rate < Utils.FEE_RATE) this._fee_rate = Utils.FEE_RATE;
+                this._fee_tx = this.getEstimatedFee(1, 1, 0);
+            } else {
+                this._fee_rate = Utils.FEE_RATE;
+            }
+        });
+    }
+
+    /**
+     * Add a UTXO
+     * @param utxo The UTXO to add
+     */
+    public async addUTXO(utxo: Hash): Promise<IWalletResult<void>> {
+        if (this._utxos.findIndex((m) => Hash.equal(m.utxo, utxo)) < 0) {
+            const res: IWalletResult<any> = await this._client.getUTXOInfo([utxo]);
+            if (res.code === WalletResultCode.Success && res.data !== undefined) {
+                if (res.data.length >= 0) {
+                    const received_utxo: UnspentTxOutput = res.data[0];
+                    const lock_type = received_utxo.lock_type;
+                    const lock_bytes = Buffer.from(received_utxo.lock_bytes, "base64");
+                    if (lock_type !== LockType.Key) {
+                        return {
+                            code: WalletResultCode.Unfreeze_UnsupportedLockType,
+                            message: WalletMessage.Unfreeze_UnsupportedLockType,
+                        };
+                    } else if (Buffer.compare(this._account.address.data, lock_bytes) !== 0) {
+                        return {
+                            code: WalletResultCode.Unfreeze_NotUTXOOwnedAccount,
+                            message: WalletMessage.Unfreeze_NotUTXOOwnedAccount,
+                        };
+                    } else if (received_utxo.type !== OutputType.Freeze) {
+                        return {
+                            code: WalletResultCode.Unfreeze_NotFrozenUTXO,
+                            message: WalletMessage.Unfreeze_NotFrozenUTXO,
+                        };
+                    } else {
+                        this._utxos.push(received_utxo);
+                        await this.calculate();
+                        return {
+                            code: WalletResultCode.Success,
+                            message: WalletMessage.Success,
+                        };
+                    }
+                } else {
+                    return {
+                        code: WalletResultCode.Unfreeze_NotFoundUTXO,
+                        message: WalletMessage.Unfreeze_NotFoundUTXO,
+                    };
+                }
+            } else {
+                return {
+                    code: res.code,
+                    message: res.message,
+                };
+            }
+        } else {
+            return {
+                code: WalletResultCode.Unfreeze_AlreadyAdded,
+                message: WalletMessage.Unfreeze_AlreadyAdded,
+            };
+        }
+    }
+
+    /**
+     * Remove a UTXO
+     * @param utxo The UTXO to remove
+     */
+    public async removeUTXO(utxo: Hash): Promise<IWalletResult<void>> {
+        const found = this._utxos.findIndex((m) => Hash.equal(m.utxo, utxo));
+        if (found >= 0) {
+            this._utxos.splice(found, 1);
+            await this.calculate();
+            return {
+                code: WalletResultCode.Success,
+                message: WalletMessage.Success,
+            };
+        } else {
+            return {
+                code: WalletResultCode.Unfreeze_NotFoundUTXO,
+                message: WalletMessage.Unfreeze_NotFoundUTXO,
+            };
+        }
+    }
+
+    /**
+     * Clear all UTXO
+     */
+    public async clearUTXO() {
+        this._utxos.length = 0;
+        await this.calculate();
+    }
+
+    /**
+     * Get the estimated fee
+     * @param num_input         The number of the transaction inputs
+     * @param num_output        The number of the transaction outputs
+     * @param num_bytes_payload The size of the transaction _payload
+     * @private
+     */
+    private getEstimatedFee(num_input: number, num_output: number, num_bytes_payload: number): Amount {
+        return Amount.make(this._fee_rate * this.getEstimatedSize(num_input, num_output, num_bytes_payload));
+    }
+
+    /**
+     * Get the estimated transaction size
+     * @param num_input         The number of the transaction inputs
+     * @param num_output        The number of the transaction outputs
+     * @param num_bytes_payload The size of the transaction _payload
+     * @private
+     */
+    private getEstimatedSize(num_input: number, num_output: number, num_bytes_payload: number): number {
+        return Transaction.getEstimatedNumberOfBytes(
+            Math.max(num_input, 1),
+            Math.max(num_output, 1),
+            num_bytes_payload
+        );
+    }
+
+    /**
+     * Set the option of transaction fee
+     * @param value The option value  (High, Medium, Low)
+     */
+    public async setFeeOption(value: WalletTransactionFeeOption) {
+        const tx_size = this.getEstimatedSize(this._utxos.length, 1, 0);
+        const fee_res = await this._client.getTransactionFee(tx_size);
+        if (fee_res.code === WalletResultCode.Success && fee_res.data !== undefined) {
+            this._fee_option = value;
+            this._fee_rate = JSBI.toNumber(Amount.divide(fee_res.data.getFee(this._fee_option), tx_size).value);
+            if (this._fee_rate < Utils.FEE_RATE) this._fee_rate = Utils.FEE_RATE;
+        } else {
+            this._fee_rate = Utils.FEE_RATE;
+        }
+        await this.calculate();
+    }
+
+    /**
+     * Set the transaction fee, The adjusted value is returned.
+     * After calculating internally, an event occurs about the change in fees.
+     * @param tx_fee The fee of transaction
+     */
+    public async setTransactionFee(tx_fee: Amount): Promise<Amount> {
+        const tx_size = this.getEstimatedSize(this._utxos.length, 1, 0);
+        const _fee_rate = JSBI.toNumber(Amount.divide(tx_fee, tx_size).value);
+        if (_fee_rate < Utils.FEE_RATE) {
+            this._fee_rate = Utils.FEE_RATE;
+        } else {
+            this._fee_rate = _fee_rate;
+        }
+        await this.calculate();
+
+        return Amount.multiply(Amount.make(this._fee_rate), tx_size);
+    }
+
+    /**
+     * The ratio of fees to the size of the transaction
+     */
+    public get fee_rate(): number {
+        return this._fee_rate;
+    }
+
+    /**
+     * The fee of the transaction
+     */
+    public get fee_tx(): Amount {
+        return Amount.make(this._fee_tx);
+    }
+
+    /**
+     * The fee of _payload
+     */
+    public get fee_payload(): Amount {
+        return Amount.make(0);
+    }
+
+    /**
+     * The payload of a transaction
+     */
+    public get payload(): Buffer {
+        return Buffer.alloc(0);
+    }
+
+    /**
+     * The option of fee
+     */
+    public get fee_option(): WalletTransactionFeeOption {
+        return this._fee_option;
+    }
+
+    /**
+     * The amount to be unfrozen
+     */
+    public get unfreeze_amount(): Amount {
+        return Amount.make(this._unfreeze_amount);
+    }
+
+    /**
+     * Get Sum of UTXO
+     * @private
+     */
+    private getSumOfUTXO(): Amount {
+        return this._utxos.reduce<Amount>((sum, u) => Amount.add(sum, u.amount), Amount.make(0));
+    }
+
+    /**
+     * The amount of UTXO for freeze release is aggregated and fees are calculated.
+     */
+    protected async calculate() {
+        const in_count = this._utxos.length;
+        const out_count = 1;
+        const sumOfUTXO = this.getSumOfUTXO();
+        const tx_size = this.getEstimatedSize(in_count, out_count, 0);
+
+        const new_fee_tx = Amount.make(this._fee_rate * tx_size);
+        if (Amount.greaterThanOrEqual(sumOfUTXO, new_fee_tx)) {
+            const new_unfreeze_amount = Amount.subtract(sumOfUTXO, new_fee_tx);
+
+            if (!Amount.equal(this._fee_tx, new_fee_tx)) {
+                this._fee_tx = Amount.make(new_fee_tx);
+                this.dispatchEvent(Event.CHANGE_TX_FEE, this._fee_tx);
+            }
+
+            if (!Amount.equal(this._unfreeze_amount, new_unfreeze_amount)) {
+                this._unfreeze_amount = Amount.make(new_unfreeze_amount);
+                this.dispatchEvent(Event.CHANGE_RECEIVER);
+            }
+        }
+    }
+
+    /**
+     * Clear all data
+     * @param is_dispatch
+     */
+    public async clear(is_dispatch: boolean = true) {
+        await this.clearUTXO();
+
+        this._fee_rate = Utils.FEE_RATE;
+        this._fee_tx = this.getEstimatedFee(1, 1, 0);
+        this._unfreeze_amount = Amount.make(0);
+    }
+
+    /**
+     * Check if there is a condition to create a transaction.
+     */
+    public validate(): IWalletResult<any> {
+        if (this._utxos.length === 0)
+            return {
+                code: WalletResultCode.Unfreeze_NotAssignedUTXO,
+                message: WalletMessage.Unfreeze_NotAssignedUTXO,
+            };
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+        };
+    }
+
+    /**
+     * Build a transaction.
+     */
+    public buildTransaction(type: OutputType = OutputType.Payment): IWalletResult<Transaction> {
+        const res_valid: IWalletResult<Transaction> = this.validate();
+        if (res_valid.code !== WalletResultCode.Success) return res_valid;
+
+        if (this.getReadOnlyAccount().length > 0) {
+            return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
+        }
+
+        const key_pair = KeyPair.random();
+        const builder = new TxBuilder(key_pair);
+
+        this._utxos.forEach((m) => {
+            builder.addInput(m.utxo, m.amount, this._account.secret);
+        });
+
+        builder.addOutput(this._account.address, this._unfreeze_amount);
+
+        let tx: Transaction;
+        try {
+            tx = builder.sign(type, this._fee_tx, Amount.make(0));
+        } catch (e) {
+            return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
+        }
+
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: tx,
+        };
+    }
+
+    /**
+     * Get the overview of the transaction built
+     */
+    public getTransactionOverview(): IWalletResult<ITransactionOverview> {
+        const res: IWalletResult<Transaction> = this.buildTransaction();
+        if (res.code !== WalletResultCode.Success || res.data === undefined)
+            return {
+                code: res.code,
+                message: res.message,
+            };
+
+        const tx = res.data;
+        const tx_hash = hashFull(tx);
+        const r: ITransactionOverviewReceiver[] = [];
+        for (let idx = 0; idx < tx.outputs.length; idx++) {
+            r.push({
+                utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
+                address: new PublicKey(tx.outputs[idx].lock.bytes),
+                amount: tx.outputs[idx].value,
+            });
+        }
+
+        const s: ITransactionOverviewSender[] = [];
+        for (const input of tx.inputs) {
+            const found = this._utxos.find((utxo) => Hash.equal(utxo.utxo, input.utxo));
+            if (found !== undefined) {
+                s.push({
+                    utxo: found.utxo,
+                    address: this._account.address,
+                    amount: found.amount,
+                });
+            }
+        }
+
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: {
+                receivers: r,
+                senders: s,
+                payload: this.payload,
+                fee_tx: this.fee_tx,
+                fee_payload: this.fee_payload,
+            },
+        };
+    }
+
+    /**
+     * Returns accounts that require a secret key input.
+     */
+    public getReadOnlyAccount(): Account[] {
+        if (this._account.mode === AccountMode.READ_ONLY) return [this._account];
+        else return [];
     }
 }

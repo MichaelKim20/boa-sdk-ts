@@ -9,12 +9,13 @@
     License:
         MIT License. See LICENSE for details.
 
-*******************************************************************************/
+ *******************************************************************************/
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { BOASodium } from "boa-sodium-ts";
 // @ts-ignore
 import * as sdk from "../../lib";
+import { WalletResultCode } from "../../lib";
 
 // tslint:disable-next-line:no-implicit-dependencies
 import bodyParser from "body-parser";
@@ -24,6 +25,7 @@ import * as http from "http";
 
 import * as assert from "assert";
 import URI from "urijs";
+import { sample_utxo_client, sample_utxo_wallet } from "../Utils";
 
 const seeds = [
     "SDLFMXEPWO5BNB64TUZQJP5JJUET2P4QFMTMDSPYELC2LZ6UXMSAOIKE",
@@ -205,6 +207,38 @@ class TestStoa {
                 });
 
             res.status(200).send(JSON.stringify(utxos));
+        });
+
+        // GET /utxos
+        this.app.post("/utxos", (req: express.Request, res: express.Response) => {
+            if (req.body.utxos === undefined) {
+                res.status(400).send({
+                    statusMessage: "Missing 'utxos' object in body",
+                });
+                return;
+            }
+
+            let utxos_hash: sdk.Hash[];
+            try {
+                utxos_hash = req.body.utxos.map((m: string) => new sdk.Hash(m));
+            } catch (error) {
+                res.status(400).send(`Invalid value for parameter 'utxos': ${req.body.utxos.toString()}`);
+                return;
+            }
+
+            const utxo_array: any[] = [];
+            key_pairs.forEach((m) => {
+                const storage_of_address = sample_utxos[m.address.toString()];
+                const utxos_of_address: any[] = storage_of_address.utxo;
+                utxos_hash.forEach((m) => {
+                    const found = utxos_of_address.find((n) => n.utxo === m.toString());
+                    if (found !== undefined) {
+                        utxo_array.push(found);
+                    }
+                });
+            });
+
+            res.status(200).send(JSON.stringify(utxo_array));
         });
 
         this.app.set("port", this.port);
@@ -947,5 +981,135 @@ describe("Wallet Transaction Builder", function () {
         const send_amount3 = sdk.Amount.make(send_amount2);
         await builder.setReceiverAmount(send_amount3);
         assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_RECEIVER) !== undefined, false);
+    });
+});
+
+describe("Test for the class WalletUnfreeze", function () {
+    this.timeout(20000);
+
+    let agora_server: TestAgora;
+    let stoa_server: TestStoa;
+    const agora_port: string = "6020";
+    const stoa_port: string = "7020";
+
+    function makeRandomFrozenUTXO() {
+        const result: any = {};
+        for (const kp of key_pairs) {
+            const utxos: any[] = sdk.iota(0, 10).map((m: number) => {
+                return {
+                    utxo: new sdk.Hash(Buffer.from(sdk.SodiumHelper.sodium.randombytes_buf(sdk.Hash.Width))).toString(),
+                    type: Math.random() + 0.3 > 0.5 ? 1 : 0,
+                    unlock_height: (m + 2).toString(),
+                    amount: sdk.BOA(10 + Math.floor(Math.random() * 10000) / 100).toString(),
+                    height: (m + 1).toString(),
+                    time: m,
+                    lock_type: 0,
+                    lock_bytes: kp.address.data.toString("base64"),
+                };
+            });
+            const values = utxos.reduce<[sdk.JSBI, sdk.JSBI, sdk.JSBI]>(
+                (prev, value) => {
+                    prev[0] = sdk.JSBI.add(prev[0], sdk.JSBI.BigInt(value.amount));
+                    if (value.type === 0) {
+                        prev[1] = sdk.JSBI.add(prev[1], sdk.JSBI.BigInt(value.amount));
+                    } else {
+                        prev[2] = sdk.JSBI.add(prev[2], sdk.JSBI.BigInt(value.amount));
+                    }
+                    return prev;
+                },
+                [sdk.JSBI.BigInt(0), sdk.JSBI.BigInt(0), sdk.JSBI.BigInt(0)]
+            );
+
+            result[kp.address.toString()] = {
+                utxo: utxos,
+                balance: {
+                    address: kp.address.toString(),
+                    balance: values[0].toString(),
+                    spendable: values[1].toString(),
+                    frozen: values[2].toString(),
+                    locked: "0",
+                },
+            };
+        }
+        sample_utxos = result;
+    }
+
+    before("Wait for the package libsodium to finish loading", async () => {
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
+        await sdk.SodiumHelper.init();
+    });
+
+    before("Start TestStoa", async () => {
+        stoa_server = new TestStoa(stoa_port);
+        await stoa_server.start();
+    });
+
+    before("Start TestAgora", async () => {
+        agora_server = new TestAgora(agora_port);
+        await agora_server.start();
+    });
+
+    after("Stop TestStoa", async () => {
+        await stoa_server.stop();
+    });
+
+    after("Stop TestAgora", async () => {
+        await agora_server.stop();
+    });
+
+    before("Create KeyPairs", async () => {
+        key_pairs = seeds.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+    });
+
+    it("Test for the class WalletUnfreeze", async () => {
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+
+        const wallet_client = new sdk.WalletClient(endpoint);
+        const accounts = new sdk.AccountContainer(wallet_client);
+
+        const max_count = 50;
+        for (let count = 0; count < max_count; count++) {
+            // Make Random UTXO
+            makeRandomFrozenUTXO();
+            accounts.clear();
+            accounts.add(key_pairs[0].address.toString(), key_pairs[0].secret);
+            const account = accounts.items[accounts.items.length - 1];
+            const unfreeze_builder = new sdk.WalletUnfreeze(account, wallet_client);
+            await unfreeze_builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
+            const res = await account.getFrozenUTXOs();
+
+            assert.strictEqual(res.code, WalletResultCode.Success);
+            assert.ok(res.data !== undefined);
+
+            for (const m of res.data) await unfreeze_builder.addUTXO(m.utxo);
+
+            // Calculate sum of UTXO
+            const sum = res.data.reduce<sdk.Amount>(
+                (prev, value) => sdk.Amount.add(prev, value.amount),
+                sdk.Amount.make(0)
+            );
+
+            // Verify amount
+            assert.deepStrictEqual(sum, sdk.Amount.add(unfreeze_builder.unfreeze_amount, unfreeze_builder.fee_tx));
+
+            // Build Transaction
+            const res_builder = unfreeze_builder.buildTransaction();
+            assert.deepStrictEqual(res_builder.code, sdk.WalletResultCode.Success);
+            assert.ok(res_builder.data !== undefined);
+
+            // Create Overview
+            const res_overview = unfreeze_builder.getTransactionOverview();
+            assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
+            assert.ok(res_overview.data !== undefined);
+
+            assert.deepStrictEqual(res_overview.data.receivers.length, 1);
+            for (const sender of res_overview.data.senders) {
+                assert.deepStrictEqual(sender.address, account.address);
+            }
+            assert.deepStrictEqual(res_overview.data.receivers[0].address, account.address);
+        }
     });
 });

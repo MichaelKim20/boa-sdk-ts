@@ -41,7 +41,6 @@ export class WalletMA {
     /**
      * The instances of the WalletTxBuilder
      * One instance must be shared with each other on several screens.
-     * @private
      */
     public builders: Map<string, WalletTxBuilder>;
 
