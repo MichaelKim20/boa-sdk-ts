@@ -365,6 +365,18 @@ export class WalletTxBuilder extends EventDispatcher {
 
         this._fee_rate = Utils.FEE_RATE;
         this._size_tx = Transaction.getEstimatedNumberOfBytes(1, 2, 0);
+        this._fee_tx = this.getEstimatedFee(1, 2, 0);
+
+        const tx_size = this.getEstimatedSize(1, 2, 0);
+        this._client.getTransactionFee(tx_size).then((res) => {
+            if (res.code === WalletResultCode.Success && res.data !== undefined) {
+                this._fee_rate = JSBI.toNumber(Amount.divide(res.data.getFee(this._fee_option), tx_size).value);
+                if (this._fee_rate < Utils.FEE_RATE) this._fee_rate = Utils.FEE_RATE;
+                this._fee_tx = this.getEstimatedFee(1, 2, 0);
+            } else {
+                this._fee_rate = Utils.FEE_RATE;
+            }
+        });
     }
 
     /**
