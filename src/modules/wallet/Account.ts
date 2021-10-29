@@ -436,6 +436,7 @@ export class AccountContainer extends EventDispatcher {
      */
     public attachEventListener(account: Account) {
         account.addEventListener(Event.CHANGE_BALANCE, this.onAccountChangeBalance, this);
+        account.addEventListener(Event.CHANGE, this.onAccountChangeSecretKey, this);
     }
 
     /**
@@ -444,6 +445,7 @@ export class AccountContainer extends EventDispatcher {
      */
     public detachEventListener(account: Account) {
         account.removeEventListener(Event.CHANGE_BALANCE, this.onAccountChangeBalance, this);
+        account.removeEventListener(Event.CHANGE, this.onAccountChangeSecretKey, this);
     }
 
     /**
@@ -466,6 +468,15 @@ export class AccountContainer extends EventDispatcher {
         }
         this._balance = new WalletBalance("", balance, spendable, frozen, locked, true);
         this.dispatchEvent(Event.CHANGE_BALANCE, this);
+    }
+
+    /**
+     * The event listener on changed the secret key
+     * @param type The event type
+     * @param account The account with changed the secret key
+     */
+    public onAccountChangeSecretKey(type: string, account: Account) {
+        this.dispatchEvent(Event.CHANGE_SECRET_KEY, account);
     }
 
     /**

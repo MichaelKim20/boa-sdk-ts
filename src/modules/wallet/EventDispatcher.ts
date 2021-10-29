@@ -21,6 +21,7 @@ export class Event {
     public static CANCEL: string = "cancel";
     public static CHANGE: string = "change";
     public static CHANGE_SELECTED: string = "change_selected";
+    public static CHANGE_SECRET_KEY: string = "change_secret_key";
     public static SEND_TX: string = "send_tx";
     public static ACCEPT_TX: string = "accept_tx";
     public static CHANGE_BALANCE: string = "change_balance";
