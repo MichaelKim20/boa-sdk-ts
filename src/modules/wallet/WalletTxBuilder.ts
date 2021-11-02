@@ -986,21 +986,20 @@ export class WalletTxBuilder extends EventDispatcher {
             return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
         }
 
-        const builder = new TxBuilder(refund_keypair);
-
-        if (this._payload.length > 0) builder.assignPayload(this._payload);
-        this._senders.items.forEach((s) => {
-            s.utxos.forEach((m) => {
-                builder.addInput(m.utxo, m.amount, s.account.secret);
-            });
-        });
-
-        this._receivers.items.forEach((r) => {
-            builder.addOutput(r.address, r.amount);
-        });
-
         let tx: Transaction;
         try {
+            const builder = new TxBuilder(refund_keypair);
+
+            if (this._payload.length > 0) builder.assignPayload(this._payload);
+            this._senders.items.forEach((s) => {
+                s.utxos.forEach((m) => {
+                    builder.addInput(m.utxo, m.amount, s.account.secret);
+                });
+            });
+
+            this._receivers.items.forEach((r) => {
+                builder.addOutput(r.address, r.amount);
+            });
             tx = builder.sign(type, this._fee_tx, this._fee_payload);
         } catch (e) {
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
@@ -1474,21 +1473,18 @@ export class WalletUnfreeze extends EventDispatcher {
         const res_valid: IWalletResult<Transaction> = this.validate();
         if (res_valid.code !== WalletResultCode.Success) return res_valid;
 
-        if (this.getReadOnlyAccount().length > 0) {
+        if (this._account.secret === undefined) {
             return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
         }
 
-        const key_pair = KeyPair.random();
-        const builder = new TxBuilder(key_pair);
-
-        this._utxos.forEach((m) => {
-            builder.addInput(m.utxo, m.amount, this._account.secret);
-        });
-
-        builder.addOutput(this._account.address, this._unfreeze_amount);
-
         let tx: Transaction;
         try {
+            const key_pair = KeyPair.fromSeed(this._account.secret);
+            const builder = new TxBuilder(key_pair);
+            this._utxos.forEach((m) => {
+                builder.addInput(m.utxo, m.amount, this._account.secret);
+            });
+            builder.addOutput(this._account.address, this._unfreeze_amount);
             tx = builder.sign(type, this._fee_tx, Amount.make(0));
         } catch (e) {
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
