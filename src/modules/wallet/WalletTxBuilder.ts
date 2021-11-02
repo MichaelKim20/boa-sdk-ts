@@ -1015,8 +1015,8 @@ export class WalletTxBuilder extends EventDispatcher {
     /**
      * Get the overview of the transaction built
      */
-    public getTransactionOverview(): IWalletResult<ITransactionOverview> {
-        const res: IWalletResult<Transaction> = this.buildTransaction();
+    public getTransactionOverview(type: OutputType = OutputType.Payment): IWalletResult<ITransactionOverview> {
+        const res: IWalletResult<Transaction> = this.buildTransaction(type);
         if (res.code !== WalletResultCode.Success || res.data === undefined)
             return {
                 code: res.code,
@@ -1469,7 +1469,7 @@ export class WalletUnfreeze extends EventDispatcher {
     /**
      * Build a transaction.
      */
-    public buildTransaction(type: OutputType = OutputType.Payment): IWalletResult<Transaction> {
+    public buildTransaction(): IWalletResult<Transaction> {
         const res_valid: IWalletResult<Transaction> = this.validate();
         if (res_valid.code !== WalletResultCode.Success) return res_valid;
 
@@ -1485,7 +1485,7 @@ export class WalletUnfreeze extends EventDispatcher {
                 builder.addInput(m.utxo, m.amount, this._account.secret);
             });
             builder.addOutput(this._account.address, this._unfreeze_amount);
-            tx = builder.sign(type, this._fee_tx, Amount.make(0));
+            tx = builder.sign(OutputType.Payment, this._fee_tx, Amount.make(0));
         } catch (e) {
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
