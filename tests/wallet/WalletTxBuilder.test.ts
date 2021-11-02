@@ -980,6 +980,51 @@ describe("Wallet Transaction Builder", function () {
         await builder.setReceiverAmount(send_amount3);
         assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_RECEIVER) !== undefined, false);
     });
+
+    it("Store data - without receiver", async () => {
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+
+        const wallet_client = new sdk.WalletClient(endpoint);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilder(wallet_client);
+
+        const max_count = 5;
+        for (let count = 0; count < max_count; count++) {
+            makeRandomUTXO();
+            accounts.clear();
+            await builder.clear();
+            await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
+            await builder.setPayload(Buffer.from(sdk.iota(256).map((m) => m)));
+
+            let spendable = sdk.Amount.make(0);
+            key_pairs.forEach((value, idx) => {
+                const elem = sample_utxos[value.address.toString()];
+                spendable = sdk.Amount.add(spendable, sdk.Amount.make(elem.balance.spendable));
+            });
+            const send_amount = sdk.Amount.divide(
+                sdk.Amount.multiply(spendable, 10 + Math.floor(Math.random() * 80)),
+                100
+            );
+
+            for (const key_pair of key_pairs) {
+                const account = accounts.add(key_pair.address.toString(), key_pair.secret);
+                if (account === undefined) continue;
+                await account.checkBalance();
+                await builder.addSender(account, account.balance.spendable);
+            }
+
+            const res_transaction = builder.buildTransaction();
+            assert.deepStrictEqual(res_transaction.code, sdk.WalletResultCode.Success);
+            assert.ok(res_transaction.data !== undefined);
+
+            const res_overview = builder.getTransactionOverview();
+            assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
+            assert.ok(res_overview.data !== undefined);
+        }
+    });
 });
 
 describe("Test for the class WalletUnfreeze", function () {

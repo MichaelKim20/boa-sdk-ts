@@ -960,18 +960,20 @@ export class WalletTxBuilder extends EventDispatcher {
      * Check if there is a condition to create a transaction.
      */
     public validate(): IWalletResult<any> {
-        if (this.lengthReceiver < 1)
-            return {
-                code: WalletResultCode.NotAssignedReceiver,
-                message: WalletMessage.NotAssignedReceiver,
-            };
+        if (this._payload.length === 0) {
+            if (this.lengthReceiver < 1)
+                return {
+                    code: WalletResultCode.NotAssignedReceiver,
+                    message: WalletMessage.NotAssignedReceiver,
+                };
 
-        const totalAmount = this.getTotalReceiverAmount();
-        if (Amount.lessThanOrEqual(totalAmount, Amount.make(0)))
-            return {
-                code: WalletResultCode.NotAssignedReceiverAmount,
-                message: WalletMessage.NotAssignedReceiverAmount,
-            };
+            const totalAmount = this.getTotalReceiverAmount();
+            if (Amount.lessThanOrEqual(totalAmount, Amount.make(0)))
+                return {
+                    code: WalletResultCode.NotAssignedReceiverAmount,
+                    message: WalletMessage.NotAssignedReceiverAmount,
+                };
+        }
 
         if (Amount.greaterThan(this._remaining, Amount.make(0)))
             return {
