@@ -498,6 +498,10 @@ describe("Wallet Transaction Builder", function () {
                 assert.deepStrictEqual(builder.fee_tx.toString(), expected_fee.toString());
                 assert.deepStrictEqual(builder.remaining, expected_remaining);
             }
+
+            const res_transaction = builder.buildTransaction();
+            assert.deepStrictEqual(res_transaction.code, sdk.WalletResultCode.Success);
+            assert.ok(res_transaction.data !== undefined);
         }
     });
 
@@ -590,6 +594,10 @@ describe("Wallet Transaction Builder", function () {
             assert.deepStrictEqual(builder.fee_tx.toString(), expected_fee.toString());
             assert.ok(sdk.Amount.greaterThanOrEqual(actual_in_sum, builder.total_drawn));
             assert.deepStrictEqual(builder.remaining, sdk.Amount.ZERO_BOA);
+
+            const res_transaction = builder.buildTransaction();
+            assert.deepStrictEqual(res_transaction.code, sdk.WalletResultCode.Success);
+            assert.ok(res_transaction.data !== undefined);
         }
     });
 
