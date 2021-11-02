@@ -568,28 +568,6 @@ export class WalletTxBuilder extends EventDispatcher {
             }
         }
 
-        if (
-            Amount.greaterThan(new_total_drawn, Amount.make(0)) &&
-            Amount.equal(new_remaining, Amount.make(0)) &&
-            Amount.greaterThan(new_total_spendable, Amount.make(0))
-        ) {
-            const key_pair = KeyPair.random();
-            const builder = new TxBuilder(key_pair);
-            if (this._payload.length > 0) builder.assignPayload(this._payload);
-            this._senders.items.forEach((s) => {
-                s.utxos.forEach((m) => {
-                    builder.addInput(m.utxo, m.amount, s.account.secret);
-                });
-            });
-            this._receivers.items.forEach((r) => {
-                builder.addOutput(r.address, r.amount);
-            });
-            let transaction: Transaction;
-            let tx_size: number;
-            transaction = builder.sign(OutputType.Payment);
-            tx_size = transaction.getNumberOfBytes();
-            const actual_fee = Amount.make(this._fee_rate * tx_size);
-        }
         // If the total value has been changed, indicate it.
         if (
             !Amount.equal(this._total_spendable, new_total_spendable) ||
