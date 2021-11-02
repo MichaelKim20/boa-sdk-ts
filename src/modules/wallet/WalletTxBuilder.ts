@@ -522,56 +522,49 @@ export class WalletTxBuilder extends EventDispatcher {
         let new_remaining = Amount.make(0);
         let new_total_spendable = Amount.make(0);
 
-        if (Amount.equal(total_amount, Amount.make(0))) {
-            for (const sender of this._senders.items) {
-                sender.drawn = sender.spendable;
+        let done = false; // If you have already made the amount to be transferred, this value is true.
+        for (const sender of this._senders.items) {
+            const sender_old_enable = sender.enable;
+            const sender_old_spendable = sender.spendable;
+            const sender_old_drawn = sender.drawn;
+            const sender_old_remaining = sender.remaining;
+
+            sender.spendable = sender.account.balance.spendable;
+            new_total_spendable = Amount.add(new_total_spendable, sender.spendable);
+            if (done) {
+                sender.drawn = Amount.make(0);
                 sender.remaining = Amount.make(0);
+                sender.account.spendableUTXOProvider.giveBack(sender.utxos);
+                sender.utxos.length = 0;
+                sender.total_amount_utxos = Amount.make(0);
+            } else {
+                const cs_res: { done: boolean; fee: Amount } = await this.calculateSender(
+                    sender,
+                    total_amount,
+                    new_total_drawn,
+                    in_count,
+                    out_count,
+                    new_fee_payload
+                );
+                done = cs_res.done;
+                new_fee_tx = cs_res.fee;
+
+                // It is reflected in the total value.
+                if (sender.enable) {
+                    in_count += sender.utxos.length;
+                    new_total_drawn = Amount.add(new_total_drawn, sender.drawn);
+                    new_remaining = Amount.make(sender.remaining);
+                }
             }
-        } else {
-            let done = false; // If you have already made the amount to be transferred, this value is true.
-            for (const sender of this._senders.items) {
-                const sender_old_enable = sender.enable;
-                const sender_old_spendable = sender.spendable;
-                const sender_old_drawn = sender.drawn;
-                const sender_old_remaining = sender.remaining;
 
-                sender.spendable = sender.account.balance.spendable;
-                new_total_spendable = Amount.add(new_total_spendable, sender.spendable);
-                if (done) {
-                    sender.drawn = Amount.make(0);
-                    sender.remaining = Amount.make(0);
-                    sender.account.spendableUTXOProvider.giveBack(sender.utxos);
-                    sender.utxos.length = 0;
-                    sender.total_amount_utxos = Amount.make(0);
-                } else {
-                    const cs_res: { done: boolean; fee: Amount } = await this.calculateSender(
-                        sender,
-                        total_amount,
-                        new_total_drawn,
-                        in_count,
-                        out_count,
-                        new_fee_payload
-                    );
-                    done = cs_res.done;
-                    new_fee_tx = cs_res.fee;
-
-                    // It is reflected in the total value.
-                    if (sender.enable) {
-                        in_count += sender.utxos.length;
-                        new_total_drawn = Amount.add(new_total_drawn, sender.drawn);
-                        new_remaining = Amount.make(sender.remaining);
-                    }
-                }
-
-                // If the recipient's value has changed, indicate that it has changed.
-                if (
-                    sender_old_enable !== sender.enable ||
-                    !Amount.equal(sender_old_spendable, sender.spendable) ||
-                    !Amount.equal(sender_old_drawn, sender.drawn) ||
-                    !Amount.equal(sender_old_remaining, sender.remaining)
-                ) {
-                    changed = true;
-                }
+            // If the recipient's value has changed, indicate that it has changed.
+            if (
+                sender_old_enable !== sender.enable ||
+                !Amount.equal(sender_old_spendable, sender.spendable) ||
+                !Amount.equal(sender_old_drawn, sender.drawn) ||
+                !Amount.equal(sender_old_remaining, sender.remaining)
+            ) {
+                changed = true;
             }
         }
 
