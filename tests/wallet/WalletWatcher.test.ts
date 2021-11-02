@@ -427,8 +427,8 @@ describe("Wallet Watcher ", function () {
 
     let agora_server: FakeAgora;
     let stoa_server: FakeStoa;
-    const agora_port: string = "6000";
-    const stoa_port: string = "7000";
+    const agora_port: string = "2610";
+    const stoa_port: string = "5610";
 
     function makeRandomUTXO() {
         const result: any = {};

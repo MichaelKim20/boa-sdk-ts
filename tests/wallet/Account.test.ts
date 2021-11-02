@@ -25,8 +25,8 @@ import URI from "urijs";
 describe("AccountContainer", () => {
     let agora_server: TestAgora;
     let stoa_server: TestStoa;
-    const agora_port: string = "6000";
-    const stoa_port: string = "7000";
+    const agora_port: string = "2210";
+    const stoa_port: string = "5210";
 
     before("Wait for the package libsodium to finish loading", async () => {
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());

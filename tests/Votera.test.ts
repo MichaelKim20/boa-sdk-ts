@@ -348,8 +348,8 @@ class TestAgora {
 describe("Checking the proposal and ballot data", () => {
     let stoa_server: TestStoa;
     let agora_server: TestAgora;
-    const stoa_port: string = "5000";
-    const agora_port: string = "2826";
+    const stoa_port: string = "5210";
+    const agora_port: string = "3210";
 
     before("Wait for the package libsodium to finish loading", async () => {
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());

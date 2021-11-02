@@ -15,7 +15,6 @@
 import { BOASodium } from "boa-sodium-ts";
 // @ts-ignore
 import * as sdk from "../../lib";
-import { WalletResultCode } from "../../lib";
 
 // tslint:disable-next-line:no-implicit-dependencies
 import bodyParser from "body-parser";
@@ -25,7 +24,6 @@ import * as http from "http";
 
 import * as assert from "assert";
 import URI from "urijs";
-import { sample_utxo_client, sample_utxo_wallet } from "../Utils";
 
 const seeds = [
     "SDLFMXEPWO5BNB64TUZQJP5JJUET2P4QFMTMDSPYELC2LZ6UXMSAOIKE",
@@ -345,8 +343,8 @@ describe("Wallet Transaction Builder", function () {
 
     let agora_server: TestAgora;
     let stoa_server: TestStoa;
-    const agora_port: string = "6000";
-    const stoa_port: string = "7000";
+    const agora_port: string = "2510";
+    const stoa_port: string = "5510";
 
     function makeRandomUTXO() {
         const result: any = {};
@@ -989,8 +987,8 @@ describe("Test for the class WalletUnfreeze", function () {
 
     let agora_server: TestAgora;
     let stoa_server: TestStoa;
-    const agora_port: string = "6020";
-    const stoa_port: string = "7020";
+    const agora_port: string = "2520";
+    const stoa_port: string = "5520";
 
     function makeRandomFrozenUTXO() {
         const result: any = {};
@@ -1081,7 +1079,7 @@ describe("Test for the class WalletUnfreeze", function () {
             await unfreeze_builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
             const res = await account.getFrozenUTXOs();
 
-            assert.strictEqual(res.code, WalletResultCode.Success);
+            assert.strictEqual(res.code, sdk.WalletResultCode.Success);
             assert.ok(res.data !== undefined);
 
             for (const m of res.data) await unfreeze_builder.addUTXO(m.utxo);
