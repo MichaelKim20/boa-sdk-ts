@@ -789,8 +789,21 @@ export class WalletTxBuilder extends EventDispatcher {
         const sender = this._senders.items.find((m) => m.account === account);
         if (sender === undefined) return;
 
-        sender.spendable = sender.account.balance.spendable;
+        sender.drawn = Amount.make(sender.spendable);
+        sender.spendable = Amount.make(sender.account.balance.spendable);
+        sender.total_amount_utxos = Amount.make(0);
         sender.utxos.length = 0;
+        sender.account.spendableUTXOProvider.clear();
+        const res = await sender.account.spendableUTXOProvider.getUTXO(sender.drawn);
+        if (res.code === WalletResultCode.Success && res.data !== undefined) {
+            sender.utxos.push(...res.data);
+            sender.calculateUTXOSum();
+            sender.enable = true;
+            await this.calculate(true);
+        } else {
+            sender.enable = false;
+            this.dispatchEvent(Event.ERROR, res.code);
+        }
         await this.calculate();
     }
 
