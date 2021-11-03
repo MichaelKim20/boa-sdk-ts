@@ -1010,16 +1010,6 @@ describe("Wallet Transaction Builder", function () {
             await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
             await builder.setPayload(Buffer.from(sdk.iota(256).map((m) => m)));
 
-            let spendable = sdk.Amount.make(0);
-            key_pairs.forEach((value, idx) => {
-                const elem = sample_utxos[value.address.toString()];
-                spendable = sdk.Amount.add(spendable, sdk.Amount.make(elem.balance.spendable));
-            });
-            const send_amount = sdk.Amount.divide(
-                sdk.Amount.multiply(spendable, 10 + Math.floor(Math.random() * 80)),
-                100
-            );
-
             for (const key_pair of key_pairs) {
                 const account = accounts.add(key_pair.address.toString(), key_pair.secret);
                 if (account === undefined) continue;
@@ -1035,6 +1025,34 @@ describe("Wallet Transaction Builder", function () {
             assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
             assert.ok(res_overview.data !== undefined);
         }
+    });
+
+    it("Store data - Check Event", async () => {
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+
+        const wallet_client = new sdk.WalletClient(endpoint);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilder(wallet_client);
+        const component = new FakeUIComponent(accounts, builder);
+
+        makeRandomUTXO();
+        await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
+        const account = accounts.add(key_pairs[0].address.toString(), key_pairs[0].secret);
+        assert.ok(account !== undefined);
+        await account.checkBalance();
+        await builder.addSender(account, account.balance.spendable);
+
+        component.events.length = 0;
+        await builder.setPayload(Buffer.from(sdk.iota(256).map((m) => m)));
+        // Check if event CHANGE_SENDER has been received.
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_SENDER) !== undefined, true);
+        // Check if event CHANGE_TX_FEE has been received.
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_TX_FEE) !== undefined, true);
+        // Check if event CHANGE_PAYLOAD_FEE has been received.
+        assert.strictEqual(component.events.find((m) => m === sdk.Event.CHANGE_PAYLOAD_FEE) !== undefined, true);
     });
 });
 
