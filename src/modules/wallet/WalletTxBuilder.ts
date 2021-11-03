@@ -506,7 +506,7 @@ export class WalletTxBuilder extends EventDispatcher {
      * the fee increases. Therefore, the withdrawn amount gradually increases as the used UTXO increases.
      * @private
      */
-    protected async calculate(already_changed: boolean = false) {
+    private async _calculate(already_changed: boolean = false) {
         let out_count = this.lengthReceiver;
         if (out_count === 0) out_count = 2;
         else out_count++;
@@ -594,6 +594,30 @@ export class WalletTxBuilder extends EventDispatcher {
         if (!Amount.equal(this._fee_payload, new_fee_payload)) {
             this._fee_payload = Amount.make(new_fee_payload);
             this.dispatchEvent(Event.CHANGE_PAYLOAD_FEE, this._fee_payload);
+        }
+    }
+
+    /**
+     * Calculate the amount to be withdrawn from all sending accounts.
+     * At this time, the number of UTXO to be used increases, and accordingly,
+     * the fee increases. Therefore, the withdrawn amount gradually increases as the used UTXO increases.
+     * If an error occurs during calculation, initialize the data of all callers and try again.
+     * @protected
+     */
+    protected async calculate(already_changed: boolean = false) {
+        const max_try_cnt = 3;
+        let success = false;
+        for (let cnt = 0; cnt < max_try_cnt && !success; cnt++) {
+            try {
+                await this._calculate(already_changed);
+                success = true;
+            } catch (e) {
+                success = false;
+            }
+            if (!success) {
+                if (cnt < max_try_cnt - 1) await this.initializeSenders();
+                else this.dispatchEvent(Event.ERROR, WalletResultCode.SystemError);
+            }
         }
     }
 
@@ -752,6 +776,27 @@ export class WalletTxBuilder extends EventDispatcher {
             done,
             fee,
         };
+    }
+
+    /**
+     * Check the balance of all senders. And initialize the data.
+     * @private
+     */
+    private async initializeSenders() {
+        for (const sender of this._senders.items) {
+            await sender.account.checkBalance(false);
+            sender.drawn = Amount.make(sender.account.balance.spendable);
+            sender.utxos.length = 0;
+            sender.account.spendableUTXOProvider.clear();
+            const res = await sender.account.spendableUTXOProvider.getUTXO(sender.drawn);
+            if (res.code === WalletResultCode.Success && res.data !== undefined) {
+                sender.utxos.push(...res.data);
+                sender.enable = true;
+            } else {
+                sender.enable = false;
+            }
+            sender.calculateUTXOSum();
+        }
     }
 
     /**
