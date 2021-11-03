@@ -1029,7 +1029,7 @@ export class WalletTxBuilder extends EventDispatcher {
         for (let idx = 0; idx < tx.outputs.length; idx++) {
             r.push({
                 utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
-                address: new PublicKey(tx.outputs[idx].lock.bytes),
+                address: tx.outputs[idx].address,
                 amount: tx.outputs[idx].value,
             });
         }
@@ -1514,7 +1514,7 @@ export class WalletUnfreeze extends EventDispatcher {
         for (let idx = 0; idx < tx.outputs.length; idx++) {
             r.push({
                 utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
-                address: new PublicKey(tx.outputs[idx].lock.bytes),
+                address: tx.outputs[idx].address,
                 amount: tx.outputs[idx].value,
             });
         }
