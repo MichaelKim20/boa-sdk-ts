@@ -108,6 +108,16 @@ describe("Hash", () => {
         assert.strictEqual(sdk.Hash.compare(h2, h1) > 0, true);
     });
 
+    it("Test of Hash.Null(), Hash.isNull()", () => {
+        let h = new sdk.Hash(
+            "0x76c481db1ebcc0dbd463115b2f1d66e012c62725eee4b266498657f2d6b9a236f5606384b06fca25f8c2eb6d68885878a09902ec6d01ed1b47cb4b725a672584"
+        );
+        assert.strictEqual(h.isNull(), false);
+
+        h = sdk.Hash.Null;
+        assert.strictEqual(h.isNull(), true);
+    });
+
     it("Test of multi hash of string", () => {
         const pre_image = new sdk.Hash(
             "0x76c481db1ebcc0dbd463115b2f1d66e012c62725eee4b266498657f2d6b9a236f5606384b06fca25f8c2eb6d68885878a09902ec6d01ed1b47cb4b725a672584"

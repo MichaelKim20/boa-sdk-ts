@@ -146,6 +146,22 @@ export class Hash {
     public static compare(a: Hash, b: Hash): number {
         return Utils.compareBuffer(a.data, b.data);
     }
+
+    /**
+     * Returns an instance filled with zero all bytes.
+     * @returns The instance of Hash
+     */
+    public static get Null(): Hash {
+        return new Hash(Buffer.alloc(Hash.Width));
+    }
+
+    /**
+     * This checks whether all values are initial values (0).
+     */
+    public isNull(): boolean {
+        if (this.data.length !== Hash.Width) return false;
+        return this.data.every((value) => value === 0);
+    }
 }
 
 /**
