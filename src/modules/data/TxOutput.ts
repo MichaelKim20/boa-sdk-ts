@@ -13,7 +13,7 @@
 
 import { Amount } from "../common/Amount";
 import { PublicKey } from "../common/KeyPair";
-import { Lock } from "../script/Lock";
+import { Lock, LockType } from "../script/Lock";
 import { JSONValidator } from "../utils/JSONValidator";
 import { Utils } from "../utils/Utils";
 import { VarInt } from "../utils/VarInt";
@@ -162,5 +162,18 @@ export class TxOutput {
      */
     public clone(): TxOutput {
         return new TxOutput(this.type, this.value, this.lock.clone());
+    }
+
+    /**
+     * If the key type is LockType.Key, return the instance of PublicKey. Otherwise,
+     * it returns the instance filled with zero all bytes.
+     * @returns The instance of PublicKey
+     */
+    public get address(): PublicKey {
+        if (this.lock.type === LockType.Key) {
+            return new PublicKey(this.lock.bytes);
+        } else {
+            return PublicKey.Null;
+        }
     }
 }

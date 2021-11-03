@@ -263,4 +263,19 @@ describe("Transaction", () => {
             "0xcea9497ef31f10007215455d20b25d3857100fb07395a4dea9015465a3d916bd82a3ab3fadce98673f1ca913f50e49460d88c2f704ebb2badc435af5699e3b80"
         );
     });
+
+    it("Test for TxOutput.address", () => {
+        const address = new sdk.PublicKey("boa1xrp66va5qe84kyfhywhxz9luy7glpxu99n30cuv3mu0vkhcswuzajgak3pw");
+        let output = new sdk.TxOutput(sdk.OutputType.Payment, "0", sdk.Lock.fromPublicKey(address));
+        assert.deepStrictEqual(output.address, address);
+
+        output = new sdk.TxOutput(sdk.OutputType.Payment, "0", new sdk.Lock(sdk.LockType.KeyHash, Buffer.alloc(32)));
+        assert.strictEqual(output.address.isNull(), true);
+
+        output = new sdk.TxOutput(sdk.OutputType.Payment, "0", new sdk.Lock(sdk.LockType.Script, Buffer.alloc(32)));
+        assert.strictEqual(output.address.isNull(), true);
+
+        output = new sdk.TxOutput(sdk.OutputType.Payment, "0", new sdk.Lock(sdk.LockType.Redeem, Buffer.alloc(32)));
+        assert.strictEqual(output.address.isNull(), true);
+    });
 });
