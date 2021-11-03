@@ -35,7 +35,7 @@ export class PreImage {
      */
     constructor(h?: Hash, d?: string) {
         if (h !== undefined) this.hash = new Hash(h.data);
-        else this.hash = new Hash(Buffer.alloc(Hash.Width));
+        else this.hash = Hash.Null;
 
         if (d !== undefined) this.height = d;
         else this.height = "0";

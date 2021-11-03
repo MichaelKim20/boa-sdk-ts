@@ -54,7 +54,7 @@ export class Validator {
         else this.enrolled_at = 0;
 
         if (stake !== undefined) this.stake = stake;
-        else this.stake = new Hash(Buffer.alloc(Hash.Width));
+        else this.stake = Hash.Null;
 
         if (image !== undefined) this.preimage = image;
         else this.preimage = new PreImage();

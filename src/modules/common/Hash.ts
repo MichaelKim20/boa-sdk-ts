@@ -282,7 +282,7 @@ export function makeUTXOKey(h: Hash, index: JSBI): Hash {
  * @returns The instance of the hash
  */
 export function hashFull(record: any): Hash {
-    if (record === null || record === undefined) return new Hash(Buffer.alloc(Hash.Width));
+    if (record === null || record === undefined) return Hash.Null;
 
     const buffer = new SmartBuffer();
     hashPart(record, buffer);
