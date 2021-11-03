@@ -42,4 +42,19 @@ describe("Test of Amount", () => {
         assert.deepStrictEqual(new sdk.Amount(sdk.JSBI.BigInt("1000000001234567")).toJSON(), "1000000001234567");
         assert.deepStrictEqual(new sdk.Amount(sdk.JSBI.BigInt("1000000000000000")).toJSON(), "1000000000000000");
     });
+
+    it("Test of Amount.canSubtract", () => {
+        assert.deepStrictEqual(
+            sdk.Amount.canSubtract(sdk.Amount.make("1000000000000000"), sdk.Amount.make("1000000000000001")),
+            false
+        );
+        assert.deepStrictEqual(
+            sdk.Amount.canSubtract(sdk.Amount.make("1000000000000001"), sdk.Amount.make("1000000000000000")),
+            true
+        );
+        assert.deepStrictEqual(
+            sdk.Amount.canSubtract(sdk.Amount.make("1000000000000000"), sdk.Amount.make("1000000000000000")),
+            true
+        );
+    });
 });

@@ -207,6 +207,16 @@ export class Amount {
     }
 
     /**
+     * Check if the subtraction result is no negative.
+     * @param x The first Amount
+     * @param y The second Amount
+     * @returns If there is no negative number, return true and return false when there is a negative number.
+     */
+    public static canSubtract(x: Amount, y: Amount): boolean {
+        return Amount.greaterThanOrEqual(x, y);
+    }
+
+    /**
      * Compare whether x is less than y.
      * @param x The first Amount
      * @param y The second Amount
