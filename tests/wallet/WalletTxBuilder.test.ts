@@ -16,6 +16,9 @@ import { BOASodium } from "boa-sodium-ts";
 // @ts-ignore
 import * as sdk from "../../lib";
 
+// @ts-ignore
+import { delay } from "../Utils";
+
 // tslint:disable-next-line:no-implicit-dependencies
 import bodyParser from "body-parser";
 // tslint:disable-next-line:no-implicit-dependencies
@@ -1032,6 +1035,150 @@ describe("Wallet Transaction Builder", function () {
             assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
             assert.ok(res_overview.data !== undefined);
         }
+    });
+});
+
+describe("WalletTxBuilder - When the balance of the selected account changes,", function () {
+    this.timeout(20000);
+
+    let agora_server: TestAgora;
+    let stoa_server: TestStoa;
+    const agora_port: string = "2550";
+    const stoa_port: string = "5550";
+
+    before("Wait for the package libsodium to finish loading", async () => {
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
+        await sdk.SodiumHelper.init();
+    });
+
+    before("Start TestStoa", async () => {
+        stoa_server = new TestStoa(stoa_port);
+        await stoa_server.start();
+    });
+
+    before("Start TestAgora", async () => {
+        agora_server = new TestAgora(agora_port);
+        await agora_server.start();
+    });
+
+    after("Stop TestStoa", async () => {
+        await stoa_server.stop();
+    });
+
+    after("Stop TestAgora", async () => {
+        await agora_server.stop();
+    });
+
+    before("Create KeyPairs", async () => {
+        key_pairs = seeds.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+
+        sample_utxos = {};
+        for (const kp of key_pairs) {
+            const address = kp.address.toString();
+            sample_utxos[address] = {
+                utxo: [],
+                balance: {
+                    address,
+                    balance: "0",
+                    spendable: "0",
+                    frozen: "0",
+                    locked: "0",
+                },
+            };
+        }
+    });
+
+    it("Test for changing balance", async () => {
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+
+        const wallet_client = new sdk.WalletClient(endpoint);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilderSingleReceiver(wallet_client);
+
+        function addUTXO(key: sdk.KeyPair, height: number) {
+            const address = key.address.toString();
+            sample_utxos[address].utxo.push({
+                utxo: new sdk.Hash(Buffer.from(sdk.SodiumHelper.sodium.randombytes_buf(sdk.Hash.Width))).toString(),
+                type: sdk.OutputType.Payment,
+                unlock_height: "1",
+                amount: sdk.BOA(100),
+                height: height.toString(),
+                time: 0,
+                lock_type: 0,
+                lock_bytes: key.address.data.toString("base64"),
+            });
+            calcBalance(key);
+        }
+
+        function removeUTXO(key: sdk.KeyPair) {
+            const address = key.address.toString();
+            sample_utxos[address].utxo.shift();
+            calcBalance(key);
+        }
+
+        function calcBalance(key: sdk.KeyPair) {
+            const address = key.address.toString();
+            const utxos: any[] = sample_utxos[address].utxo;
+            const values = utxos.reduce<[sdk.JSBI, sdk.JSBI, sdk.JSBI]>(
+                (prev, value) => {
+                    prev[0] = sdk.JSBI.add(prev[0], sdk.JSBI.BigInt(value.amount));
+                    if (value.type === 0) {
+                        prev[1] = sdk.JSBI.add(prev[1], sdk.JSBI.BigInt(value.amount));
+                    } else {
+                        prev[2] = sdk.JSBI.add(prev[2], sdk.JSBI.BigInt(value.amount));
+                    }
+                    return prev;
+                },
+                [sdk.JSBI.BigInt(0), sdk.JSBI.BigInt(0), sdk.JSBI.BigInt(0)]
+            );
+            sample_utxos[address].balance.balance = values[0].toString();
+            sample_utxos[address].balance.spendable = values[1].toString();
+            sample_utxos[address].balance.frozen = values[2].toString();
+            sample_utxos[address].balance.locked = "0";
+        }
+
+        addUTXO(key_pairs[0], 0);
+        addUTXO(key_pairs[0], 1);
+        addUTXO(key_pairs[1], 0);
+        addUTXO(key_pairs[1], 1);
+
+        accounts.add("Account0", key_pairs[0].secret);
+        accounts.add("Account1", key_pairs[1].secret);
+
+        await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
+
+        await builder.setReceiverAddress(
+            new sdk.PublicKey("boa1xpr00rxtcprlf99dnceuma0ftm9sv03zhtlwfytd5p0dkvzt4ryp595zpjp")
+        );
+        await builder.setReceiverAmount(sdk.BOA(350));
+
+        for (const elem of accounts.items) {
+            await builder.addSender(elem, sdk.Amount.make(0));
+        }
+
+        assert.strictEqual(builder.senders.items.length, 2);
+        assert.strictEqual(builder.senders.items[0].spendable.toString(), "2000000000");
+        assert.strictEqual(builder.senders.items[0].remaining.toString(), "1500254800");
+        assert.strictEqual(builder.senders.items[1].spendable.toString(), "2000000000");
+        assert.strictEqual(builder.senders.items[1].remaining.toString(), "0");
+        assert.strictEqual(builder.remaining.toString(), "0");
+        assert.strictEqual(builder.total_drawn.toString(), "3500441000");
+        assert.strictEqual(builder.total_spendable.toString(), "4000000000");
+
+        removeUTXO(key_pairs[1]);
+        removeUTXO(key_pairs[1]);
+
+        accounts.checkBalance();
+
+        await delay(100);
+
+        assert.strictEqual(builder.senders.items[0].spendable.toString(), "2000000000");
+        assert.strictEqual(builder.senders.items[0].remaining.toString(), "1500254800");
+        assert.strictEqual(builder.senders.items[1].spendable.toString(), "0");
+        assert.strictEqual(builder.senders.items[1].remaining.toString(), "1500254800");
     });
 });
 
