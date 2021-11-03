@@ -162,6 +162,14 @@ describe("Public Key", () => {
         const invalid_addr_str = bech32m.encode("boa", conv_data);
         assert.strictEqual(sdk.PublicKey.validate(invalid_addr_str), "Decoded data size is not normal");
     });
+
+    it("Test of PublicKey.Null(), PublicKey.isNull()", () => {
+        let pk = new sdk.PublicKey("boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssuz4lg0");
+        assert.strictEqual(pk.isNull(), false);
+
+        pk = sdk.PublicKey.Null;
+        assert.strictEqual(pk.isNull(), true);
+    });
 });
 
 describe("Secret Key", () => {
@@ -193,6 +201,14 @@ describe("Secret Key", () => {
         const invalid_decoded = Buffer.concat([body, checksum.map((n) => ~n)]);
         const invalid_seed = base32Encode(invalid_decoded);
         assert.strictEqual(sdk.SecretKey.validate(invalid_seed), "Checksum result do not match");
+    });
+
+    it("Test of SecretKey.Null(), SecretKey.isNull()", () => {
+        let sk = new sdk.SecretKey("SDV3GLVZ6W7R7UFB2EMMY4BBFJWNCQB5FTCXUMD5ZCFTDEVZZ3RQ2BZI");
+        assert.strictEqual(sk.isNull(), false);
+
+        sk = sdk.SecretKey.Null;
+        assert.strictEqual(sk.isNull(), true);
     });
 });
 

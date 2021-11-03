@@ -244,6 +244,24 @@ export class PublicKey {
     public static compare(a: PublicKey, b: PublicKey): number {
         return Utils.compareBuffer(a.data, b.data);
     }
+
+    /**
+     * Returns an instance filled with zero all bytes.
+     * @returns The instance of PublicKey
+     */
+    public static get Null(): PublicKey {
+        const pk = new PublicKey(Point.random());
+        pk.point.data.set(Buffer.alloc(SodiumHelper.sodium.crypto_core_ed25519_BYTES));
+        return pk;
+    }
+
+    /**
+     * This checks whether all values are initial values (0).
+     */
+    public isNull(): boolean {
+        if (this.data.length !== SodiumHelper.sodium.crypto_core_ed25519_BYTES) return false;
+        return this.data.every((value) => value === 0);
+    }
 }
 
 /**
@@ -359,6 +377,24 @@ export class SecretKey {
      */
     public static compare(a: SecretKey, b: SecretKey): number {
         return Utils.compareBuffer(a.data, b.data);
+    }
+
+    /**
+     * Returns an instance filled with zero all bytes.
+     * @returns The instance of SecretKey
+     */
+    public static get Null(): SecretKey {
+        const sk = new SecretKey(Scalar.random());
+        sk.scalar.data.set(Buffer.alloc(SodiumHelper.sodium.crypto_core_ed25519_SCALARBYTES));
+        return sk;
+    }
+
+    /**
+     * This checks whether all values are initial values (0).
+     */
+    public isNull(): boolean {
+        if (this.data.length !== SodiumHelper.sodium.crypto_core_ed25519_SCALARBYTES) return false;
+        return this.data.every((value) => value === 0);
     }
 }
 
