@@ -530,13 +530,13 @@ export class WalletTxBuilder extends EventDispatcher {
             const sender_old_remaining = sender.remaining;
 
             sender.spendable = sender.account.balance.spendable;
-            new_total_spendable = Amount.add(new_total_spendable, sender.spendable);
             if (done) {
                 sender.drawn = Amount.make(0);
                 sender.remaining = Amount.make(0);
                 sender.account.spendableUTXOProvider.giveBack(sender.utxos);
                 sender.utxos.length = 0;
                 sender.total_amount_utxos = Amount.make(0);
+                new_total_spendable = Amount.add(new_total_spendable, sender.spendable);
             } else {
                 const cs_res: { done: boolean; fee: Amount } = await this.calculateSender(
                     sender,
@@ -554,6 +554,7 @@ export class WalletTxBuilder extends EventDispatcher {
                     in_count += sender.utxos.length;
                     new_total_drawn = Amount.add(new_total_drawn, sender.drawn);
                     new_remaining = Amount.make(sender.remaining);
+                    new_total_spendable = Amount.add(new_total_spendable, sender.spendable);
                 }
             }
 
