@@ -16,6 +16,9 @@ import { BOASodium } from "boa-sodium-ts";
 // @ts-ignore
 import * as sdk from "../../lib";
 
+// @ts-ignore
+import { delay } from "../Utils";
+
 // tslint:disable-next-line:no-implicit-dependencies
 import bodyParser from "body-parser";
 // tslint:disable-next-line:no-implicit-dependencies
@@ -470,12 +473,6 @@ describe("Wallet Watcher ", function () {
             };
         }
         sample_utxos = result;
-    }
-
-    function delay(interval: number): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            setTimeout(resolve, interval);
-        });
     }
 
     before("Wait for the package libsodium to finish loading", async () => {
