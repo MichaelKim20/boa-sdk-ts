@@ -1165,8 +1165,8 @@ export class WalletTxBuilderSingleReceiver extends WalletTxBuilder {
         if (this._receiver_amount === undefined || Amount.notEqual(this._receiver_amount, amount)) {
             changed = true;
         }
+        this._receiver_amount = Amount.make(amount);
         if (this._receiver_address !== undefined) {
-            this._receiver_amount = Amount.make(amount);
             this._receivers.clear();
             this._receivers.add({
                 address: this._receiver_address,
