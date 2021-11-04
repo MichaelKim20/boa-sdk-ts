@@ -342,7 +342,6 @@ export class WalletTxBuilder extends EventDispatcher {
 
     /**
      * The size of transaction
-     * @private
      */
     private _size_tx: number;
 
@@ -504,7 +503,6 @@ export class WalletTxBuilder extends EventDispatcher {
      * Calculate the amount to be withdrawn from all sending accounts.
      * At this time, the number of UTXO to be used increases, and accordingly,
      * the fee increases. Therefore, the withdrawn amount gradually increases as the used UTXO increases.
-     * @private
      */
     private async _calculate(already_changed: boolean = false) {
         let out_count = this.lengthReceiver;
@@ -602,7 +600,6 @@ export class WalletTxBuilder extends EventDispatcher {
      * At this time, the number of UTXO to be used increases, and accordingly,
      * the fee increases. Therefore, the withdrawn amount gradually increases as the used UTXO increases.
      * If an error occurs during calculation, initialize the data of all callers and try again.
-     * @protected
      */
     protected async calculate(already_changed: boolean = false) {
         const max_try_cnt = 3;
@@ -629,7 +626,6 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param in_count      The number of the transaction input
      * @param out_count     The number of the transaction output
      * @param fee_payload   The fee of _payload
-     * @private
      */
     protected async calculateSender(
         sender: WalletSender,
@@ -780,7 +776,6 @@ export class WalletTxBuilder extends EventDispatcher {
 
     /**
      * Check the balance of all senders. And initialize the data.
-     * @private
      */
     private async initializeSenders() {
         for (const sender of this._senders.items) {
@@ -804,7 +799,6 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param num_input         The number of the transaction inputs
      * @param num_output        The number of the transaction outputs
      * @param num_bytes_payload The size of the transaction _payload
-     * @private
      */
     protected getEstimatedFee(num_input: number, num_output: number, num_bytes_payload: number): Amount {
         return Amount.make(this._fee_rate * this.getEstimatedSize(num_input, num_output, num_bytes_payload));
@@ -815,7 +809,6 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param num_input         The number of the transaction inputs
      * @param num_output        The number of the transaction outputs
      * @param num_bytes_payload The size of the transaction _payload
-     * @private
      */
     protected getEstimatedSize(num_input: number, num_output: number, num_bytes_payload: number): number {
         return Transaction.getEstimatedNumberOfBytes(
@@ -853,11 +846,11 @@ export class WalletTxBuilder extends EventDispatcher {
     }
 
     /**
-     * Aet the _payload
-     * @param _payload The data to be stored in the transaction
+     * Set the payload
+     * @param payload The data to be stored in the transaction
      */
-    public async setPayload(_payload: Buffer) {
-        this._payload = _payload;
+    public async setPayload(payload: Buffer) {
+        this._payload = payload;
         await this.calculate();
     }
 
@@ -1379,7 +1372,6 @@ export class WalletUnfreezeBuilder extends WalletTxBuilder {
      * @param num_input         The number of the transaction inputs
      * @param num_output        The number of the transaction outputs
      * @param num_bytes_payload The size of the transaction _payload
-     * @private
      */
     protected getEstimatedFee(num_input: number, num_output: number, num_bytes_payload: number): Amount {
         return Amount.make(this._fee_rate * this.getEstimatedSize(num_input, num_output, num_bytes_payload));
@@ -1390,7 +1382,6 @@ export class WalletUnfreezeBuilder extends WalletTxBuilder {
      * @param num_input         The number of the transaction inputs
      * @param num_output        The number of the transaction outputs
      * @param num_bytes_payload The size of the transaction _payload
-     * @private
      */
     protected getEstimatedSize(num_input: number, num_output: number, num_bytes_payload: number): number {
         return Transaction.getEstimatedNumberOfBytes(
