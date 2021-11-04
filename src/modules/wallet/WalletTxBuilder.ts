@@ -806,7 +806,7 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param num_bytes_payload The size of the transaction _payload
      * @private
      */
-    private getEstimatedFee(num_input: number, num_output: number, num_bytes_payload: number): Amount {
+    protected getEstimatedFee(num_input: number, num_output: number, num_bytes_payload: number): Amount {
         return Amount.make(this._fee_rate * this.getEstimatedSize(num_input, num_output, num_bytes_payload));
     }
 
@@ -817,7 +817,7 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param num_bytes_payload The size of the transaction _payload
      * @private
      */
-    private getEstimatedSize(num_input: number, num_output: number, num_bytes_payload: number): number {
+    protected getEstimatedSize(num_input: number, num_output: number, num_bytes_payload: number): number {
         return Transaction.getEstimatedNumberOfBytes(
             Math.max(num_input, 1),
             Math.max(num_output, 2),
@@ -1609,5 +1609,450 @@ export class WalletUnfreeze extends EventDispatcher {
     public getReadOnlyAccount(): Account[] {
         if (this._account.mode === AccountMode.READ_ONLY) return [this._account];
         else return [];
+    }
+}
+
+export interface AccountUTXOItem {
+    account: Account;
+    utxo: UnspentTxOutput;
+    selected: boolean;
+}
+
+export interface AccountUTXOSummaryItem {
+    account: Account;
+    to_be_unfrozen: Amount;
+    frozen_balance: Amount;
+    total_balance: Amount;
+}
+
+export class AccountUTXOSummary {
+    public items: AccountUTXOSummaryItem[] = [];
+
+    public aggregate(account: Account, utxo: UnspentTxOutput) {
+        const found = this.items.find((m) => PublicKey.equal(m.account.address, account.address));
+        if (found !== undefined) {
+            found.to_be_unfrozen = Amount.add(found.to_be_unfrozen, utxo.amount);
+        } else {
+            this.items.push({
+                account,
+                to_be_unfrozen: Amount.make(utxo.amount),
+                frozen_balance: Amount.make(account.balance.frozen),
+                total_balance: Amount.make(account.balance.balance),
+            });
+        }
+    }
+
+    public clear() {
+        this.items.length = 0;
+    }
+}
+
+/**
+ * Create a transaction for unfreeze.
+ * This provides a function to selectively unfreezing of the added account among frozen UTXOs.
+ * Among the members, `WalletUnfreezeBuilder.utxo` provides all UTXO of the added account.
+ * `WalletUnfreezeBuilder.summary` is information of selected UTXOs and the balance of the account.
+ */
+export class WalletUnfreezeBuilder extends WalletTxBuilder {
+    /**
+     * Account and frozen UTXO's list.
+     */
+    private readonly _utxos: AccountUTXOItem[];
+
+    /**
+     * Summary to be unfrozen by account.
+     */
+    private readonly _summary: AccountUTXOSummary;
+
+    /**
+     * The amount to be unfrozen, The amount excluding the fee from the frozen amount
+     */
+    private _unfreeze_amount: Amount;
+
+    /**
+     * Constructor
+     * @param client The wallet client to request
+     */
+    constructor(client: WalletClient) {
+        super(client);
+        this._unfreeze_amount = Amount.make(0);
+        this._utxos = [];
+        this._summary = new AccountUTXOSummary();
+    }
+
+    /**
+     * Add a sender
+     * @param account The account of the sender to be added
+     */
+    public async addSender(account: Account) {
+        const found = this._senders.items.find((value) => PublicKey.equal(value.account.address, account.address));
+        if (found === undefined) {
+            this._senders.items.forEach((m) =>
+                m.account.removeEventListener(Event.CHANGE_BALANCE, this.onAccountChangeBalance, this)
+            );
+            this._senders.clear();
+            const sender = this._senders.add(account, Amount.make(0));
+            if (sender !== undefined) {
+                if (!sender.account.balance.enable) await sender.account.checkBalance(false);
+                sender.drawn = Amount.make(sender.account.balance.frozen);
+                sender.utxos.length = 0;
+                sender.account.addEventListener(Event.CHANGE_BALANCE, this.onAccountChangeBalance, this);
+                sender.account.frozenUTXOProvider.clear();
+                const res = await sender.account.frozenUTXOProvider.getUTXO(sender.drawn);
+                if (res.code === WalletResultCode.Success && res.data !== undefined) {
+                    sender.utxos.push(...res.data);
+                    sender.calculateUTXOSum();
+                    sender.enable = true;
+                    this._utxos.push(
+                        ...sender.utxos.map((u) => {
+                            return { account: sender.account, utxo: u, selected: false };
+                        })
+                    );
+                    await this.calculate();
+                    this.dispatchEvent(Event.CHANGE_UTXO_ITEM);
+                    this.dispatchEvent(Event.CHANGE_SENDER);
+                } else {
+                    this.dispatchEvent(Event.ERROR, res.code);
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove a sender
+     * @param account The account of the sender to be removed
+     */
+    public async removeSender(account: Account) {
+        const sender = this._senders.remove(account);
+        if (sender !== undefined) {
+            sender.account.removeEventListener(Event.CHANGE_BALANCE, this.onAccountChangeBalance, this);
+            const filtered = this._utxos.filter((m) => !PublicKey.equal(m.account.address, sender.account.address));
+            this._utxos.length = 0;
+            this._utxos.push(...filtered);
+            await this.calculate();
+            this.dispatchEvent(Event.CHANGE_UTXO_ITEM);
+            this.dispatchEvent(Event.CHANGE_SENDER);
+        }
+    }
+
+    /**
+     * Clear all sender
+     */
+    public async clearSender(is_dispatch: boolean = true) {
+        this._senders.items.forEach((m) =>
+            m.account.removeEventListener(Event.CHANGE_BALANCE, this.onAccountChangeBalance, this)
+        );
+        if (this._senders.clear()) {
+            this._utxos.length = 0;
+            if (is_dispatch) {
+                await this.calculate();
+            }
+            this.dispatchEvent(Event.CHANGE_UTXO_ITEM);
+            this.dispatchEvent(Event.CHANGE_SENDER);
+        }
+    }
+
+    private getSelectedUTXO(): AccountUTXOItem[] {
+        return this._utxos.filter((m) => m.selected);
+    }
+
+    private makeSummary() {
+        this._summary.clear();
+        this.getSelectedUTXO().forEach((m) => this._summary.aggregate(m.account, m.utxo));
+    }
+
+    public async selectUTXO(utxo: Hash, value: boolean) {
+        const found = this._utxos.find((m) => Hash.equal(m.utxo.utxo, utxo));
+        if (found !== undefined) {
+            if (found.selected !== value) {
+                found.selected = value;
+                this.makeSummary();
+                await this.calculate();
+                this.dispatchEvent(Event.CHANGE_UTXO_SELECTION, found);
+                this.dispatchEvent(Event.CHANGE_UTXO_SUMMARY);
+            }
+        }
+    }
+
+    /**
+     * Get the estimated fee
+     * @param num_input         The number of the transaction inputs
+     * @param num_output        The number of the transaction outputs
+     * @param num_bytes_payload The size of the transaction _payload
+     * @private
+     */
+    protected getEstimatedFee(num_input: number, num_output: number, num_bytes_payload: number): Amount {
+        return Amount.make(this._fee_rate * this.getEstimatedSize(num_input, num_output, num_bytes_payload));
+    }
+
+    /**
+     * Get the estimated transaction size
+     * @param num_input         The number of the transaction inputs
+     * @param num_output        The number of the transaction outputs
+     * @param num_bytes_payload The size of the transaction _payload
+     * @private
+     */
+    protected getEstimatedSize(num_input: number, num_output: number, num_bytes_payload: number): number {
+        return Transaction.getEstimatedNumberOfBytes(
+            Math.max(num_input, 1),
+            Math.max(num_output, 1),
+            num_bytes_payload
+        );
+    }
+
+    /**
+     * Event Handler on change balance of an account
+     * @param type The event type
+     * @param account The instance of an account
+     */
+    public async onAccountChangeBalance(type: string, account: Account) {
+        const sender = this._senders.items.find((m) => m.account === account);
+        if (sender === undefined) return;
+
+        sender.drawn = Amount.make(sender.account.balance.frozen);
+        sender.spendable = Amount.make(sender.account.balance.spendable);
+        sender.total_amount_utxos = Amount.make(0);
+        sender.utxos.length = 0;
+        sender.account.frozenUTXOProvider.clear();
+        const res = await sender.account.frozenUTXOProvider.getUTXO(sender.drawn);
+        if (res.code === WalletResultCode.Success && res.data !== undefined) {
+            sender.utxos.push(...res.data);
+            sender.calculateUTXOSum();
+            sender.enable = true;
+            await this.calculate();
+        } else {
+            sender.enable = false;
+            this.dispatchEvent(Event.ERROR, res.code);
+        }
+        await this.calculate();
+    }
+
+    /**
+     * Set the option of transaction fee
+     * @param value The option value  (High, Medium, Low)
+     */
+    public async setFeeOption(value: WalletTransactionFeeOption) {
+        const selected = this.getSelectedUTXO();
+        const tx_size = this.getEstimatedSize(selected.length, 1, 0);
+        const fee_res = await this._client.getTransactionFee(tx_size);
+        if (fee_res.code === WalletResultCode.Success && fee_res.data !== undefined) {
+            this._fee_option = value;
+            this._fee_rate = JSBI.toNumber(Amount.divide(fee_res.data.getFee(this._fee_option), tx_size).value);
+            if (this._fee_rate < Utils.FEE_RATE) this._fee_rate = Utils.FEE_RATE;
+        } else {
+            this._fee_rate = Utils.FEE_RATE;
+        }
+        await this.calculate();
+    }
+
+    /**
+     * Set the transaction fee, The adjusted value is returned.
+     * After calculating internally, an event occurs about the change in fees.
+     * @param tx_fee The fee of transaction
+     */
+    public async setTransactionFee(tx_fee: Amount): Promise<Amount> {
+        const selected = this.getSelectedUTXO();
+        const tx_size = this.getEstimatedSize(selected.length, 1, 0);
+        const _fee_rate = JSBI.toNumber(Amount.divide(tx_fee, tx_size).value);
+        if (_fee_rate < Utils.FEE_RATE) {
+            this._fee_rate = Utils.FEE_RATE;
+        } else {
+            this._fee_rate = _fee_rate;
+        }
+        await this.calculate();
+
+        return Amount.multiply(Amount.make(this._fee_rate), tx_size);
+    }
+
+    /**
+     * The fee of _payload
+     */
+    public get fee_payload(): Amount {
+        return Amount.make(0);
+    }
+
+    /**
+     * Set the payload
+     * @deprecated
+     */
+    public async setPayload() {
+        // Do not use
+    }
+
+    /**
+     * The payload of a transaction
+     */
+    public get payload(): Buffer {
+        return Buffer.alloc(0);
+    }
+
+    /**
+     * Account and frozen UTXO's list.
+     */
+    public get utxos(): AccountUTXOItem[] {
+        return this._utxos;
+    }
+
+    /**
+     * Summary to be unfrozen by account.
+     */
+    public get summary(): AccountUTXOSummary {
+        return this._summary;
+    }
+
+    /**
+     * The amount to be unfrozen
+     */
+    public get unfreeze_amount(): Amount {
+        return Amount.make(this._unfreeze_amount);
+    }
+
+    /**
+     * The amount of UTXO for freeze release is aggregated and fees are calculated.
+     */
+    protected async calculate() {
+        const selected = this.getSelectedUTXO();
+        const in_count = selected.length;
+        const out_count = 1;
+        const sumOfUTXO = selected.reduce<Amount>((sum, u) => Amount.add(sum, u.utxo.amount), Amount.make(0));
+
+        const tx_size = this.getEstimatedSize(in_count, out_count, 0);
+        const new_fee_tx = Amount.make(this._fee_rate * tx_size);
+
+        if (Amount.greaterThanOrEqual(sumOfUTXO, new_fee_tx)) {
+            const new_unfreeze_amount = Amount.subtract(sumOfUTXO, new_fee_tx);
+
+            if (!Amount.equal(this._fee_tx, new_fee_tx)) {
+                this._fee_tx = Amount.make(new_fee_tx);
+                this.dispatchEvent(Event.CHANGE_TX_FEE, this._fee_tx);
+            }
+
+            if (!Amount.equal(this._unfreeze_amount, new_unfreeze_amount)) {
+                this._unfreeze_amount = Amount.make(new_unfreeze_amount);
+                this.dispatchEvent(Event.CHANGE_RECEIVER);
+            }
+        }
+    }
+
+    /**
+     * Clear all data
+     * @param is_dispatch
+     */
+    public async clear(is_dispatch: boolean = true) {
+        await this.clearReceiver(is_dispatch);
+        await this.clearSender(is_dispatch);
+
+        this._fee_rate = Utils.FEE_RATE;
+        this._fee_tx = this.getEstimatedFee(1, 1, 0);
+        this._fee_payload = Amount.make(0);
+        this._total_drawn = Amount.make(0);
+        this._remaining = Amount.make(0);
+        this._payload = Buffer.alloc(0);
+        this._unfreeze_amount = Amount.make(0);
+    }
+    /**
+     * Check if there is a condition to create a transaction.
+     */
+    public validate(): IWalletResult<any> {
+        const selected = this.getSelectedUTXO();
+        if (selected.length === 0)
+            return {
+                code: WalletResultCode.Unfreeze_NotAssignedUTXO,
+                message: WalletMessage.Unfreeze_NotAssignedUTXO,
+            };
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+        };
+    }
+
+    /**
+     * Build a transaction.
+     */
+    public buildTransaction(): IWalletResult<Transaction> {
+        const res_valid: IWalletResult<Transaction> = this.validate();
+        if (res_valid.code !== WalletResultCode.Success) return res_valid;
+
+        if (this.getReadOnlyAccount().length > 0) {
+            return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
+        }
+
+        if (this.lengthSender === 0) {
+            return { code: WalletResultCode.NotAssignedSender, message: WalletMessage.NotAssignedSender };
+        }
+
+        const account = this._senders.items[0].account;
+        let keypair: KeyPair;
+        if (account.secret !== undefined) {
+            keypair = KeyPair.fromSeed(account.secret);
+        } else {
+            return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
+        }
+
+        let tx: Transaction;
+        try {
+            const selected = this.getSelectedUTXO();
+            const builder = new TxBuilder(keypair);
+            selected.forEach((m) => {
+                builder.addInput(m.utxo.utxo, m.utxo.amount, m.account.secret);
+            });
+            builder.addOutput(keypair.address, this._unfreeze_amount);
+            tx = builder.sign(OutputType.Payment, this._fee_tx, Amount.make(0));
+        } catch (e) {
+            return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
+        }
+
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: tx,
+        };
+    }
+
+    /**
+     * Get the overview of the transaction built
+     */
+    public getTransactionOverview(): IWalletResult<ITransactionOverview> {
+        const res: IWalletResult<Transaction> = this.buildTransaction();
+        if (res.code !== WalletResultCode.Success || res.data === undefined)
+            return {
+                code: res.code,
+                message: res.message,
+            };
+
+        const tx = res.data;
+        const tx_hash = hashFull(tx);
+        const r: ITransactionOverviewReceiver[] = [];
+        for (let idx = 0; idx < tx.outputs.length; idx++) {
+            r.push({
+                utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
+                address: tx.outputs[idx].address,
+                amount: tx.outputs[idx].value,
+            });
+        }
+
+        const s: ITransactionOverviewSender[] = [];
+        for (const input of tx.inputs) {
+            const found = this._utxos.find((m) => Hash.equal(m.utxo.utxo, input.utxo));
+            if (found !== undefined) {
+                s.push({
+                    utxo: found.utxo.utxo,
+                    address: found.account.address,
+                    amount: found.utxo.amount,
+                });
+            }
+        }
+
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: {
+                receivers: r,
+                senders: s,
+                payload: this.payload,
+                fee_tx: this.fee_tx,
+                fee_payload: this.fee_payload,
+            },
+        };
     }
 }
