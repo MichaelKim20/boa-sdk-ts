@@ -1328,4 +1328,69 @@ describe("Test for the class WalletUnfreeze", function () {
             assert.deepStrictEqual(res_overview.data.receivers[0].address, account.address);
         }
     });
+
+    it("Test for the class WalletUnfreezeBuilder", async () => {
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+
+        const wallet_client = new sdk.WalletClient(endpoint);
+        const accounts = new sdk.AccountContainer(wallet_client);
+
+        const max_count = 50;
+        for (let count = 0; count < max_count; count++) {
+            // Make Random UTXO
+            makeRandomFrozenUTXO();
+            accounts.clear();
+            accounts.add(key_pairs[0].address.toString(), key_pairs[0].secret);
+            const account = accounts.items[accounts.items.length - 1];
+
+            const unfreeze_builder = new sdk.WalletUnfreezeBuilder(wallet_client);
+            await unfreeze_builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
+
+            assert.deepStrictEqual(unfreeze_builder.summary.items.length, 0);
+            assert.deepStrictEqual(unfreeze_builder.utxos.length, 0);
+
+            await unfreeze_builder.addSender(account);
+
+            assert.deepStrictEqual(unfreeze_builder.utxos.length, account.frozenUTXOProvider.length);
+            assert.deepStrictEqual(unfreeze_builder.summary.items.length, 0);
+
+            let to_be_unfrozen = sdk.Amount.make(0);
+            for (const m of unfreeze_builder.utxos) {
+                // Select UTXO
+                await unfreeze_builder.selectUTXO(m.utxo.utxo, true);
+                to_be_unfrozen = sdk.Amount.add(to_be_unfrozen, m.utxo.amount);
+
+                // Check Amount
+                assert.deepStrictEqual(
+                    sdk.Amount.add(unfreeze_builder.unfreeze_amount, unfreeze_builder.fee_tx).toString(),
+                    to_be_unfrozen.toString()
+                );
+
+                assert.deepStrictEqual(unfreeze_builder.summary.items.length, 1);
+                assert.deepStrictEqual(unfreeze_builder.summary.items[0].account, account);
+                assert.deepStrictEqual(unfreeze_builder.summary.items[0].to_be_unfrozen, to_be_unfrozen);
+                assert.deepStrictEqual(unfreeze_builder.summary.items[0].frozen_balance, account.balance.frozen);
+                assert.deepStrictEqual(unfreeze_builder.summary.items[0].total_balance, account.balance.balance);
+            }
+
+            // Build Transaction
+            const res_builder = unfreeze_builder.buildTransaction();
+            assert.deepStrictEqual(res_builder.code, sdk.WalletResultCode.Success);
+            assert.ok(res_builder.data !== undefined);
+
+            // Create Overview
+            const res_overview = unfreeze_builder.getTransactionOverview();
+            assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
+            assert.ok(res_overview.data !== undefined);
+
+            assert.deepStrictEqual(res_overview.data.receivers.length, 1);
+            for (const sender of res_overview.data.senders) {
+                assert.deepStrictEqual(sender.address, account.address);
+            }
+            assert.deepStrictEqual(res_overview.data.receivers[0].address, account.address);
+        }
+    });
 });
