@@ -1277,58 +1277,6 @@ describe("Test for the class WalletUnfreeze", function () {
         key_pairs = seeds.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
     });
 
-    it("Test for the class WalletUnfreeze", async () => {
-        const endpoint = {
-            agora: URI("http://localhost").port(agora_port).toString(),
-            stoa: URI("http://localhost").port(stoa_port).toString(),
-        };
-
-        const wallet_client = new sdk.WalletClient(endpoint);
-        const accounts = new sdk.AccountContainer(wallet_client);
-
-        const max_count = 50;
-        for (let count = 0; count < max_count; count++) {
-            // Make Random UTXO
-            makeRandomFrozenUTXO();
-            accounts.clear();
-            accounts.add(key_pairs[0].address.toString(), key_pairs[0].secret);
-            const account = accounts.items[accounts.items.length - 1];
-            const unfreeze_builder = new sdk.WalletUnfreeze(account, wallet_client);
-            await unfreeze_builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
-            const res = await account.getFrozenUTXOs();
-
-            assert.strictEqual(res.code, sdk.WalletResultCode.Success);
-            assert.ok(res.data !== undefined);
-
-            for (const m of res.data) await unfreeze_builder.addUTXO(m.utxo);
-
-            // Calculate sum of UTXO
-            const sum = res.data.reduce<sdk.Amount>(
-                (prev, value) => sdk.Amount.add(prev, value.amount),
-                sdk.Amount.make(0)
-            );
-
-            // Verify amount
-            assert.deepStrictEqual(sum, sdk.Amount.add(unfreeze_builder.unfreeze_amount, unfreeze_builder.fee_tx));
-
-            // Build Transaction
-            const res_builder = unfreeze_builder.buildTransaction();
-            assert.deepStrictEqual(res_builder.code, sdk.WalletResultCode.Success);
-            assert.ok(res_builder.data !== undefined);
-
-            // Create Overview
-            const res_overview = unfreeze_builder.getTransactionOverview();
-            assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
-            assert.ok(res_overview.data !== undefined);
-
-            assert.deepStrictEqual(res_overview.data.receivers.length, 1);
-            for (const sender of res_overview.data.senders) {
-                assert.deepStrictEqual(sender.address, account.address);
-            }
-            assert.deepStrictEqual(res_overview.data.receivers[0].address, account.address);
-        }
-    });
-
     it("Test for the class WalletUnfreezeBuilder", async () => {
         const endpoint = {
             agora: URI("http://localhost").port(agora_port).toString(),
