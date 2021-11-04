@@ -98,7 +98,6 @@ export { Event, EventDispatcher, TListener } from "./modules/wallet/EventDispatc
 export {
     WalletTxBuilder,
     WalletTxBuilderSingleReceiver,
-    WalletUnfreeze,
     WalletUnfreezeBuilder,
     AccountUTXOItem,
     AccountUTXOSummaryItem,
