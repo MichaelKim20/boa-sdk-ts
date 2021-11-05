@@ -1654,6 +1654,7 @@ export class WalletUnfreezeBuilder extends WalletTxBuilder {
             builder.addOutput(keypair.address, this._unfreeze_amount);
             tx = builder.sign(OutputType.Payment, this._fee_tx, Amount.make(0));
         } catch (e) {
+            console.log(e);
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
 
