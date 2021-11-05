@@ -346,6 +346,21 @@ export class WalletTxBuilder extends EventDispatcher {
     private _size_tx: number;
 
     /**
+     * The most recent time that Stoa brought in the fee rate.
+     */
+    private _latest_fee_rate_time: number;
+
+    /**
+     * This value is true when the user changes the fee manually.
+     */
+    private _manual_fee: boolean;
+
+    /**
+     * If an event has already occurred about the fee change, this value is true.
+     */
+    private _already_change_fee: boolean;
+
+    /**
      * Constructor
      * @param client The wallet client to request
      */
@@ -367,10 +382,13 @@ export class WalletTxBuilder extends EventDispatcher {
         this._size_tx = Transaction.getEstimatedNumberOfBytes(1, 2, 0);
         this._fee_tx = this.getEstimatedFee(1, 2, 0);
 
-        const tx_size = this.getEstimatedSize(1, 2, 0);
-        this._client.getTransactionFee(tx_size).then((res) => {
+        this._latest_fee_rate_time = 0;
+        this._manual_fee = false;
+        this._already_change_fee = false;
+
+        this._client.getTransactionFee(this._size_tx).then((res) => {
             if (res.code === WalletResultCode.Success && res.data !== undefined) {
-                this._fee_rate = JSBI.toNumber(Amount.divide(res.data.getFee(this._fee_option), tx_size).value);
+                this._fee_rate = JSBI.toNumber(Amount.divide(res.data.getFee(this._fee_option), this._size_tx).value);
                 if (this._fee_rate < Utils.FEE_RATE) this._fee_rate = Utils.FEE_RATE;
                 this._fee_tx = this.getEstimatedFee(1, 2, 0);
             } else {
@@ -505,6 +523,21 @@ export class WalletTxBuilder extends EventDispatcher {
      * the fee increases. Therefore, the withdrawn amount gradually increases as the used UTXO increases.
      */
     private async _calculate(already_changed: boolean = false) {
+        const now = new Date().getTime();
+        if (!this._manual_fee && now - this._latest_fee_rate_time > 60 * 1000) {
+            this._client.getTransactionFee(this._size_tx).then((res) => {
+                if (res.code === WalletResultCode.Success && res.data !== undefined) {
+                    this._fee_rate = JSBI.toNumber(
+                        Amount.divide(res.data.getFee(this._fee_option), this._size_tx).value
+                    );
+                    if (this._fee_rate < Utils.FEE_RATE) this._fee_rate = Utils.FEE_RATE;
+                } else {
+                    this._fee_rate = Utils.FEE_RATE;
+                }
+            });
+            this._latest_fee_rate_time = now;
+        }
+
         let out_count = this.lengthReceiver;
         if (out_count === 0) out_count = 2;
         else out_count++;
@@ -584,9 +617,10 @@ export class WalletTxBuilder extends EventDispatcher {
             this.dispatchEvent(Event.CHANGE_SENDER);
         }
 
-        if (!Amount.equal(this._fee_tx, new_fee_tx)) {
+        if (!Amount.equal(this._fee_tx, new_fee_tx) || !this._already_change_fee) {
             this._fee_tx = Amount.make(new_fee_tx);
             this.dispatchEvent(Event.CHANGE_TX_FEE, this._fee_tx);
+            this._already_change_fee = true;
         }
 
         if (!Amount.equal(this._fee_payload, new_fee_payload)) {
@@ -859,6 +893,7 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param value The option value  (High, Medium, Low)
      */
     public async setFeeOption(value: WalletTransactionFeeOption) {
+        this._manual_fee = false;
         const fee_res = await this._client.getTransactionFee(this._size_tx);
         if (fee_res.code === WalletResultCode.Success && fee_res.data !== undefined) {
             this._fee_option = value;
@@ -876,6 +911,7 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param tx_fee The fee of transaction
      */
     public async setTransactionFee(tx_fee: Amount): Promise<Amount> {
+        this._manual_fee = true;
         let num_input = 0;
         for (const sender of this._senders.items) {
             num_input += sender.utxos.length;
@@ -907,6 +943,9 @@ export class WalletTxBuilder extends EventDispatcher {
         this._total_spendable = Amount.make(0);
         this._payload = Buffer.alloc(0);
         this._size_tx = Transaction.getEstimatedNumberOfBytes(1, 2, 0);
+        this._latest_fee_rate_time = 0;
+        this._manual_fee = false;
+        this._already_change_fee = false;
     }
 
     /**
