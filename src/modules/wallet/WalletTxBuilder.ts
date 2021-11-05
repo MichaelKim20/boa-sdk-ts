@@ -1118,6 +1118,7 @@ export class WalletTxBuilder extends EventDispatcher {
             });
             tx = builder.sign(type, this._fee_tx, this._fee_payload);
         } catch (e) {
+            console.log(e);
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
 
