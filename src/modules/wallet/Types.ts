@@ -65,6 +65,7 @@ export enum WalletResultCode {
     InsufficientAmount = 1602,
     ExistUnknownSecretKey = 1603,
     NotAssignedSender = 1604,
+    AmountIsZero = 1605,
 
     Unfreeze_ExistNotFrozenUTXO = 1700,
     Unfreeze_UnsupportedLockType = 1701,
@@ -141,6 +142,8 @@ export enum WalletMessage {
     InsufficientAmount = "Insufficient amount.",
     ExistUnknownSecretKey = "An account exists where the secret key is unknown.",
     NotAssignedSender = "Not assigned any sender.",
+    AmountIsZero = "The amount to be transferred is zero.",
+
     FailedBuildTransaction = "An exception occurred in the process of building a transaction.",
     FailedSendTx = "Failed to process a transfer transaction.",
 

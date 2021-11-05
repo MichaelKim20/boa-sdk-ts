@@ -19,7 +19,6 @@ import { Transaction } from "../data/Transaction";
 import { TxInput } from "../data/TxInput";
 import { OutputType } from "../data/TxOutput";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
-import { LockType } from "../script/Lock";
 import { TxBuilder } from "../utils/TxBuilder";
 import { TxPayloadFee } from "../utils/TxPayloadFee";
 import { Utils } from "../utils/Utils";
@@ -1036,6 +1035,12 @@ export class WalletTxBuilder extends EventDispatcher {
                     message: WalletMessage.NotAssignedReceiverAmount,
                 };
         }
+
+        if (this.receivers.items.some((m) => Amount.equal(m.amount, Amount.ZERO_BOA)))
+            return {
+                code: WalletResultCode.AmountIsZero,
+                message: WalletMessage.AmountIsZero,
+            };
 
         if (Amount.greaterThan(this._remaining, Amount.make(0)))
             return {
