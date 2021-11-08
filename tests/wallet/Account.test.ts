@@ -133,6 +133,49 @@ describe("AccountContainer", () => {
         assert.strictEqual(accounts.length, 0);
     });
 
+    it("Test AccountContainer find", async () => {
+        const seeds = [
+            "SDLFMXEPWO5BNB64TUZQJP5JJUET2P4QFMTMDSPYELC2LZ6UXMSAOIKE",
+            "SDLAFDIR6HVSP6AAAY5MH2MGAWZ24EGCHILI4GPAU2BETGNMTFYQKQ6V",
+            "SCTP4PL5V635752FTC546RBNFBRZIWXL3QI34ZRNMY4C2PERCVRQJQYX",
+            "SBTQUF4TQPRE5GKU3A6EICN35BZPSYNNYEYYZ2GNMNY76XQ7ILQALTKP",
+            "SATBAW3HLRCRWA3LJIHFADM5RVWY4RDDG6ZNEXDNSDGC2MD3MBMQLUS5",
+            "SCXE6LI5SNOSHAGD7K5LJD4GODHEHOQ7JFKHJZSEHBLVPJ4Q2MSQGTFL",
+        ];
+        const kps = seeds.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+        const accounts = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
+
+        accounts.add("Account0", kps[0].secret);
+        accounts.add("Account1", kps[1].secret);
+        accounts.add("Account2", kps[2].secret);
+        accounts.add("Account3", kps[3].address);
+        accounts.add("Account4", kps[4].secret);
+
+        let acc = accounts.findByName("Account4");
+        assert.ok(acc !== undefined);
+        assert.deepStrictEqual(acc.secret, kps[4].secret);
+
+        acc = accounts.findByPublicKey(kps[0].address);
+        assert.ok(acc !== undefined);
+        assert.deepStrictEqual(acc.secret, kps[0].secret);
+
+        acc = accounts.findByPublicKey(kps[3].address);
+        assert.ok(acc !== undefined);
+        assert.deepStrictEqual(acc.address, kps[3].address);
+
+        acc = accounts.findBySecretKey(kps[3].secret);
+        assert.ok(acc !== undefined);
+        assert.deepStrictEqual(acc.address, kps[3].address);
+
+        acc = accounts.findBySecretKey(kps[2].secret);
+        assert.ok(acc !== undefined);
+        assert.deepStrictEqual(acc.secret, kps[2].secret);
+    });
+
     it("Test AccountContainer - Balance", (done) => {
         const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
         const endpoint = {
@@ -223,5 +266,45 @@ describe("AccountContainer", () => {
             accounts.remove(accounts.selected_account.name);
             assert.strictEqual(accounts.selected_index, 3);
         }
+    });
+
+    it("Test WalletSenderContainer", () => {
+        const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+        const accounts = new sdk.AccountContainer(new sdk.WalletClient(endpoint));
+        const senders = new sdk.WalletSenderContainer();
+        const account0 = new sdk.Account(accounts, "Account0", kps[0].secret);
+        const account1 = new sdk.Account(accounts, "Account1", kps[1].secret);
+        senders.add(account0, sdk.Amount.make(0));
+        senders.add(account1, sdk.Amount.make(0));
+
+        assert.strictEqual(senders.exist(kps[2].address), false);
+        assert.strictEqual(senders.exist(kps[0].address), true);
+        assert.strictEqual(senders.exist(kps[1].address), true);
+
+        senders.remove(account0);
+        assert.strictEqual(senders.exist(kps[0].address), false);
+    });
+
+    it("Test WalletReceiverContainer", () => {
+        const kps = sample_secret_multi_account.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+        const receivers = new sdk.WalletReceiverContainer();
+        const receiver0 = { address: kps[0].address, amount: sdk.BOA(100) };
+        const receiver1 = { address: kps[1].address, amount: sdk.BOA(100) };
+        receivers.add(receiver0);
+        receivers.add(receiver1);
+
+        assert.strictEqual(receivers.exist(kps[2].address), false);
+        assert.strictEqual(receivers.exist(kps[0].address), true);
+        assert.strictEqual(receivers.exist(kps[1].address), true);
+
+        receivers.remove(receiver0);
+        assert.strictEqual(receivers.exist(kps[0].address), false);
+
+        receivers.removeAddress(receiver1.address);
+        assert.strictEqual(receivers.exist(kps[1].address), false);
     });
 });

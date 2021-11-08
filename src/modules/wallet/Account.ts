@@ -363,6 +363,37 @@ export class AccountContainer extends EventDispatcher {
     }
 
     /**
+     * Find the account by name
+     * @param name The account name
+     */
+    public findByName(name: string): Account | undefined {
+        return this._items.find((m) => m.name === name);
+    }
+
+    /**
+     * Find the account by public key
+     * @param pk The public key
+     */
+    public findByPublicKey(pk: PublicKey): Account | undefined {
+        return this._items.find((m) => PublicKey.equal(m.address, pk));
+    }
+
+    /**
+     * Find the account by secret key
+     * @param sk The secret key
+     */
+    public findBySecretKey(sk: SecretKey): Account | undefined {
+        const pk = new PublicKey(sk.scalar.toPoint());
+        return this._items.find((m) => {
+            if (m.secret !== undefined) {
+                return SecretKey.equal(m.secret, sk);
+            } else {
+                return PublicKey.equal(m.address, pk);
+            }
+        });
+    }
+
+    /**
      * Clear all accounts
      * @param is_dispatch Set whether an event for changes will occur or not.
      */
