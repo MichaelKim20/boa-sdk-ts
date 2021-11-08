@@ -99,6 +99,7 @@ export {
     WalletTxBuilder,
     WalletTxBuilderSingleReceiver,
     WalletUnfreezeBuilder,
+    WalletCancelBuilder,
     AccountUTXOItem,
     AccountUTXOSummaryItem,
     AccountUTXOSummary,

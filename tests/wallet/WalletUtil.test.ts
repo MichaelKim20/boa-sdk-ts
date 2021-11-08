@@ -290,4 +290,9 @@ describe("Test of WalletUtils", () => {
         assert.deepStrictEqual(res.data.secret, reproduced_res.data.secret);
         assert.deepStrictEqual(res.data.address, reproduced_res.data.address);
     });
+
+    it("Test of WalletUtils.getShortAddress()", () => {
+        const pk = new sdk.PublicKey("boa1xrv266cegdthdc87uche9zvj8842shz3sdyvw0qecpgeykyv4ynssuz4lg0");
+        assert.strictEqual(sdk.WalletUtils.getShortAddress(pk), "boa1xrv2...g0");
+    });
 });

@@ -42,6 +42,8 @@ const seeds = [
 ];
 let key_pairs: sdk.KeyPair[];
 let sample_utxos: any = {};
+let sample_transaction: sdk.Transaction;
+let sample_transaction_hash: sdk.Hash;
 
 /**
  * This allows data transfer and reception testing with the server.
@@ -240,6 +242,25 @@ class TestStoa {
             });
 
             res.status(200).send(JSON.stringify(utxo_array));
+        });
+
+        // GET /transaction/pending/:hash
+        this.app.get("/transaction/pending/:hash", (req: express.Request, res: express.Response) => {
+            const hash: string = String(req.params.hash);
+
+            let tx_hash: sdk.Hash;
+            try {
+                tx_hash = new sdk.Hash(hash);
+            } catch (error) {
+                res.status(400).send(`Invalid value for parameter 'hash': ${hash}`);
+                return;
+            }
+
+            if (sdk.Hash.equal(tx_hash, sample_transaction_hash)) {
+                res.status(200).send(JSON.stringify(sample_transaction));
+            } else {
+                res.status(204).send(`No transactions. hash': (${hash})`);
+            }
         });
 
         this.app.set("port", this.port);
@@ -1200,7 +1221,7 @@ describe("WalletTxBuilder - When the balance of the selected account changes,", 
     });
 });
 
-describe("Test for the class WalletUnfreeze", function () {
+describe("Test for the class WalletUnfreezeBuilder", function () {
     this.timeout(20000);
 
     let agora_server: TestAgora;
@@ -1339,6 +1360,182 @@ describe("Test for the class WalletUnfreeze", function () {
                 assert.deepStrictEqual(sender.address, account.address);
             }
             assert.deepStrictEqual(res_overview.data.receivers[0].address, account.address);
+        }
+    });
+});
+
+describe("Test for the class WalletCancelBuilder", function () {
+    this.timeout(20000);
+
+    let agora_server: TestAgora;
+    let stoa_server: TestStoa;
+    const agora_port: string = "2520";
+    const stoa_port: string = "5520";
+
+    function makeRandomUTXO() {
+        const result: any = {};
+        for (const kp of key_pairs) {
+            const utxos: any[] = sdk.iota(0, 10).map((m: number) => {
+                return {
+                    utxo: new sdk.Hash(Buffer.from(sdk.SodiumHelper.sodium.randombytes_buf(sdk.Hash.Width))).toString(),
+                    type: Math.random() > 0.2 ? 0 : 1,
+                    unlock_height: (m + 2).toString(),
+                    amount: sdk.BOA(10 + Math.floor(Math.random() * 10000) / 100).toString(),
+                    height: (m + 1).toString(),
+                    time: m,
+                    lock_type: 0,
+                    lock_bytes: kp.address.data.toString("base64"),
+                };
+            });
+            const values = utxos.reduce<[sdk.JSBI, sdk.JSBI, sdk.JSBI]>(
+                (prev, value) => {
+                    prev[0] = sdk.JSBI.add(prev[0], sdk.JSBI.BigInt(value.amount));
+                    if (value.type === 0) {
+                        prev[1] = sdk.JSBI.add(prev[1], sdk.JSBI.BigInt(value.amount));
+                    } else {
+                        prev[2] = sdk.JSBI.add(prev[2], sdk.JSBI.BigInt(value.amount));
+                    }
+                    return prev;
+                },
+                [sdk.JSBI.BigInt(0), sdk.JSBI.BigInt(0), sdk.JSBI.BigInt(0)]
+            );
+
+            result[kp.address.toString()] = {
+                utxo: utxos,
+                balance: {
+                    address: kp.address.toString(),
+                    balance: values[0].toString(),
+                    spendable: values[1].toString(),
+                    frozen: values[2].toString(),
+                    locked: "0",
+                },
+            };
+        }
+        sample_utxos = result;
+    }
+
+    before("Wait for the package libsodium to finish loading", async () => {
+        if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
+        await sdk.SodiumHelper.init();
+    });
+
+    before("Start TestStoa", async () => {
+        stoa_server = new TestStoa(stoa_port);
+        await stoa_server.start();
+    });
+
+    before("Start TestAgora", async () => {
+        agora_server = new TestAgora(agora_port);
+        await agora_server.start();
+    });
+
+    after("Stop TestStoa", async () => {
+        await stoa_server.stop();
+    });
+
+    after("Stop TestAgora", async () => {
+        await agora_server.stop();
+    });
+
+    before("Create KeyPairs", async () => {
+        key_pairs = seeds.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
+    });
+
+    before("Create a transaction", async () => {
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+
+        const wallet_client = new sdk.WalletClient(endpoint);
+        const accounts = new sdk.AccountContainer(wallet_client);
+        const builder = new sdk.WalletTxBuilder(wallet_client);
+
+        makeRandomUTXO();
+        accounts.clear();
+        await builder.clear();
+        await builder.setFeeOption(sdk.WalletTransactionFeeOption.Medium);
+
+        key_pairs.forEach((value, idx) => {
+            accounts.add("Account" + idx.toString(), value.secret);
+        });
+
+        let spendable = sdk.Amount.make(0);
+        key_pairs.forEach((value, idx) => {
+            const elem = sample_utxos[value.address.toString()];
+            spendable = sdk.Amount.add(spendable, sdk.Amount.make(elem.balance.spendable));
+        });
+
+        const send_amount = sdk.Amount.divide(sdk.Amount.multiply(spendable, 10 + Math.floor(Math.random() * 20)), 100);
+        await builder.addReceiver({
+            address: new sdk.PublicKey("boa1xpr00rxtcprlf99dnceuma0ftm9sv03zhtlwfytd5p0dkvzt4ryp595zpjp"),
+            amount: send_amount,
+        });
+
+        for (const elem of accounts.items) {
+            await elem.checkBalance();
+        }
+
+        for (const elem of accounts.items) {
+            await builder.addSender(elem, elem.balance.spendable);
+        }
+
+        const res_transaction = builder.buildTransaction();
+        assert.deepStrictEqual(res_transaction.code, sdk.WalletResultCode.Success);
+        assert.ok(res_transaction.data !== undefined);
+
+        sample_transaction = res_transaction.data;
+        sample_transaction_hash = sdk.hashFull(sample_transaction);
+    });
+
+    it("Test for the class WalletCancelBuilder", async () => {
+        const endpoint = {
+            agora: URI("http://localhost").port(agora_port).toString(),
+            stoa: URI("http://localhost").port(stoa_port).toString(),
+        };
+
+        const wallet_client = new sdk.WalletClient(endpoint);
+        const accounts = new sdk.AccountContainer(wallet_client);
+
+        // Create an account except for the 0th key.
+        accounts.clear();
+        for (let idx = 1; idx < key_pairs.length; idx++) {
+            accounts.add("Account" + idx.toString(), key_pairs[idx].secret);
+        }
+
+        const builder = new sdk.WalletCancelBuilder(wallet_client, accounts);
+        assert.ok(builder.validate());
+
+        await builder.setTransactionHash(sample_transaction_hash);
+
+        // An error occurred because there was no secret key for the 0th account.
+        let res_transaction = builder.buildTransaction();
+        assert.deepStrictEqual(res_transaction.code, sdk.WalletResultCode.ExistUnknownSecretKey);
+        assert.ok(res_transaction.data === undefined);
+
+        // Set the secret key of the 0th account.
+        const account = accounts.find(key_pairs[0].address.toString());
+        if (account !== undefined) {
+            account.setSecret(key_pairs[0].secret);
+        }
+        await builder.setTransactionHash(sample_transaction_hash);
+
+        // Transactions are created normally.
+        res_transaction = builder.buildTransaction();
+        assert.deepStrictEqual(res_transaction.code, sdk.WalletResultCode.Success);
+        assert.ok(res_transaction.data !== undefined);
+
+        const res_overview = builder.getTransactionOverview();
+        assert.deepStrictEqual(res_overview.code, sdk.WalletResultCode.Success);
+        assert.ok(res_overview.data !== undefined);
+
+        for (const sender of res_overview.data.senders) {
+            const found = res_overview.data.receivers.find((m) => sdk.PublicKey.equal(m.address, sender.address));
+            assert.ok(found !== undefined);
+        }
+        for (const receiver of res_overview.data.receivers) {
+            const found = res_overview.data.senders.find((m) => sdk.PublicKey.equal(m.address, receiver.address));
+            assert.ok(found !== undefined);
         }
     });
 });

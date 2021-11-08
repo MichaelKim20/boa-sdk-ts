@@ -13,16 +13,19 @@
 *******************************************************************************/
 
 import { Amount } from "../common/Amount";
+import { Scalar } from "../common/ECC";
 import { Hash, hashFull, makeUTXOKey } from "../common/Hash";
-import { KeyPair, PublicKey } from "../common/KeyPair";
+import { KeyPair, PublicKey, SecretKey } from "../common/KeyPair";
 import { Transaction } from "../data/Transaction";
 import { TxInput } from "../data/TxInput";
 import { OutputType } from "../data/TxOutput";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
+import { LockType } from "../script/Lock";
 import { TxBuilder } from "../utils/TxBuilder";
+import { TxCanceller, TxCancelResultCode } from "../utils/TxCanceller";
 import { TxPayloadFee } from "../utils/TxPayloadFee";
 import { Utils } from "../utils/Utils";
-import { Account, AccountMode } from "./Account";
+import { Account, AccountContainer, AccountMode } from "./Account";
 import { Event, EventDispatcher } from "./EventDispatcher";
 import {
     ITransactionOverview,
@@ -36,6 +39,7 @@ import {
     WalletTransactionFeeOption,
 } from "./Types";
 import { WalletClient } from "./WalletClient";
+import { WalletUtils } from "./WalletUtil";
 
 import JSBI from "jsbi";
 
@@ -1686,6 +1690,303 @@ export class WalletUnfreezeBuilder extends WalletTxBuilder {
                 senders: s,
                 payload: this.payload,
                 fee_tx: this.fee_tx,
+                fee_payload: this.fee_payload,
+            },
+        };
+    }
+}
+
+/**
+ * Create a transaction to cancel the pending transaction.
+ */
+export class WalletCancelBuilder extends WalletTxBuilder {
+    private _accounts: AccountContainer;
+    private _tx: Transaction | undefined;
+    private _utxos: UnspentTxOutput[] = [];
+
+    /**
+     * Constructor
+     * @param client The wallet client to request
+     * @param accounts The accounts
+     */
+    constructor(client: WalletClient, accounts: AccountContainer) {
+        super(client);
+        this._accounts = accounts;
+    }
+
+    /**
+     * Set up a pending transaction
+     * @param tx The pending transaction
+     */
+    public async setTransaction(tx: Transaction): Promise<IWalletResult<any>> {
+        this._tx = tx;
+        const res = await this.makeUTXO();
+        if (res.code !== WalletResultCode.Success) {
+            return { code: res.code, message: res.message };
+        }
+        await this.makeSender();
+        return { code: WalletResultCode.Success, message: WalletMessage.Success };
+    }
+
+    /**
+     * Set the pending transaction hash
+     * @param tx_hash The pending transaction hash
+     */
+    public async setTransactionHash(tx_hash: Hash): Promise<IWalletResult<any>> {
+        try {
+            const res = await this._client.getPendingTransaction(tx_hash);
+            if (res.code !== WalletResultCode.Success || res.data === undefined) {
+                return { code: res.code, message: res.message };
+            }
+            if (res.data.isCoinbase()) {
+                return {
+                    code: WalletResultCode.Cancel_NotAllowCoinbase,
+                    message: WalletMessage.Cancel_NotAllowCoinbase,
+                };
+            }
+            return this.setTransaction(res.data);
+        } catch (e) {
+            return {
+                code: WalletResultCode.FailedRequestPendingTransaction,
+                message: WalletMessage.FailedRequestPendingTransaction,
+            };
+        }
+    }
+
+    /**
+     * Find UTXO information used in a set transaction.
+     */
+    private async makeUTXO(): Promise<IWalletResult<any>> {
+        if (this._tx === undefined) {
+            return {
+                code: WalletResultCode.Cancel_NotAssignedTx,
+                message: WalletMessage.Cancel_NotAssignedTx,
+            };
+        }
+
+        // Requests the information of the UTXO used in the transaction.
+        try {
+            const utxo_res = await this._client.getUTXOInfo(this._tx.inputs.map((m) => m.utxo));
+            if (utxo_res.code !== WalletResultCode.Success || utxo_res.data === undefined) {
+                return { code: WalletResultCode.FailedRequestUTXO, message: WalletMessage.FailedRequestUTXO };
+            }
+            this._utxos.length = 0;
+            this._utxos.push(...utxo_res.data);
+            return { code: WalletResultCode.Success, message: WalletMessage.Success };
+        } catch (e) {
+            return { code: WalletResultCode.FailedRequestUTXO, message: WalletMessage.FailedRequestUTXO };
+        }
+    }
+
+    /**
+     * Extract the account needed for the cancellation transaction from the account container
+     * and register it as a Sender.
+     * If it cannot be found in the account container, create an account without a secret key.
+     */
+    private async makeSender() {
+        await this.clearSender(false);
+        const addresses = this._utxos
+            .filter((m) => m.lock_type === LockType.Key)
+            .map((u) => new PublicKey(Buffer.from(u.lock_bytes, "base64")));
+        addresses.forEach((address) => {
+            const added = this.senders.items.findIndex((m) => PublicKey.equal(m.account.address, address));
+            if (added < 0) {
+                let account = this._accounts.items.find((m) => PublicKey.equal(m.address, address));
+                if (account === undefined) {
+                    account = this._accounts.add(WalletUtils.getShortAddress(address), address, true, false);
+                }
+                if (account !== undefined) this.addSender(account, Amount.make(0));
+            }
+        });
+    }
+
+    protected async calculate(already_changed: boolean = false): Promise<void> {
+        // Do not use
+    }
+
+    /**
+     * Set the payload
+     * @deprecated
+     */
+    public async setPayload() {
+        // Do not use
+    }
+
+    /**
+     * The payload of a transaction
+     */
+    public get payload(): Buffer {
+        return Buffer.alloc(0);
+    }
+
+    /**
+     * Clear all data
+     * @param is_dispatch
+     */
+    public async clear(is_dispatch: boolean = true) {
+        await this.clearReceiver(is_dispatch);
+        await this.clearSender(is_dispatch);
+
+        this._payload = Buffer.alloc(0);
+        this._tx = undefined;
+        this._utxos.length = 0;
+    }
+
+    /**
+     * Check if there is a condition to create a transaction.
+     */
+    public validate(): IWalletResult<any> {
+        if (this._tx === undefined)
+            return {
+                code: WalletResultCode.Cancel_NotAssignedTx,
+                message: WalletMessage.Cancel_NotAssignedTx,
+            };
+
+        const key_pairs = this.senders.items.map((m) => {
+            return new KeyPair(
+                m.account.address,
+                m.account.secret !== undefined ? m.account.secret : new SecretKey(Scalar.random())
+            );
+        });
+
+        // Create a cancellation transaction.
+        const canceller = new TxCanceller(this._tx, this._utxos, key_pairs);
+        const res = canceller.build();
+
+        // Check for errors that occurred during the cancellation transaction creation process.
+        switch (res.code) {
+            case TxCancelResultCode.Cancel_NotAllowUnfreezing:
+                return {
+                    code: WalletResultCode.Cancel_NotAllowUnfreezing,
+                    message: WalletMessage.Cancel_NotAllowUnfreezing,
+                };
+            case TxCancelResultCode.Cancel_InvalidTransaction:
+                return {
+                    code: WalletResultCode.Cancel_InvalidTransaction,
+                    message: WalletMessage.Cancel_InvalidTransaction,
+                };
+            case TxCancelResultCode.Cancel_NotFoundUTXO:
+                return {
+                    code: WalletResultCode.Cancel_NotFoundUTXO,
+                    message: WalletMessage.Cancel_NotFoundUTXO,
+                };
+            case TxCancelResultCode.Cancel_UnsupportedLockType:
+                return {
+                    code: WalletResultCode.Cancel_UnsupportedLockType,
+                    message: WalletMessage.Cancel_UnsupportedLockType,
+                };
+            case TxCancelResultCode.Cancel_NotFoundKey:
+                return {
+                    code: WalletResultCode.Cancel_NotFoundKey,
+                    message: WalletMessage.Cancel_NotFoundKey,
+                };
+            case TxCancelResultCode.Cancel_NotEnoughFee:
+                return {
+                    code: WalletResultCode.Cancel_NotEnoughFee,
+                    message: WalletMessage.Cancel_NotEnoughFee,
+                };
+            case TxCancelResultCode.FailedBuildTransaction:
+                return {
+                    code: WalletResultCode.FailedBuildTransaction,
+                    message: WalletMessage.FailedBuildTransaction,
+                };
+        }
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+        };
+    }
+
+    /**
+     * Build a transaction.
+     */
+    public buildTransaction(): IWalletResult<Transaction> {
+        if (this._tx === undefined)
+            return {
+                code: WalletResultCode.Cancel_NotAssignedTx,
+                message: WalletMessage.Cancel_NotAssignedTx,
+            };
+        const res_valid: IWalletResult<Transaction> = this.validate();
+        if (res_valid.code !== WalletResultCode.Success) return res_valid;
+
+        if (this.getReadOnlyAccount().length > 0) {
+            return { code: WalletResultCode.ExistUnknownSecretKey, message: WalletMessage.ExistUnknownSecretKey };
+        }
+
+        try {
+            const key_pairs: KeyPair[] = [];
+            for (const sender of this.senders.items) {
+                if (sender.account.secret !== undefined) key_pairs.push(KeyPair.fromSeed(sender.account.secret));
+            }
+
+            // Create a cancellation transaction.
+            const canceller = new TxCanceller(this._tx, this._utxos, key_pairs);
+            const res = canceller.build();
+
+            // If there are no errors, send
+            if (res.code === TxCancelResultCode.Success && res.tx !== undefined) {
+                return {
+                    code: WalletResultCode.Success,
+                    message: WalletMessage.Success,
+                    data: res.tx,
+                };
+            } else {
+                return {
+                    code: WalletResultCode.UnknownError,
+                    message: WalletMessage.UnknownError,
+                };
+            }
+        } catch (e) {
+            return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
+        }
+    }
+
+    /**
+     * Get the overview of the transaction built
+     */
+    public getTransactionOverview(): IWalletResult<ITransactionOverview> {
+        const res: IWalletResult<Transaction> = this.buildTransaction();
+        if (res.code !== WalletResultCode.Success || res.data === undefined)
+            return {
+                code: res.code,
+                message: res.message,
+            };
+
+        const tx = res.data;
+        const tx_hash = hashFull(tx);
+        const r: ITransactionOverviewReceiver[] = [];
+        for (let idx = 0; idx < tx.outputs.length; idx++) {
+            r.push({
+                utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
+                address: tx.outputs[idx].address,
+                amount: tx.outputs[idx].value,
+            });
+        }
+
+        const s: ITransactionOverviewSender[] = [];
+        for (const input of tx.inputs) {
+            const found = this._utxos.find((m) => Hash.equal(m.utxo, input.utxo));
+            if (found !== undefined) {
+                s.push({
+                    utxo: found.utxo,
+                    address: new PublicKey(Buffer.from(found.lock_bytes, "base64")),
+                    amount: found.amount,
+                });
+            }
+        }
+
+        const sum_s = s.reduce<Amount>((prev, value) => Amount.add(prev, value.amount), Amount.make(0));
+        const sum_r = r.reduce<Amount>((prev, value) => Amount.add(prev, value.amount), Amount.make(0));
+        const fee = Amount.subtract(sum_s, sum_r);
+
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: {
+                receivers: r,
+                senders: s,
+                payload: this.payload,
+                fee_tx: fee,
                 fee_payload: this.fee_payload,
             },
         };
