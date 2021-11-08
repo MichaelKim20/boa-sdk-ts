@@ -169,6 +169,14 @@ export class WalletReceiverContainer extends EventDispatcher {
     }
 
     /**
+     * If there's an element with a public key, return true, otherwise return false.
+     * @param address The public key
+     */
+    public exist(address: PublicKey): boolean {
+        return this.items.findIndex((m) => PublicKey.equal(m.address, address)) >= 0;
+    }
+
+    /**
      * Remove a receiver by address
      * @param address the receiver to be removed with this address
      */
@@ -233,6 +241,14 @@ export class WalletSenderContainer extends EventDispatcher {
         const sender = this.items[idx];
         this.items.splice(idx, 1);
         return sender;
+    }
+
+    /**
+     * If there's an element with a public key, return true, otherwise return false.
+     * @param address The public key
+     */
+    public exist(address: PublicKey): boolean {
+        return this.items.findIndex((m) => PublicKey.equal(m.account.address, address)) >= 0;
     }
 
     /**
@@ -1785,19 +1801,17 @@ export class WalletCancelBuilder extends WalletTxBuilder {
      */
     private async makeSender() {
         await this.clearSender(false);
-        const addresses = this._utxos
+        this._utxos
             .filter((m) => m.lock_type === LockType.Key)
-            .map((u) => new PublicKey(Buffer.from(u.lock_bytes, "base64")));
-        addresses.forEach((address) => {
-            const added = this.senders.items.findIndex((m) => PublicKey.equal(m.account.address, address));
-            if (added < 0) {
-                let account = this._accounts.items.find((m) => PublicKey.equal(m.address, address));
-                if (account === undefined) {
-                    account = this._accounts.add(WalletUtils.getShortAddress(address), address, true, false);
+            .map((u) => new PublicKey(Buffer.from(u.lock_bytes, "base64")))
+            .forEach((address) => {
+                if (!this.senders.exist(address)) {
+                    let account = this._accounts.findByPublicKey(address);
+                    if (account === undefined)
+                        account = this._accounts.add(WalletUtils.getShortAddress(address), address, true, false);
+                    if (account !== undefined) this.addSender(account, Amount.make(0));
                 }
-                if (account !== undefined) this.addSender(account, Amount.make(0));
-            }
-        });
+            });
     }
 
     protected async calculate(already_changed: boolean = false): Promise<void> {

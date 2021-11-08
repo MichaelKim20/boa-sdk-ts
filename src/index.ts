@@ -103,6 +103,10 @@ export {
     AccountUTXOItem,
     AccountUTXOSummaryItem,
     AccountUTXOSummary,
+    WalletReceiver,
+    WalletSender,
+    WalletReceiverContainer,
+    WalletSenderContainer,
 } from "./modules/wallet/WalletTxBuilder";
 export { WalletWatcher } from "./modules/wallet/WalletWatcher";
 export { AmountConverter, WalletValidator, WalletUtils } from "./modules/wallet/WalletUtil";
