@@ -282,4 +282,13 @@ export class WalletUtils {
             data: key,
         };
     }
+
+    /**
+     * Get short address (boa11234....12)
+     * @param address The public key
+     */
+    public static getShortAddress(address: PublicKey) {
+        const full = address.toString();
+        return full.substring(0, 8) + "..." + full.substring(full.length - 2);
+    }
 }

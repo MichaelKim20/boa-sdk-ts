@@ -59,6 +59,7 @@ export enum WalletResultCode {
     Cancel_UnsupportedLockType = 1504,
     Cancel_NotFoundKey = 1505,
     Cancel_NotEnoughFee = 1506,
+    Cancel_NotAssignedTx = 1507,
 
     NotAssignedReceiver = 1600,
     NotAssignedReceiverAmount = 1601,
@@ -136,6 +137,7 @@ export enum WalletMessage {
     Cancel_UnsupportedLockType = "This LockType not supported by cancel feature.",
     Cancel_NotFoundKey = "Secret key not found.",
     Cancel_NotEnoughFee = "Not enough fees are needed to cancel.",
+    Cancel_NotAssignedTx = "Not assigned a transaction.",
 
     NotAssignedReceiver = "Not assigned any receiver.",
     NotAssignedReceiverAmount = "Not assigned any receiver amount.",
