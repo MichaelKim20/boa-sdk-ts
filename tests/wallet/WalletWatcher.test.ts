@@ -47,9 +47,9 @@ let key_pairs: sdk.KeyPair[];
 let sample_utxos: any = {};
 
 interface IWatchEvent {
+    address: string;
+    tx_hash: string;
     type: string;
-    address?: string;
-    height?: number;
 }
 
 /**
@@ -108,30 +108,12 @@ class WalletWatcherIO {
     }
 
     /**
-     * When a new block occurs, an event occurs.
-     * @param height
-     */
-    public onNewBlock(height: number) {
-        this.height = height;
-        const values = this.tables.get("block");
-        if (values !== undefined) {
-            for (const elem of values) {
-                try {
-                    elem.emit("new_block", { height });
-                } catch (e) {
-                    //
-                }
-            }
-        }
-    }
-
-    /**
      * An event occurs when the account's UTXO is consumed.
      */
-    public onNewTransactionAccount(address: string) {
+    public onNewTransactionAccount(address: string, tx_hash: string, type: string) {
         const values = this.tables.get(address);
         if (values !== undefined) {
-            values.forEach((m) => m.emit("new_tx_acc", { address }));
+            values.forEach((m) => m.emit("new_tx_acc", { address, tx_hash, type }));
         }
     }
 }
@@ -336,14 +318,8 @@ class FakeStoa {
         const _emit = () => {
             if (idx >= events.length) return;
             const elem = events[idx];
-            if (elem.type === "block" && elem.height !== undefined) {
-                this.socket.onNewBlock(elem.height);
-            }
-            if (elem.type === "transaction" && elem.address !== undefined) {
-                this.socket.onNewTransactionAccount(elem.address);
-            }
+            this.socket.onNewTransactionAccount(elem.address, elem.tx_hash, elem.type);
             idx++;
-
             setTimeout(_emit.bind(this), 100);
         };
         setTimeout(_emit.bind(this), 1000);
@@ -426,54 +402,12 @@ class FakeAgora {
 }
 
 describe("Wallet Watcher ", function () {
-    this.timeout(8000);
+    this.timeout(10000);
 
     let agora_server: FakeAgora;
     let stoa_server: FakeStoa;
-    const agora_port: string = "2610";
-    const stoa_port: string = "5610";
-
-    function makeRandomUTXO() {
-        const result: any = {};
-        for (const kp of key_pairs) {
-            const utxos: any[] = sdk.iota(0, 10).map((m: number) => {
-                return {
-                    utxo: new sdk.Hash(Buffer.from(sdk.SodiumHelper.sodium.randombytes_buf(sdk.Hash.Width))).toString(),
-                    type: Math.random() > 0.2 ? 0 : 1,
-                    unlock_height: (m + 2).toString(),
-                    amount: sdk.BOA(10 + Math.floor(Math.random() * 10000) / 100).toString(),
-                    height: (m + 1).toString(),
-                    time: m,
-                    lock_type: 0,
-                    lock_bytes: kp.address.data.toString("base64"),
-                };
-            });
-            const values = utxos.reduce<[sdk.JSBI, sdk.JSBI, sdk.JSBI]>(
-                (prev, value) => {
-                    prev[0] = sdk.JSBI.add(prev[0], sdk.JSBI.BigInt(value.amount));
-                    if (value.type === 0) {
-                        prev[1] = sdk.JSBI.add(prev[1], sdk.JSBI.BigInt(value.amount));
-                    } else {
-                        prev[2] = sdk.JSBI.add(prev[2], sdk.JSBI.BigInt(value.amount));
-                    }
-                    return prev;
-                },
-                [sdk.JSBI.BigInt(0), sdk.JSBI.BigInt(0), sdk.JSBI.BigInt(0)]
-            );
-
-            result[kp.address.toString()] = {
-                utxo: utxos,
-                balance: {
-                    address: kp.address.toString(),
-                    balance: values[0].toString(),
-                    spendable: values[1].toString(),
-                    frozen: values[2].toString(),
-                    locked: "0",
-                },
-            };
-        }
-        sample_utxos = result;
-    }
+    const agora_port: string = "2620";
+    const stoa_port: string = "5620";
 
     before("Wait for the package libsodium to finish loading", async () => {
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
@@ -502,63 +436,6 @@ describe("Wallet Watcher ", function () {
         key_pairs = seeds.map((m) => sdk.KeyPair.fromSeed(new sdk.SecretKey(m)));
     });
 
-    it("Test for event of new blocks", async () => {
-        const endpoint = {
-            agora: URI("http://localhost").port(agora_port).toString(),
-            stoa: URI("http://localhost").port(stoa_port).toString(),
-        };
-
-        const wallet_client = new sdk.WalletClient(endpoint);
-        const accounts = new sdk.AccountContainer(wallet_client);
-        const watcher = new sdk.WalletWatcher(accounts, wallet_client);
-        const WatchEvents: { event: string; value: string }[] = [];
-        await watcher.initialize();
-
-        watcher.addEventListener(sdk.Event.NEW_BLOCK, (type: string, height: number) => {
-            WatchEvents.push({
-                event: sdk.Event.NEW_BLOCK,
-                value: height.toString(),
-            });
-        });
-
-        const test_data: IWatchEvent[] = [
-            {
-                type: "block",
-                height: 1,
-            },
-            {
-                type: "block",
-                height: 2,
-            },
-            {
-                type: "block",
-                height: 3,
-            },
-        ];
-
-        stoa_server.sendWatchEvent(test_data);
-
-        await delay(2000);
-
-        // Events for all accounts are delivered.
-        assert.deepStrictEqual(WatchEvents, [
-            {
-                event: "new_block",
-                value: "1",
-            },
-            {
-                event: "new_block",
-                value: "2",
-            },
-            {
-                event: "new_block",
-                value: "3",
-            },
-        ]);
-
-        watcher.finalize();
-    });
-
     it("Test for event of new transactions", async () => {
         const endpoint = {
             agora: URI("http://localhost").port(agora_port).toString(),
@@ -571,11 +448,8 @@ describe("Wallet Watcher ", function () {
         const WatchEvents: { event: string; value: string }[] = [];
         await watcher.initialize();
 
-        watcher.addEventListener(sdk.Event.NEW_TRANSACTION, (type: string, account: sdk.Account) => {
-            WatchEvents.push({
-                event: sdk.Event.NEW_TRANSACTION,
-                value: account.address.toString(),
-            });
+        watcher.addEventListener(sdk.Event.NEW_TRANSACTION, (type: string, data: any) => {
+            WatchEvents.push(data);
         });
 
         // When an account is added, a watcher of the account is registered on the server.
@@ -586,44 +460,64 @@ describe("Wallet Watcher ", function () {
         // A virtual event for data that will occur on the server.
         const test_data: IWatchEvent[] = [
             {
-                type: "transaction",
                 address: "boa1xzcd00f8jn36mzppkue6w3gpt2ufevulupaa5a8f9uc0st8uh68jyak7p64",
+                tx_hash:
+                    "0x210f6551d648a4da654da116b100e941e434e4f232b8579439c2ef64b04819bd2782eb3524c7a29c38c347cdf26006bccac54a58a58f103ae7eb5b252eb53b64",
+                type: "pending",
             },
             {
-                type: "transaction",
                 address: "boa1xqam00nfz03mv4jr80c7wr4hd2zqtgezr9kysgjqg3gdz7ygyutvylhhwlx",
+                tx_hash:
+                    "0xcfc5b09bc53136c1691e0991ffae7f2657bba248da07fb153ddf08a5109ce1c7d38206bfab6da57d70c428286d65081db992fbade6c67b97c62e9cb2862433e1",
+                type: "pending",
             },
             {
-                type: "transaction",
                 address: "boa1xzce00jfyy7jxukasfx8xndpx2l8mcyf2kmcfrvux9800pdj2670q5htf0e",
+                tx_hash:
+                    "0x018389f5876ebac77ad4c2269415bf8a5b14e2374e9d30a933f70a10abbca2a4035ec0640ba07ea8b39416e65ff66d373e25265ce78541b582ac34f2e625fb90",
+                type: "pending",
             },
             {
-                type: "transaction",
                 address: "boa1xpcq00pz4md60d06vukmw8mj7xseslt3spu7sp6daz36dt7eg5q35m8ehhc",
+                tx_hash:
+                    "0x3b44d65edb3361dd91441ab4f449eeda55644026624c4b8ae12ecf0264fa8a228dbf672ef97e2c4f87fb98ad7099e17b7f9ba7dbe8479672066912b1ea24ba77",
+                type: "pending",
             },
             {
-                type: "transaction",
                 address: "boa1xrap00gy9ttpvhk9hfz5vhwuy430ua7td88exhq2rx9lm3l6sgfeqzaeew9",
+                tx_hash:
+                    "0xff4e39063d315690608429a08b1b74c4a32c9f1529f1d9a3243ece4227765e98c564da4f8b083494c1b542ffb375b0dfa600be83653a5854d274602533a6d698",
+                type: "pending",
             },
             {
-                type: "transaction",
                 address: "boa1xpazy00l0n5wkxz340jmkfew5s4jc2hpfal405u6cslng6djj688vzfsxfr",
+                tx_hash:
+                    "0xe3f959407fe99cb23f352be4477bbef8f619a11283319192418ac869eeb204060facc7e99186a09d9d6aa951d548e6ab228196f96ec104ae2f94741efa760344",
+                type: "pending",
             },
             {
-                type: "transaction",
                 address: "boa1xqs00rejsuwmlreljp8k2c0k7q8cmkgxx76m6tc9f8j2s97vsvw4gzyhdcq",
+                tx_hash:
+                    "0x7bacc99e9bf827f0fa6dc6a77303d2e6ba6f1591277b896a9305a9e200853986fe9527fd551077a4ac2b511633ada4190a7b82cddaf606171336e1efba87ea8f",
+                type: "pending",
             },
             {
-                type: "transaction",
                 address: "boa1xpt00hv2rrlrm56pq70dukq4trlrfveqwna20su7457dnrl33xkrua6s5tf",
+                tx_hash:
+                    "0x375eefbe1990a6e37b2f9a11b1ba68e3c8f8d0976f51a5de55e4d58a6798cd4f023fe780113d551a9afe61f6f56ee0a93fe8752ba92869103b8a1aaa6c8b89e5",
+                type: "confirm",
             },
             {
-                type: "transaction",
                 address: "boa1xzu00x9m4u5ke9uav3v5vxr9pmfdcxc6qmzw3ht7kk20cckyc7uzusk2zah",
+                tx_hash:
+                    "0xe0dce92ebd44c6398e582e5439dfe03a08a0cb9c45075f6ecbe1edac3bcacf201baddc9c522415eb2f8033f263122becaa7fc078aa2423d39de05df7eaa27c3e",
+                type: "confirm",
             },
             {
-                type: "transaction",
                 address: "boa1xzv00g8k23usvepjkqhf3xzp7r5d6crync0klk6zakwl3y8eh47hgjct2py",
+                tx_hash:
+                    "0xa72ed0e4b392632c51a923a79b319d9db6c5269319bb94ecff4588c18d0a9a1c0c754ea4dbea99c0386afb8bfae9a65d5c9ed0fe7ddba53521badbc957271e81",
+                type: "confirm",
             },
         ];
 
@@ -633,48 +527,7 @@ describe("Wallet Watcher ", function () {
         await delay(2000);
 
         // Events for all accounts are delivered.
-        assert.deepStrictEqual(WatchEvents, [
-            {
-                event: "new_transaction",
-                value: "boa1xzcd00f8jn36mzppkue6w3gpt2ufevulupaa5a8f9uc0st8uh68jyak7p64",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xqam00nfz03mv4jr80c7wr4hd2zqtgezr9kysgjqg3gdz7ygyutvylhhwlx",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xzce00jfyy7jxukasfx8xndpx2l8mcyf2kmcfrvux9800pdj2670q5htf0e",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xpcq00pz4md60d06vukmw8mj7xseslt3spu7sp6daz36dt7eg5q35m8ehhc",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xrap00gy9ttpvhk9hfz5vhwuy430ua7td88exhq2rx9lm3l6sgfeqzaeew9",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xpazy00l0n5wkxz340jmkfew5s4jc2hpfal405u6cslng6djj688vzfsxfr",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xqs00rejsuwmlreljp8k2c0k7q8cmkgxx76m6tc9f8j2s97vsvw4gzyhdcq",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xpt00hv2rrlrm56pq70dukq4trlrfveqwna20su7457dnrl33xkrua6s5tf",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xzu00x9m4u5ke9uav3v5vxr9pmfdcxc6qmzw3ht7kk20cckyc7uzusk2zah",
-            },
-            {
-                event: "new_transaction",
-                value: "boa1xzv00g8k23usvepjkqhf3xzp7r5d6crync0klk6zakwl3y8eh47hgjct2py",
-            },
-        ]);
+        assert.deepStrictEqual(WatchEvents, test_data);
 
         // When the account is removed, the registered subscription to the server is released.
         accounts.remove("Account0");
@@ -692,24 +545,34 @@ describe("Wallet Watcher ", function () {
         // Events for the removed account are not delivered.
         assert.deepStrictEqual(WatchEvents, [
             {
-                event: "new_transaction",
-                value: "boa1xqam00nfz03mv4jr80c7wr4hd2zqtgezr9kysgjqg3gdz7ygyutvylhhwlx",
+                address: "boa1xqam00nfz03mv4jr80c7wr4hd2zqtgezr9kysgjqg3gdz7ygyutvylhhwlx",
+                tx_hash:
+                    "0xcfc5b09bc53136c1691e0991ffae7f2657bba248da07fb153ddf08a5109ce1c7d38206bfab6da57d70c428286d65081db992fbade6c67b97c62e9cb2862433e1",
+                type: "pending",
             },
             {
-                event: "new_transaction",
-                value: "boa1xpcq00pz4md60d06vukmw8mj7xseslt3spu7sp6daz36dt7eg5q35m8ehhc",
+                address: "boa1xpcq00pz4md60d06vukmw8mj7xseslt3spu7sp6daz36dt7eg5q35m8ehhc",
+                tx_hash:
+                    "0x3b44d65edb3361dd91441ab4f449eeda55644026624c4b8ae12ecf0264fa8a228dbf672ef97e2c4f87fb98ad7099e17b7f9ba7dbe8479672066912b1ea24ba77",
+                type: "pending",
             },
             {
-                event: "new_transaction",
-                value: "boa1xpazy00l0n5wkxz340jmkfew5s4jc2hpfal405u6cslng6djj688vzfsxfr",
+                address: "boa1xpazy00l0n5wkxz340jmkfew5s4jc2hpfal405u6cslng6djj688vzfsxfr",
+                tx_hash:
+                    "0xe3f959407fe99cb23f352be4477bbef8f619a11283319192418ac869eeb204060facc7e99186a09d9d6aa951d548e6ab228196f96ec104ae2f94741efa760344",
+                type: "pending",
             },
             {
-                event: "new_transaction",
-                value: "boa1xpt00hv2rrlrm56pq70dukq4trlrfveqwna20su7457dnrl33xkrua6s5tf",
+                address: "boa1xpt00hv2rrlrm56pq70dukq4trlrfveqwna20su7457dnrl33xkrua6s5tf",
+                tx_hash:
+                    "0x375eefbe1990a6e37b2f9a11b1ba68e3c8f8d0976f51a5de55e4d58a6798cd4f023fe780113d551a9afe61f6f56ee0a93fe8752ba92869103b8a1aaa6c8b89e5",
+                type: "confirm",
             },
             {
-                event: "new_transaction",
-                value: "boa1xzv00g8k23usvepjkqhf3xzp7r5d6crync0klk6zakwl3y8eh47hgjct2py",
+                address: "boa1xzv00g8k23usvepjkqhf3xzp7r5d6crync0klk6zakwl3y8eh47hgjct2py",
+                tx_hash:
+                    "0xa72ed0e4b392632c51a923a79b319d9db6c5269319bb94ecff4588c18d0a9a1c0c754ea4dbea99c0386afb8bfae9a65d5c9ed0fe7ddba53521badbc957271e81",
+                type: "confirm",
             },
         ]);
 
