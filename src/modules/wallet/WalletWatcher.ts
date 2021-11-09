@@ -53,10 +53,8 @@ export class WalletWatcher extends EventDispatcher {
      * It is the tasks to be done at the beginning of the creation of this class. This is called from the constructor.
      */
     public initialize() {
-        this.socket.on("new_block", this.onNewBlock.bind(this));
         this.socket.on("new_tx_acc", this.onNewTransaction.bind(this));
 
-        this.socket.emit("subscribe", { address: "block" });
         for (const account of this.accounts.items) {
             this.subscribe(account.address);
         }
@@ -78,7 +76,6 @@ export class WalletWatcher extends EventDispatcher {
         this.accounts.removeEventListener(Event.ADDED, this.onChangedAccount, this);
         this.accounts.removeEventListener(Event.REMOVED, this.onChangedAccount, this);
 
-        this.socket.emit("unsubscribe", { address: "block" });
         for (const account of this.accounts.items) {
             this.unsubscribe(account.address);
         }
@@ -115,32 +112,17 @@ export class WalletWatcher extends EventDispatcher {
     }
 
     /**
-     * It is a message handler that delivers a new block on the server.
-     * @param data { height: number }
-     * @private
-     */
-    private onNewBlock(data: { height: number }) {
-        if (data === undefined || data.height === undefined) return;
-
-        if (data.height > this.height) {
-            this.height = data.height;
-            this.accounts.checkBalance();
-            this.dispatchEvent(Event.NEW_BLOCK, this.height);
-        }
-    }
-
-    /**
      * It is a message handler that delivers a new transaction occurs on the server.
-     * @param data { address: string }
+     * @param data { address: string; tx_hash: string; type: string  }
      * @private
      */
-    private onNewTransaction(data: { address: string }) {
+    private onNewTransaction(data: { address: string; tx_hash: string; type: string }) {
         if (data === undefined || data.address === undefined) return;
 
         const account = this.accounts.find(data.address);
         if (account !== undefined) {
             account.checkBalance();
-            this.dispatchEvent(Event.NEW_TRANSACTION, account);
+            this.dispatchEvent(Event.NEW_TRANSACTION, data);
         }
     }
 
