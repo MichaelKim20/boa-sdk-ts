@@ -104,7 +104,7 @@ export {
     AccountUTXOSummaryItem,
     AccountUTXOSummary,
 } from "./modules/wallet/WalletTxBuilder";
-export { WalletWatcher } from "./modules/wallet/WalletWatcher";
+export { IWalletWatcherEvent, WalletWatcher } from "./modules/wallet/WalletWatcher";
 export { AmountConverter, WalletValidator, WalletUtils } from "./modules/wallet/WalletUtil";
 export { WalletMA } from "./modules/wallet/WalletMA";
 

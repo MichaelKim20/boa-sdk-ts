@@ -21,6 +21,26 @@ import JSBI from "jsbi";
 import { io, Socket } from "socket.io-client";
 
 /**
+ * Definition of events that occur when balance changes.
+ */
+export interface IWalletWatcherEvent {
+    /**
+     * Address where the balance has changed.
+     */
+    address: string;
+
+    /**
+     * Transaction hash
+     */
+    tx_hash: string;
+
+    /**
+     * "pending" or "confirm"
+     */
+    type: string;
+}
+
+/**
  * It monitors whether new blocks has been created.
  * It monitors whether transactions have occurred in accounts registered in Wallet in real time.
  */
@@ -116,7 +136,7 @@ export class WalletWatcher extends EventDispatcher {
      * @param data { address: string; tx_hash: string; type: string  }
      * @private
      */
-    private onNewTransaction(data: { address: string; tx_hash: string; type: string }) {
+    private onNewTransaction(data: IWalletWatcherEvent) {
         if (data === undefined || data.address === undefined) return;
 
         const account = this.accounts.find(data.address);
