@@ -538,6 +538,7 @@ export class AccountContainer extends EventDispatcher {
                     const account = new Account(this, elem.name, new PublicKey(elem.address));
                     this._items.push(account);
                     this.attachEventListener(account);
+                    this.dispatchEvent(Event.ADDED, account);
                 }
             }
             if (this._items.length > 0) this._selected_index = 0;
