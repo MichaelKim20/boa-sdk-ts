@@ -138,6 +138,7 @@ export class WalletWatcher extends EventDispatcher {
      */
     private onNewTransaction(data: IWalletWatcherEvent) {
         if (data === undefined || data.address === undefined) return;
+        console.log(data);
 
         const account = this.accounts.find(data.address);
         if (account !== undefined) {
