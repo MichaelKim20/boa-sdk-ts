@@ -529,6 +529,7 @@ export class AccountContainer extends EventDispatcher {
      * @param data
      */
     public fromString(data: string): boolean {
+        console.info("load");
         try {
             const list: any[] = JSON.parse(data);
             this._selected_index = -1;
