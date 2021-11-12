@@ -120,6 +120,7 @@ export class WalletWatcher extends EventDispatcher {
      * @param address The address to monitor.
      */
     public subscribe(address: PublicKey) {
+        console.log("subscribe", address.toString());
         this.socket.emit("subscribe", { address: address.toString() });
     }
 
@@ -128,6 +129,7 @@ export class WalletWatcher extends EventDispatcher {
      * @param address The address to monitor.
      */
     public unsubscribe(address: PublicKey) {
+        console.log("unsubscribe", address.toString());
         this.socket.emit("unsubscribe", { address: address.toString() });
     }
 
@@ -138,7 +140,7 @@ export class WalletWatcher extends EventDispatcher {
      */
     private onNewTransaction(data: IWalletWatcherEvent) {
         if (data === undefined || data.address === undefined) return;
-        console.log(data);
+        console.log("onNewTransaction", data);
 
         const account = this.accounts.find(data.address);
         if (account !== undefined) {
