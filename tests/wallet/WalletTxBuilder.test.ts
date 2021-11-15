@@ -1537,5 +1537,10 @@ describe("Test for the class WalletCancelBuilder", function () {
             const found = res_overview.data.senders.find((m) => sdk.PublicKey.equal(m.address, receiver.address));
             assert.ok(found !== undefined);
         }
+
+        const builder2 = new sdk.WalletCancelBuilder(wallet_client, accounts);
+        await builder2.setTransaction(res_transaction.data);
+        assert.strictEqual(builder2.validate(false).code, sdk.WalletResultCode.Cancel_CancellationTx);
+        assert.strictEqual(builder2.validate(true).code, sdk.WalletResultCode.Success);
     });
 });

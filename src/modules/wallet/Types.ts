@@ -60,6 +60,7 @@ export enum WalletResultCode {
     Cancel_NotFoundKey = 1505,
     Cancel_NotEnoughFee = 1506,
     Cancel_NotAssignedTx = 1507,
+    Cancel_CancellationTx = 1508,
 
     NotAssignedReceiver = 1600,
     NotAssignedReceiverAmount = 1601,
@@ -138,6 +139,7 @@ export enum WalletMessage {
     Cancel_NotFoundKey = "Secret key not found.",
     Cancel_NotEnoughFee = "Not enough fees are needed to cancel.",
     Cancel_NotAssignedTx = "Not assigned a transaction.",
+    Cancel_CancellationTx = "This is a cancellation transaction.",
 
     NotAssignedReceiver = "Not assigned any receiver.",
     NotAssignedReceiverAmount = "Not assigned any receiver amount.",
