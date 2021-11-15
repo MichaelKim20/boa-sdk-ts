@@ -1847,9 +1847,36 @@ export class WalletCancelBuilder extends WalletTxBuilder {
     }
 
     /**
-     * Check if there is a condition to create a transaction.
+     * Determine whether the set transaction is a cancellation transaction.
+     * If it is made for cancellation of another transaction, return true. Otherwise, return false.
      */
-    public validate(): IWalletResult<any> {
+    private isCancelTx(): boolean {
+        if (this._tx !== undefined) {
+            for (const sender of this.senders.items) {
+                if (
+                    this._tx.outputs.find((output) => PublicKey.equal(output.address, sender.account.address)) ===
+                    undefined
+                )
+                    return false;
+            }
+            for (const output of this._tx.outputs) {
+                if (
+                    this.senders.items.find((sender) => PublicKey.equal(output.address, sender.account.address)) ===
+                    undefined
+                )
+                    return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if there is a condition to create a transaction.
+     * @param allow_cancellation_tx Whether to allow a cancellation transaction, the default value is false.
+     */
+    public validate(allow_cancellation_tx: boolean = false): IWalletResult<any> {
         if (this._tx === undefined)
             return {
                 code: WalletResultCode.Cancel_NotAssignedTx,
@@ -1862,6 +1889,15 @@ export class WalletCancelBuilder extends WalletTxBuilder {
                 m.account.secret !== undefined ? m.account.secret : new SecretKey(Scalar.random())
             );
         });
+
+        if (!allow_cancellation_tx) {
+            if (this.isCancelTx()) {
+                return {
+                    code: WalletResultCode.Cancel_CancellationTx,
+                    message: WalletMessage.Cancel_CancellationTx,
+                };
+            }
+        }
 
         // Create a cancellation transaction.
         const canceller = new TxCanceller(this._tx, this._utxos, key_pairs);
@@ -1920,7 +1956,7 @@ export class WalletCancelBuilder extends WalletTxBuilder {
                 code: WalletResultCode.Cancel_NotAssignedTx,
                 message: WalletMessage.Cancel_NotAssignedTx,
             };
-        const res_valid: IWalletResult<Transaction> = this.validate();
+        const res_valid: IWalletResult<Transaction> = this.validate(true);
         if (res_valid.code !== WalletResultCode.Success) return res_valid;
 
         if (this.getReadOnlyAccount().length > 0) {
