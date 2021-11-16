@@ -1519,6 +1519,8 @@ describe("Test for the class WalletCancelBuilder", function () {
             account.setSecret(key_pairs[0].secret);
         }
         await builder.setTransactionHash(sample_transaction_hash);
+        assert.ok(builder.tx !== undefined);
+        assert.strictEqual(builder.isCancelTx(), false);
 
         // Transactions are created normally.
         res_transaction = builder.buildTransaction();
@@ -1540,7 +1542,7 @@ describe("Test for the class WalletCancelBuilder", function () {
 
         const builder2 = new sdk.WalletCancelBuilder(wallet_client, accounts);
         await builder2.setTransaction(res_transaction.data);
-        assert.strictEqual(builder2.validate(false).code, sdk.WalletResultCode.Cancel_CancellationTx);
-        assert.strictEqual(builder2.validate(true).code, sdk.WalletResultCode.Success);
+        assert.ok(builder2.tx !== undefined);
+        assert.strictEqual(builder2.isCancelTx(), true);
     });
 });
