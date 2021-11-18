@@ -67,7 +67,7 @@ export class BlockHeader {
     /**
      * Block seconds offset from Genesis Timestamp in `ConsensusParams`
      */
-    public time_offset: number;
+    public time_offset: number = 0;
 
     /**
      * Constructor
@@ -78,7 +78,6 @@ export class BlockHeader {
      * @param height      The block height
      * @param preimages   The pre-images propagated in this block
      * @param enrollments The enrolled validators
-     * @param time_offset Block seconds offset from Genesis Timestamp in `ConsensusParams`
      */
     constructor(
         prev_block: Hash,
@@ -87,8 +86,7 @@ export class BlockHeader {
         validators: BitMask,
         height: Height,
         preimages: Hash[],
-        enrollments: Enrollment[],
-        time_offset: number
+        enrollments: Enrollment[]
     ) {
         this.prev_block = prev_block;
         this.merkle_root = merkle_root;
@@ -97,7 +95,6 @@ export class BlockHeader {
         this.height = height;
         this.preimages = preimages;
         this.enrollments = enrollments;
-        this.time_offset = time_offset;
     }
 
     /**
@@ -122,9 +119,23 @@ export class BlockHeader {
             BitMask.fromString(value.validators),
             new Height(value.height),
             value.preimages.map((elem: string) => new Hash(elem)),
-            value.enrollments.map((elem: any) => Enrollment.reviver("", elem)),
-            value.time_offset
+            value.enrollments.map((elem: any) => Enrollment.reviver("", elem))
         );
+    }
+
+    /**
+     * Converts this object to its JSON representation
+     */
+    public toJSON(): any {
+        return {
+            prev_block: this.prev_block,
+            merkle_root: this.merkle_root,
+            signature: this.signature.toString(),
+            validators: this.validators.toString(),
+            height: this.height.toString(),
+            preimages: this.preimages,
+            enrollments: this.enrollments,
+        };
     }
 
     /**
@@ -137,7 +148,6 @@ export class BlockHeader {
         this.height.computeHash(buffer);
         for (const elem of this.preimages) hashPart(elem, buffer);
         for (const elem of this.enrollments) elem.computeHash(buffer);
-        hashPart(JSBI.BigInt(this.time_offset), buffer);
     }
 
     /**
@@ -156,8 +166,6 @@ export class BlockHeader {
 
         VarInt.fromNumber(this.enrollments.length, buffer);
         for (const elem of this.enrollments) elem.serialize(buffer);
-
-        VarInt.fromNumber(this.time_offset, buffer);
     }
 
     /**
@@ -177,16 +185,6 @@ export class BlockHeader {
         const enroll_length = VarInt.toNumber(buffer);
         const enrollments = iota(enroll_length).map(() => Enrollment.deserialize(buffer));
 
-        const time_offset = VarInt.toNumber(buffer);
-        return new BlockHeader(
-            prev_block,
-            merkle_root,
-            signature,
-            validators,
-            height,
-            preimages,
-            enrollments,
-            time_offset
-        );
+        return new BlockHeader(prev_block, merkle_root, signature, validators, height, preimages, enrollments);
     }
 }

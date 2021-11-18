@@ -85,9 +85,6 @@ export class JSONValidator {
                         },
                         type: "array",
                     },
-                    time_offset: {
-                        type: "number",
-                    },
                 },
                 additionalProperties: false,
                 required: [
@@ -98,7 +95,6 @@ export class JSONValidator {
                     "height",
                     "preimages",
                     "enrollments",
-                    "time_offset",
                 ],
             },
         ],

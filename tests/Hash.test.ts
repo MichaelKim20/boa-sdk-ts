@@ -184,12 +184,11 @@ describe("Hash", () => {
             sdk.BitMask.fromString("0"),
             new sdk.Height("0"),
             [],
-            [],
-            0
+            []
         );
         assert.strictEqual(
             sdk.hashFull(header).toString(),
-            "0xde4132329e5e3d7acb2efc075c0d67f4e29995d49a813445cf7ad74f66140df014f411dc71529142e2f0223578195a6cb22662ee990992b510b74e56a02dae87"
+            "0xbcf8118c75dfab48ef62235a2908aa4a659feee8cee513dd3329b7eee5a4feab16c4802abb819b884fc2e845c65ecc348f1b5d1f5de7350b24fc08fc6c702107"
         );
     });
 
@@ -210,12 +209,11 @@ describe("Hash", () => {
                     "0xe99832a1469beb4830f2faf3a6b8da5d027afe6f3f80098d89c4e6d22b8a22b1074b493041c124c86333891f5c62df8bd2bb0b6a493b6ea0ed276ad03db59b3f"
                 ),
             ],
-            [],
-            0
+            []
         );
         assert.strictEqual(
             sdk.hashFull(header).toString(),
-            "0xed0982420419abfef6d181d25d871619657d09a9e3e111a3c14ca92c40ab7d97b587c6ec05cd783bedd7b15681dd792a1dcef6c98614513442c00951d2bfb6d0"
+            "0xabb03b214d7568274253e1a95c3f928165b8fb643249a2eaf9f7c19b2f9041a9666bf8a2961f9c56f25fe8a5f6c780ead8651cee5c412f53849086c062dda964"
         );
     });
 

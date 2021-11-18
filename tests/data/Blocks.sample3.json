@@ -40,8 +40,7 @@
                     "commitment": "0x00eb7bc977af8044f37453b7498f0db9e58bb21c5d0065a05d6ca656b40758e62bd2fd18a403b99bfd6f8e2530528a12b76cf70fead17145e503f5a6bb78fb56",
                     "enroll_sig": "0x07ffcebf03b8e7c2f14209f0999bfbd80f2704d69d1383434c9c0ff7f52ad22c09e7b71a5d9bd8605f04db19fdbe35e2078a920ea3cd46b69dac6c2749f64ad1"
                 }
-            ],
-            "time_offset": 0
+            ]
         },
         "txs": [
             {
@@ -183,7 +182,7 @@
     },
     {
         "header": {
-            "prev_block": "0x67a40d4e4149c9c64efdbeabcb35d466bff111d7298f80ab310a514c15ba0e163c6ff78b1c60ad7fcb7e125a4738163343b62462ba9ce24ae576f01bbc5ce11c",
+            "prev_block": "0x6db06ab1cae5c4b05e806401e2c42d526ebf4ac81411d0fcd82344561b5a25ae0d29728f5c1c9bec6cf254f621c183be71858a6ed5339c06fc5b34d7881b9b23",
             "merkle_root": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
             "signature": "0xadb6fa02d8a83d7a580c012aafb025fb2e4fc5e4789f02f0e72468f6839f9b9f04bdbb61771c5ac1d21655714e53562488beeedeed747c2252e6851cb9beb7da",
             "validators": "110111",
@@ -198,8 +197,7 @@
             ],
             "enrollments": [
 
-            ],
-            "time_offset": 10037327
+            ]
         },
         "txs": [
 
@@ -210,7 +208,7 @@
     },
     {
         "header": {
-            "prev_block": "0x45fda44f528ee727b10f95b48133bcdf11e2924cd68486342c353e463f5645f8970092ef96b86645741506993828bfd6e10a40c3a31ff35090ce81d63495b129",
+            "prev_block": "0x0834e2207a3d4ed20bec5d61084e372139965d494002509618a2738e5553d9f559faf29d3b6f5c35fb3436019e8f3a1c4927dc23a49d6b33f95efacd9ead62dc",
             "merkle_root": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
             "signature": "0x46f9ee0dc9340df24278fae2802a18d5290bad4f9c193ddadd70d2c6658c5822096566170baef443e5ecabe1c387ad9b1c916d8f106228a927dbaaefc1eb7ce9",
             "validators": "11111",
@@ -224,8 +222,7 @@
             ],
             "enrollments": [
 
-            ],
-            "time_offset": 10037387
+            ]
         },
         "txs": [
 
