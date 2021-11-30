@@ -2035,4 +2035,55 @@ export class WalletCancelBuilder extends WalletTxBuilder {
             },
         };
     }
+
+    /**
+     * Get the overview of the original transaction
+     */
+    public getOriginalTransactionOverview(): IWalletResult<ITransactionOverview> {
+        if (this._tx === undefined) {
+            return {
+                code: WalletResultCode.Cancel_NotAssignedTx,
+                message: WalletMessage.Cancel_NotAssignedTx,
+            };
+        }
+        const tx = this._tx;
+        const tx_hash = hashFull(tx);
+        const r: ITransactionOverviewReceiver[] = [];
+        for (let idx = 0; idx < tx.outputs.length; idx++) {
+            r.push({
+                utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
+                address: tx.outputs[idx].address,
+                amount: tx.outputs[idx].value,
+            });
+        }
+
+        const s: ITransactionOverviewSender[] = [];
+        for (const input of tx.inputs) {
+            const found = this._utxos.find((m) => Hash.equal(m.utxo, input.utxo));
+            if (found !== undefined) {
+                s.push({
+                    utxo: found.utxo,
+                    address: new PublicKey(Buffer.from(found.lock_bytes, "base64")),
+                    amount: found.amount,
+                });
+            }
+        }
+
+        const sum_s = s.reduce<Amount>((prev, value) => Amount.add(prev, value.amount), Amount.make(0));
+        const sum_r = r.reduce<Amount>((prev, value) => Amount.add(prev, value.amount), Amount.make(0));
+        const fee = Amount.subtract(sum_s, sum_r);
+        const fee_payload = TxPayloadFee.getFeeAmount(this._tx.payload.length);
+        const fee_tx = Amount.subtract(fee, fee_payload);
+        return {
+            code: WalletResultCode.Success,
+            message: WalletMessage.Success,
+            data: {
+                receivers: r,
+                senders: s,
+                payload: this._tx.payload,
+                fee_tx,
+                fee_payload,
+            },
+        };
+    }
 }

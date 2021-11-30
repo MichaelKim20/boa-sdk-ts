@@ -1540,6 +1540,22 @@ describe("Test for the class WalletCancelBuilder", function () {
             assert.ok(found !== undefined);
         }
 
+        const res_original_overview = builder.getOriginalTransactionOverview();
+        assert.deepStrictEqual(res_original_overview.code, sdk.WalletResultCode.Success);
+        assert.ok(res_original_overview.data !== undefined);
+
+        for (const sender of res_original_overview.data.senders) {
+            const found = sample_transaction.inputs.find((m: sdk.TxInput) => sdk.Hash.equal(m.utxo, sender.utxo));
+            assert.ok(found !== undefined);
+        }
+
+        for (const receiver of res_original_overview.data.receivers) {
+            const found = sample_transaction.outputs.find((m: sdk.TxOutput) =>
+                sdk.PublicKey.equal(m.address, receiver.address)
+            );
+            assert.ok(found !== undefined);
+        }
+
         const builder2 = new sdk.WalletCancelBuilder(wallet_client, accounts);
         await builder2.setTransaction(res_transaction.data);
         assert.ok(builder2.tx !== undefined);
