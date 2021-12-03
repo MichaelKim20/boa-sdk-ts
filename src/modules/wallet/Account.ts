@@ -457,8 +457,12 @@ export class AccountContainer extends EventDispatcher {
     /**
      * Check the balance of all accounts.
      */
-    public checkBalance() {
+    public checkBalance(calculate: boolean = true) {
         this._items.forEach((m) => m.checkBalance());
+        if (calculate) {
+            this.calculateTotalBalance();
+            this.dispatchEvent(Event.CHANGE_BALANCE, this);
+        }
     }
 
     /**
@@ -485,6 +489,14 @@ export class AccountContainer extends EventDispatcher {
      * @param account The account with changed balance
      */
     public onAccountChangeBalance(type: string, account: Account) {
+        this.calculateTotalBalance();
+        this.dispatchEvent(Event.CHANGE_BALANCE, this);
+    }
+
+    /**
+     * Sum all account balances.
+     */
+    private calculateTotalBalance() {
         let balance = Amount.make(0);
         let spendable = Amount.make(0);
         let frozen = Amount.make(0);
@@ -498,7 +510,6 @@ export class AccountContainer extends EventDispatcher {
             locked = Amount.add(locked, elem.balance.locked);
         }
         this._balance = new WalletBalance("", balance, spendable, frozen, locked, true);
-        this.dispatchEvent(Event.CHANGE_BALANCE, this);
     }
 
     /**

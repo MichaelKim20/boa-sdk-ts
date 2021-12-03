@@ -214,7 +214,7 @@ describe("AccountContainer", () => {
                 done();
             }
         });
-        accounts.checkBalance();
+        accounts.checkBalance(false);
     });
 
     it("Test AccountList - toString & fromString", () => {
