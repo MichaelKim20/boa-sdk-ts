@@ -433,4 +433,59 @@ describe("Serialize and Deserialize", () => {
             "When serialize, then deserialize, it does not match the original."
         );
     });
+
+    it("Test Unlock.getNumberOfBytes()", () => {
+        const num_bytes = block.txs[0].inputs[0].unlock.getNumberOfBytes();
+        assert.strictEqual(num_bytes, 65);
+    });
+
+    it("Test TxInput.getNumberOfBytes()", () => {
+        const num_bytes = block.txs[0].inputs[0].getNumberOfBytes();
+        assert.strictEqual(num_bytes, 133);
+    });
+
+    it("Test Lock.getNumberOfBytes()", () => {
+        const num_bytes = block.txs[0].outputs[0].lock.getNumberOfBytes();
+        assert.strictEqual(num_bytes, 33);
+    });
+
+    it("Test TxOutput.getNumberOfBytes()", () => {
+        const num_bytes = block.txs[0].outputs[0].getNumberOfBytes();
+        assert.strictEqual(num_bytes, 45);
+    });
+
+    it("Test Transaction.getNumberOfBytes()", () => {
+        const num_bytes = block.txs[0].getNumberOfBytes();
+        assert.strictEqual(num_bytes, 186);
+    });
+
+    it("Test Enrollment.getNumberOfBytes()", () => {
+        const num_bytes = enrollment.getNumberOfBytes();
+        assert.strictEqual(num_bytes, 192);
+    });
+
+    it("Test BitMask.getNumberOfBytes()", () => {
+        const num_bytes = block.header.validators.getNumberOfBytes();
+        assert.strictEqual(num_bytes, 1);
+    });
+
+    it("Test Height.getNumberOfBytes()", () => {
+        const num_bytes = block.header.height.getNumberOfBytes();
+        assert.strictEqual(num_bytes, 8);
+    });
+
+    it("Test Signature.getNumberOfBytes()", () => {
+        const num_bytes = block.header.signature.getNumberOfBytes();
+        assert.strictEqual(num_bytes, 64);
+    });
+
+    it("Test BlockHeader.getNumberOfBytes()", () => {
+        const num_bytes = block.header.getNumberOfBytes();
+        assert.strictEqual(num_bytes, 585);
+    });
+
+    it("Test Block.getNumberOfBytes()", () => {
+        const num_bytes = block.getNumberOfBytes();
+        assert.strictEqual(num_bytes, 3033);
+    });
 });

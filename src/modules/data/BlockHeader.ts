@@ -20,7 +20,6 @@ import { VarInt } from "../utils/VarInt";
 import { BitMask } from "./BitMask";
 import { Enrollment } from "./Enrollment";
 
-import JSBI from "jsbi";
 import { SmartBuffer } from "smart-buffer";
 
 /**
@@ -186,5 +185,20 @@ export class BlockHeader {
         const enrollments = iota(enroll_length).map(() => Enrollment.deserialize(buffer));
 
         return new BlockHeader(prev_block, merkle_root, signature, validators, height, preimages, enrollments);
+    }
+
+    /**
+     * Returns the data size.
+     */
+    public getNumberOfBytes(): number {
+        let num_bytes =
+            this.prev_block.getNumberOfBytes() +
+            this.merkle_root.getNumberOfBytes() +
+            this.signature.getNumberOfBytes() +
+            this.validators.getNumberOfBytes() +
+            this.height.getNumberOfBytes();
+        for (const elem of this.preimages) num_bytes += elem.getNumberOfBytes();
+        for (const elem of this.enrollments) num_bytes += elem.getNumberOfBytes();
+        return num_bytes;
     }
 }

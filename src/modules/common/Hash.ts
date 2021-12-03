@@ -162,6 +162,13 @@ export class Hash {
         if (this.data.length !== Hash.Width) return false;
         return this.data.every((value) => value === 0);
     }
+
+    /**
+     * Returns the data size.
+     */
+    public getNumberOfBytes(): number {
+        return this.data.length;
+    }
 }
 
 /**
