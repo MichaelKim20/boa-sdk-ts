@@ -14,7 +14,6 @@
 import { Hash, hashPart } from "../common/Hash";
 import { Signature } from "../common/Signature";
 import { JSONValidator } from "../utils/JSONValidator";
-import { VarInt } from "../utils/VarInt";
 
 import { SmartBuffer } from "smart-buffer";
 
@@ -98,5 +97,14 @@ export class Enrollment {
         const enroll_sig = Signature.deserialize(buffer);
 
         return new Enrollment(utxo_key, commitment, enroll_sig);
+    }
+
+    /**
+     * Returns the data size.
+     */
+    public getNumberOfBytes(): number {
+        return (
+            this.utxo_key.getNumberOfBytes() + this.commitment.getNumberOfBytes() + this.enroll_sig.getNumberOfBytes()
+        );
     }
 }

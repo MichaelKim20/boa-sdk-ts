@@ -106,4 +106,15 @@ export class Block {
 
         return new Block(header, txs, merkle_tree);
     }
+
+    /**
+     * Returns the data size.
+     */
+    public getNumberOfBytes(): number {
+        let num_bytes = this.header.getNumberOfBytes();
+        for (const tx of this.txs) num_bytes += tx.getNumberOfBytes();
+        for (const tx of this.merkle_tree) num_bytes += tx.getNumberOfBytes();
+
+        return num_bytes;
+    }
 }

@@ -12,6 +12,7 @@
 *******************************************************************************/
 
 import { SmartBuffer } from "smart-buffer";
+import { Utils } from "../utils/Utils";
 import { VarInt } from "../utils/VarInt";
 import { hashPart } from "./Hash";
 
@@ -88,5 +89,12 @@ export class Height {
      */
     public clone(): Height {
         return new Height(this.value);
+    }
+
+    /**
+     * Returns the data size.
+     */
+    public getNumberOfBytes(): number {
+        return Utils.SIZE_OF_LONG;
     }
 }

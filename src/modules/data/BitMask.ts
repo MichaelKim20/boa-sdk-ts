@@ -169,4 +169,11 @@ export class BitMask {
     public get bytes(): Buffer {
         return this._bytes;
     }
+
+    /**
+     * Returns the data size.
+     */
+    public getNumberOfBytes(): number {
+        return this.bytes.length;
+    }
 }

@@ -145,4 +145,11 @@ export class Signature {
         const s = new Scalar(Utils.readBuffer(buffer, Scalar.Width));
         return Signature.fromSchnorr(R, s);
     }
+
+    /**
+     * Returns the data size.
+     */
+    public getNumberOfBytes(): number {
+        return this.data.length;
+    }
 }
