@@ -164,7 +164,7 @@ export class WalletWatcher extends EventDispatcher {
                 const height = JSBI.toNumber(res.data);
                 if (height > this.height) {
                     this.height = height;
-                    this.accounts.checkBalance();
+                    this.accounts.checkBalance(false);
                     this.dispatchEvent(Event.NEW_BLOCK, this.height);
                 }
             }
