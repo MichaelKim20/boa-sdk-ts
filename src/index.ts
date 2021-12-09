@@ -40,6 +40,7 @@ export { Transaction } from "./modules/data/Transaction";
 export { TxInput } from "./modules/data/TxInput";
 export { TxOutput, OutputType } from "./modules/data/TxOutput";
 export { PreImageInfo } from "./modules/data/PreImageInfo";
+export { Constant } from "./modules/data/Constant";
 
 export { ProposalFeeData } from "./modules/vote/ProposalFeeData";
 export { ProposalType, ProposalData } from "./modules/vote/ProposalData";

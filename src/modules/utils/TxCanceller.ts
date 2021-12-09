@@ -205,6 +205,7 @@ export class TxCanceller {
                 OutputType.Payment,
                 tx_fee,
                 payload_fee,
+                Amount.make(0),
                 this.tx.lock_height,
                 this.tx.inputs[0].unlock_age
             );

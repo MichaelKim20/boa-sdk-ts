@@ -122,6 +122,7 @@ export class TxBuilder {
      * @param lock_height The transaction-level height lock
      * @param tx_fee The transaction fee
      * @param payload_fee The payload fee
+     * @param freezing_fee The freezing fee
      * @param unlock_age The unlock age for each input in the transaction
      * @param unlocker optional callback to generate the unlock script.
      * If one is not provided then a LockType.Key unlock script
@@ -131,6 +132,7 @@ export class TxBuilder {
         type: OutputType = OutputType.Payment,
         tx_fee: Amount | JSBI = Amount.make(0),
         payload_fee: Amount | JSBI = Amount.make(0),
+        freezing_fee: Amount | JSBI = Amount.make(0),
         lock_height: Height = new Height("0"),
         unlock_age: number = 0,
         unlocker?: (tx: Transaction, s: RawInput, idx: number) => Unlock
@@ -144,7 +146,8 @@ export class TxBuilder {
 
         const amount_tx_fee = tx_fee instanceof Amount ? tx_fee : Amount.make(tx_fee);
         const amount_payload_fee = payload_fee instanceof Amount ? payload_fee : Amount.make(payload_fee);
-        const total_fee = Amount.add(amount_tx_fee, amount_payload_fee);
+        const amount_freezing_fee = freezing_fee instanceof Amount ? freezing_fee : Amount.make(freezing_fee);
+        const total_fee = Amount.add(Amount.add(amount_tx_fee, amount_payload_fee), amount_freezing_fee);
         if (Amount.greaterThan(this.amount, total_fee))
             this.addOutput(this.owner_keypair.address, Amount.subtract(this.amount, total_fee));
         else if (Amount.lessThan(this.amount, total_fee)) throw new Error("There is not enough fee.");

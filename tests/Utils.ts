@@ -126,6 +126,16 @@ export const sample_utxo_wallet = [
         lock_type: 0,
         lock_bytes: "uvf5H/3E3rpj8r12wjpHMPSOcoAhhCa2ecQMw6HCI84=",
     },
+    {
+        utxo: "0x90959b83ee81cf2757eff613a0bcc35be9a9b6d3394e3c0255af4d68a43a6aeea1bfff1c5a84de5d54e1dd46436c18f6301bbfedae4168f632294c8f1d111ee3",
+        type: 0,
+        height: "9",
+        time: 1577842200000,
+        unlock_height: "10",
+        amount: "100000000000",
+        lock_type: 0,
+        lock_bytes: "uvf5H/3E3rpj8r12wjpHMPSOcoAhhCa2ecQMw6HCI84=",
+    },
 ];
 export const sample_utxo_client = [
     {

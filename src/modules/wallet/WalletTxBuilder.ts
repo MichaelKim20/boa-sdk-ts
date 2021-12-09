@@ -16,6 +16,7 @@ import { Amount } from "../common/Amount";
 import { Scalar } from "../common/ECC";
 import { Hash, hashFull, makeUTXOKey } from "../common/Hash";
 import { KeyPair, PublicKey, SecretKey } from "../common/KeyPair";
+import { Constant } from "../data/Constant";
 import { Transaction } from "../data/Transaction";
 import { TxInput } from "../data/TxInput";
 import { OutputType } from "../data/TxOutput";
@@ -335,9 +336,14 @@ export class WalletTxBuilder extends EventDispatcher {
     protected _fee_tx: Amount;
 
     /**
-     * The fee of _payload
+     * The fee of payload
      */
     protected _fee_payload: Amount;
+
+    /**
+     * The fee of freezing
+     */
+    protected _fee_freezing: Amount;
 
     /**
      * The amount to be spent
@@ -379,6 +385,9 @@ export class WalletTxBuilder extends EventDispatcher {
      */
     private _already_change_fee: boolean;
 
+
+    private _output_type: number;
+
     /**
      * Constructor
      * @param client The wallet client to request
@@ -391,7 +400,9 @@ export class WalletTxBuilder extends EventDispatcher {
         this._fee_option = WalletTransactionFeeOption.Medium;
         this._fee_tx = Amount.make(0);
         this._fee_payload = Amount.make(0);
+        this._fee_freezing = Amount.make(0);
         this._payload = Buffer.alloc(0);
+        this._output_type = OutputType.Payment;
 
         this._total_spendable = Amount.make(0);
         this._total_drawn = Amount.make(0);
@@ -414,6 +425,22 @@ export class WalletTxBuilder extends EventDispatcher {
                 this._fee_rate = Utils.FEE_RATE;
             }
         });
+    }
+
+    /**
+     *
+     * @param value
+     */
+    public async setOutputType(value: OutputType) {
+        this._output_type = value;
+        await this.calculate();
+    }
+
+    /**
+     *
+     */
+    public getOutputType(): number {
+        return this._output_type;
     }
 
     /**
@@ -565,6 +592,7 @@ export class WalletTxBuilder extends EventDispatcher {
         const total_amount = this.getTotalReceiverAmount();
 
         const new_fee_payload: Amount = TxPayloadFee.getFeeAmount(this._payload.length);
+        const new_fee_freezing: Amount = (this._output_type === OutputType.Freeze) ? Constant.SlashPenaltyAmount : Amount.make(0);
         let changed = false;
         let new_fee_tx: Amount = Amount.make(0);
 
@@ -594,7 +622,8 @@ export class WalletTxBuilder extends EventDispatcher {
                     new_total_drawn,
                     in_count,
                     out_count,
-                    new_fee_payload
+                    new_fee_payload,
+                    new_fee_freezing
                 );
                 done = cs_res.done;
                 new_fee_tx = cs_res.fee;
@@ -646,6 +675,11 @@ export class WalletTxBuilder extends EventDispatcher {
             this._fee_payload = Amount.make(new_fee_payload);
             this.dispatchEvent(Event.CHANGE_PAYLOAD_FEE, this._fee_payload);
         }
+
+        if (!Amount.equal(this._fee_freezing, new_fee_freezing)) {
+            this._fee_freezing = Amount.make(new_fee_freezing);
+            this.dispatchEvent(Event.CHANGE_FREEZING_FEE, this._fee_freezing);
+        }
     }
 
     /**
@@ -678,7 +712,8 @@ export class WalletTxBuilder extends EventDispatcher {
      * @param total_drawn   The sum of the amount to be withdrawn
      * @param in_count      The number of the transaction input
      * @param out_count     The number of the transaction output
-     * @param fee_payload   The fee of _payload
+     * @param fee_payload   The fee of payload
+     * @param fee_freezing  The fee of freezing
      */
     protected async calculateSender(
         sender: WalletSender,
@@ -686,7 +721,8 @@ export class WalletTxBuilder extends EventDispatcher {
         total_drawn: Amount,
         in_count: number,
         out_count: number,
-        fee_payload: Amount
+        fee_payload: Amount,
+        fee_freezing: Amount
     ): Promise<{ done: boolean; fee: Amount }> {
         let done = false;
         let fee = Amount.make(0);
@@ -705,7 +741,7 @@ export class WalletTxBuilder extends EventDispatcher {
             fee = this.getEstimatedFee(in_count + sender.utxos.length, out_count, this._payload.length);
 
             // Calculate the total fee.
-            const fee_total = Amount.add(fee, fee_payload);
+            const fee_total = Amount.add(Amount.add(fee, fee_payload), fee_freezing);
 
             // Calculate the amount not drawn. = Total amount to be sent + Fee - Amount already drawn
             const amount = Amount.subtract(Amount.add(total_amount, fee_total), total_drawn);
@@ -1077,7 +1113,7 @@ export class WalletTxBuilder extends EventDispatcher {
     /**
      * Build a transaction.
      */
-    public buildTransaction(type: OutputType = OutputType.Payment): IWalletResult<Transaction> {
+    public buildTransaction(): IWalletResult<Transaction> {
         const res_valid: IWalletResult<Transaction> = this.validate();
         if (res_valid.code !== WalletResultCode.Success) return res_valid;
 
@@ -1116,7 +1152,7 @@ export class WalletTxBuilder extends EventDispatcher {
             this._receivers.items.forEach((r) => {
                 builder.addOutput(r.address, r.amount);
             });
-            tx = builder.sign(type, this._fee_tx, this._fee_payload);
+            tx = builder.sign(this._output_type, this._fee_tx, this._fee_payload, this._fee_freezing);
         } catch (e) {
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
@@ -1131,8 +1167,8 @@ export class WalletTxBuilder extends EventDispatcher {
     /**
      * Get the overview of the transaction built
      */
-    public getTransactionOverview(type: OutputType = OutputType.Payment): IWalletResult<ITransactionOverview> {
-        const res: IWalletResult<Transaction> = this.buildTransaction(type);
+    public getTransactionOverview(): IWalletResult<ITransactionOverview> {
+        const res: IWalletResult<Transaction> = this.buildTransaction();
         if (res.code !== WalletResultCode.Success || res.data === undefined)
             return {
                 code: res.code,
@@ -1175,6 +1211,7 @@ export class WalletTxBuilder extends EventDispatcher {
                 payload: Buffer.from(this._payload),
                 fee_tx: Amount.make(this._fee_tx),
                 fee_payload: Amount.make(this._fee_payload),
+                fee_freezing: Amount.make(this._fee_freezing),
             },
         };
     }
@@ -1707,6 +1744,7 @@ export class WalletUnfreezeBuilder extends WalletTxBuilder {
                 payload: this.payload,
                 fee_tx: this.fee_tx,
                 fee_payload: this.fee_payload,
+                fee_freezing: Amount.make(0),
             },
         };
     }
@@ -2032,6 +2070,7 @@ export class WalletCancelBuilder extends WalletTxBuilder {
                 payload: this.payload,
                 fee_tx: fee,
                 fee_payload: this.fee_payload,
+                fee_freezing: Amount.make(0),
             },
         };
     }
@@ -2073,7 +2112,19 @@ export class WalletCancelBuilder extends WalletTxBuilder {
         const sum_r = r.reduce<Amount>((prev, value) => Amount.add(prev, value.amount), Amount.make(0));
         const fee = Amount.subtract(sum_s, sum_r);
         const fee_payload = TxPayloadFee.getFeeAmount(this._tx.payload.length);
-        const fee_tx = Amount.subtract(fee, fee_payload);
+        const fee_freezing = tx.isFreeze() ? Constant.SlashPenaltyAmount : Amount.make(0);
+        let fee_tx: Amount;
+        if (Amount.greaterThanOrEqual(fee, fee_payload)) {
+            const fee_tx_freezing = Amount.subtract(fee, fee_payload);
+            if (Amount.greaterThanOrEqual(fee_tx_freezing, fee_freezing)) {
+                fee_tx = Amount.subtract(fee_tx_freezing, fee_freezing);
+            } else {
+                fee_tx = Amount.make(0);
+            }
+        } else {
+            fee_tx = Amount.make(0);
+        }
+
         return {
             code: WalletResultCode.Success,
             message: WalletMessage.Success,
@@ -2083,6 +2134,7 @@ export class WalletCancelBuilder extends WalletTxBuilder {
                 payload: this._tx.payload,
                 fee_tx,
                 fee_payload,
+                fee_freezing,
             },
         };
     }

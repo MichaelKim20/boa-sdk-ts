@@ -309,4 +309,5 @@ export interface ITransactionOverview {
     payload: Buffer;
     fee_tx: Amount;
     fee_payload: Amount;
+    fee_freezing: Amount;
 }
