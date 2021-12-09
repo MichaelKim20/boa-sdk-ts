@@ -14,6 +14,7 @@
 import { Amount } from "../common/Amount";
 import { Hash } from "../common/Hash";
 import { KeyPair, PublicKey } from "../common/KeyPair";
+import { Constant } from "../data/Constant";
 import { Transaction } from "../data/Transaction";
 import { TxInput } from "../data/TxInput";
 import { OutputType } from "../data/TxOutput";
@@ -117,12 +118,13 @@ export class Wallet {
 
         const payloadLength = payload === undefined ? 0 : payload.length;
         const payloadFee = TxPayloadFee.getFeeAmount(payloadLength);
+        const freezingFee = (output_type === OutputType.Freeze) ? Constant.SlashPenaltyAmount : Amount.make(0);
         const sendBOA = receiver.reduce<Amount>((sum, value) => Amount.add(sum, value.amount), Amount.make(0));
         const outputCount = receiver.length + 1;
         let estimatedTxFee = Amount.make(
             Utils.FEE_RATE * Transaction.getEstimatedNumberOfBytes(0, outputCount, payloadLength)
         );
-        let totalFee = Amount.add(payloadFee, estimatedTxFee);
+        let totalFee = Amount.add(Amount.add(payloadFee, estimatedTxFee), freezingFee);
         let totalSpendAmount = Amount.add(totalFee, sendBOA);
 
         // Extract the UTXO to be spent.
@@ -157,7 +159,7 @@ export class Wallet {
 
             // Build a transaction
             receiver.forEach((m) => this.txBuilder.addOutput(m.address, m.amount));
-            tx = this.txBuilder.sign(output_type, estimatedTxFee, payloadFee);
+            tx = this.txBuilder.sign(output_type, estimatedTxFee, payloadFee, freezingFee);
         } catch (e) {
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
@@ -216,7 +218,7 @@ export class Wallet {
 
                 // Build a transaction
                 receiver.forEach((m) => this.txBuilder.addOutput(m.address, m.amount));
-                tx = this.txBuilder.sign(output_type, txFee, payloadFee);
+                tx = this.txBuilder.sign(output_type, txFee, payloadFee, freezingFee);
             } catch (e) {
                 return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
             }
@@ -252,7 +254,7 @@ export class Wallet {
 
             // Build a transaction
             receiver.forEach((m) => this.txBuilder.addOutput(m.address, m.amount));
-            tx = this.txBuilder.sign(output_type, txFee, payloadFee);
+            tx = this.txBuilder.sign(output_type, txFee, payloadFee, freezingFee);
         } catch (e) {
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
@@ -498,7 +500,7 @@ export class Wallet {
         try {
             unspentTxOutputs.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.utxo, u.amount));
             this.txBuilder.addOutput(receiver, amount);
-            tx = this.txBuilder.sign(OutputType.Payment, txFee, payloadFee);
+            tx = this.txBuilder.sign(OutputType.Payment, txFee, payloadFee, Amount.make(0));
         } catch (e) {
             return { code: WalletResultCode.FailedBuildTransaction, message: WalletMessage.FailedBuildTransaction };
         }
