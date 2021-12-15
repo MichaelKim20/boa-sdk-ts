@@ -471,7 +471,7 @@ describe("Wallet", () => {
                 outputs: [
                     {
                         type: 0,
-                        value: "1999900000",
+                        value: "101999900000",
                         lock: { type: 0, bytes: "8Pfbo1EB2MhMyXG64ZzvTt50VuOGRGwIDjiXoA5xyZ8=" },
                     },
                 ],

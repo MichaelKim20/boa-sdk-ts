@@ -118,7 +118,7 @@ export class Wallet {
 
         const payloadLength = payload === undefined ? 0 : payload.length;
         const payloadFee = TxPayloadFee.getFeeAmount(payloadLength);
-        const freezingFee = (output_type === OutputType.Freeze) ? Constant.SlashPenaltyAmount : Amount.make(0);
+        const freezingFee = output_type === OutputType.Freeze ? Constant.SlashPenaltyAmount : Amount.make(0);
         const sendBOA = receiver.reduce<Amount>((sum, value) => Amount.add(sum, value.amount), Amount.make(0));
         const outputCount = receiver.length + 1;
         let estimatedTxFee = Amount.make(
@@ -148,7 +148,7 @@ export class Wallet {
 
         let tx: Transaction;
         try {
-            utxosToSpend.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.utxo, u.amount));
+            utxosToSpend.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.type, u.utxo, u.amount));
 
             estimatedTxFee = Amount.make(
                 Utils.FEE_RATE * Transaction.getEstimatedNumberOfBytes(utxosToSpend.length, outputCount, payloadLength)
@@ -211,7 +211,7 @@ export class Wallet {
             // Add new UTXOs
             utxosToSpend.push(...moreUtxosToSpend);
             try {
-                utxosToSpend.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.utxo, u.amount));
+                utxosToSpend.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.type, u.utxo, u.amount));
 
                 // Assign Payload
                 if (payload !== undefined) this.txBuilder.assignPayload(payload);
@@ -247,7 +247,7 @@ export class Wallet {
         }
 
         try {
-            utxosToSpend.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.utxo, u.amount));
+            utxosToSpend.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.type, u.utxo, u.amount));
 
             // Assign Payload
             if (payload !== undefined) this.txBuilder.assignPayload(payload);
@@ -474,7 +474,7 @@ export class Wallet {
         const outputCount = 1;
 
         const sumOfUTXO: Amount = unspentTxOutputs.reduce<Amount>(
-            (sum, u) => Amount.add(sum, u.amount),
+            (prev, u) => Amount.add(Amount.add(prev, u.amount), Constant.SlashPenaltyAmount),
             Amount.make(0)
         );
         const txSize = Transaction.getEstimatedNumberOfBytes(unspentTxOutputs.length, outputCount, 0);
@@ -498,7 +498,7 @@ export class Wallet {
         // Build a transaction
         let tx: Transaction;
         try {
-            unspentTxOutputs.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.utxo, u.amount));
+            unspentTxOutputs.forEach((u: UnspentTxOutput) => this.txBuilder.addInput(u.type, u.utxo, u.amount));
             this.txBuilder.addOutput(receiver, amount);
             tx = this.txBuilder.sign(OutputType.Payment, txFee, payloadFee, Amount.make(0));
         } catch (e) {

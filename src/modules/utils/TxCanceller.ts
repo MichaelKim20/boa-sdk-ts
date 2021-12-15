@@ -196,7 +196,7 @@ export class TxCanceller {
                         let amount = Amount.subtract(u.amount, divided_fee);
                         if (idx === in_length - 1) amount = Amount.subtract(amount, remain_fee);
 
-                        builder.addInput(u.utxo, u.amount, k.secret);
+                        builder.addInput(u.type, u.utxo, u.amount, k.secret);
                         builder.addOutput(k.address, amount);
                     }
                 }

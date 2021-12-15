@@ -385,7 +385,6 @@ export class WalletTxBuilder extends EventDispatcher {
      */
     private _already_change_fee: boolean;
 
-
     private _output_type: number;
 
     /**
@@ -592,7 +591,8 @@ export class WalletTxBuilder extends EventDispatcher {
         const total_amount = this.getTotalReceiverAmount();
 
         const new_fee_payload: Amount = TxPayloadFee.getFeeAmount(this._payload.length);
-        const new_fee_freezing: Amount = (this._output_type === OutputType.Freeze) ? Constant.SlashPenaltyAmount : Amount.make(0);
+        const new_fee_freezing: Amount =
+            this._output_type === OutputType.Freeze ? Constant.SlashPenaltyAmount : Amount.make(0);
         let changed = false;
         let new_fee_tx: Amount = Amount.make(0);
 
@@ -1145,7 +1145,7 @@ export class WalletTxBuilder extends EventDispatcher {
             if (this._payload.length > 0) builder.assignPayload(this._payload);
             this._senders.items.forEach((s) => {
                 s.utxos.forEach((m) => {
-                    builder.addInput(m.utxo, m.amount, s.account.secret);
+                    builder.addInput(m.type, m.utxo, m.amount, s.account.secret);
                 });
             });
 
@@ -1315,6 +1315,7 @@ export interface AccountUTXOItem {
 export interface AccountUTXOSummaryItem {
     account: Account;
     to_be_unfrozen: Amount;
+    deposit: Amount;
     frozen_balance: Amount;
     total_balance: Amount;
 }
@@ -1330,6 +1331,7 @@ export class AccountUTXOSummary {
             this.items.push({
                 account,
                 to_be_unfrozen: Amount.make(utxo.amount),
+                deposit: Amount.make(Constant.SlashPenaltyAmount),
                 frozen_balance: Amount.make(account.balance.frozen),
                 total_balance: Amount.make(account.balance.balance),
             });
@@ -1606,7 +1608,10 @@ export class WalletUnfreezeBuilder extends WalletTxBuilder {
         const selected = this.getSelectedUTXO();
         const in_count = selected.length;
         const out_count = 1;
-        const sumOfUTXO = selected.reduce<Amount>((sum, u) => Amount.add(sum, u.utxo.amount), Amount.make(0));
+        const sumOfUTXO = selected.reduce<Amount>(
+            (prev, u) => Amount.add(Amount.add(prev, u.utxo.amount), Constant.SlashPenaltyAmount),
+            Amount.make(0)
+        );
 
         const tx_size = this.getEstimatedSize(in_count, out_count, 0);
         const new_fee_tx = Amount.make(this._fee_rate * tx_size);
@@ -1686,7 +1691,7 @@ export class WalletUnfreezeBuilder extends WalletTxBuilder {
             const selected = this.getSelectedUTXO();
             const builder = new TxBuilder(keypair);
             selected.forEach((m) => {
-                builder.addInput(m.utxo.utxo, m.utxo.amount, m.account.secret);
+                builder.addInput(OutputType.Freeze, m.utxo.utxo, m.utxo.amount, m.account.secret);
             });
             builder.addOutput(keypair.address, this._unfreeze_amount);
             tx = builder.sign(OutputType.Payment, this._fee_tx, Amount.make(0));
