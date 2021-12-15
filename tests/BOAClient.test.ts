@@ -356,9 +356,9 @@ describe("BOA Client", () => {
         const fee = sdk.TxPayloadFee.getFee(vote_data.length);
 
         const vote_tx = builder
-            .addInput(utxos[0].utxo, utxos[0].amount, keys[0].secret)
-            .addInput(utxos[1].utxo, utxos[1].amount, keys[1].secret)
-            .addInput(utxos[2].utxo, utxos[2].amount, keys[2].secret)
+            .addInput(sdk.OutputType.Payment, utxos[0].utxo, utxos[0].amount, keys[0].secret)
+            .addInput(sdk.OutputType.Payment, utxos[1].utxo, utxos[1].amount, keys[1].secret)
+            .addInput(sdk.OutputType.Payment, utxos[2].utxo, utxos[2].amount, keys[2].secret)
             .assignPayload(vote_data)
             .addOutput(new sdk.PublicKey(sdk.TxPayloadFee.CommonsBudgetAddress), fee)
             .sign(sdk.OutputType.Payment);
@@ -449,7 +449,7 @@ describe("BOA Client", () => {
             sdk.KeyPair.fromSeed(new sdk.SecretKey("SD4IEXJ6GWZ226ALTDDM72SYMHBTTJ6CHDPUNNTVZK4XSDHAM4BAQIC4"))
         );
         const tx = builder
-            .addInput(utxo.utxo, utxo.amount)
+            .addInput(sdk.OutputType.Payment, utxo.utxo, utxo.amount)
             .addOutput(new sdk.PublicKey(sdk.TxPayloadFee.CommonsBudgetAddress), fee)
             .assignPayload(vote_data)
             .sign(sdk.OutputType.Payment);
@@ -480,7 +480,7 @@ describe("BOA Client", () => {
         const utxo_provider = new sdk.UTXOProvider(key_pair.address, boa_client);
         // Get UTXO for the amount to need.
         const utxos = await utxo_provider.getUTXO(sdk.JSBI.add(sdk.JSBI.add(payload_fee, tx_fee), sdk.JSBI.BigInt(1)));
-        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
 
         const expected = {
             inputs: [
@@ -551,7 +551,7 @@ describe("BOA Client", () => {
         // There can't be any output. An error occurs because the constraint of
         // the transaction is not satisfied that it must have at least one output.
         const utxos = await utxo_provider.getUTXO(sdk.JSBI.add(payload_fee, tx_fee));
-        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
 
         assert.throws(() => {
             const tx = builder.assignPayload(vote_data).sign(sdk.OutputType.Payment, tx_fee, payload_fee);
@@ -581,7 +581,7 @@ describe("BOA Client", () => {
         // Get UTXO for the amount to need.
         // The amount of the UTXO found is one greater than the fee, allowing at least one change output.
         const utxos = await utxo_provider.getUTXO(sdk.JSBI.add(sdk.JSBI.add(payload_fee, tx_fee), sdk.JSBI.BigInt(1)));
-        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
 
         const tx = builder.assignPayload(vote_data).sign(sdk.OutputType.Payment, tx_fee, payload_fee);
 
@@ -683,7 +683,7 @@ describe("BOA Client", () => {
             total_send_amount,
             sdk.Amount.make(sdk.Utils.FEE_RATE * sdk.TxInput.getEstimatedNumberOfBytes())
         );
-        in_utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        in_utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
         estimated_tx_fee = sdk.Amount.make(
             sdk.Utils.FEE_RATE *
                 sdk.Transaction.getEstimatedNumberOfBytes(in_utxos.length, output_count, vote_data.length)
@@ -719,7 +719,7 @@ describe("BOA Client", () => {
                 sdk.Amount.make(sdk.Utils.FEE_RATE * sdk.TxInput.getEstimatedNumberOfBytes())
             );
             in_utxos.push(...additional);
-            in_utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+            in_utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
             estimated_tx_fee = sdk.Amount.make(
                 sdk.Utils.FEE_RATE *
                     sdk.Transaction.getEstimatedNumberOfBytes(in_utxos.length, output_count, vote_data.length)
@@ -741,7 +741,7 @@ describe("BOA Client", () => {
             tx_fee = sdk.Amount.make(fees.medium);
         }
 
-        in_utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        in_utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
         tx = builder
             .addOutput(new sdk.PublicKey(output_address), send_boa)
             .assignPayload(vote_data)

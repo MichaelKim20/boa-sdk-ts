@@ -27,6 +27,7 @@ import * as http from "http";
 
 import * as assert from "assert";
 import URI from "urijs";
+import { Constant } from "../../src";
 
 const seeds = [
     "SDLFMXEPWO5BNB64TUZQJP5JJUET2P4QFMTMDSPYELC2LZ6UXMSAOIKE",
@@ -1327,22 +1328,42 @@ describe("Test for the class WalletUnfreezeBuilder", function () {
             assert.deepStrictEqual(unfreeze_builder.summary.items.length, 0);
 
             let to_be_unfrozen = sdk.Amount.make(0);
+            let deposit = sdk.Amount.make(0);
+            let unfreeze_amount = sdk.Amount.make(0);
             for (const m of unfreeze_builder.utxos) {
                 // Select UTXO
                 await unfreeze_builder.selectUTXO(m.utxo.utxo, true);
                 to_be_unfrozen = sdk.Amount.add(to_be_unfrozen, m.utxo.amount);
+                deposit = sdk.Amount.add(deposit, sdk.Constant.SlashPenaltyAmount);
+                unfreeze_amount = sdk.Amount.add(
+                    sdk.Amount.add(unfreeze_amount, m.utxo.amount),
+                    sdk.Constant.SlashPenaltyAmount
+                );
 
                 // Check Amount
                 assert.deepStrictEqual(
                     sdk.Amount.add(unfreeze_builder.unfreeze_amount, unfreeze_builder.fee_tx).toString(),
-                    to_be_unfrozen.toString()
+                    unfreeze_amount.toString()
                 );
 
                 assert.deepStrictEqual(unfreeze_builder.summary.items.length, 1);
                 assert.deepStrictEqual(unfreeze_builder.summary.items[0].account, account);
-                assert.deepStrictEqual(unfreeze_builder.summary.items[0].to_be_unfrozen, to_be_unfrozen);
-                assert.deepStrictEqual(unfreeze_builder.summary.items[0].frozen_balance, account.balance.frozen);
-                assert.deepStrictEqual(unfreeze_builder.summary.items[0].total_balance, account.balance.balance);
+                assert.deepStrictEqual(
+                    unfreeze_builder.summary.items[0].to_be_unfrozen.toString(),
+                    to_be_unfrozen.toString()
+                );
+                assert.deepStrictEqual(
+                    unfreeze_builder.summary.items[0].deposit.toString(),
+                    sdk.Constant.SlashPenaltyAmount.toString()
+                );
+                assert.deepStrictEqual(
+                    unfreeze_builder.summary.items[0].frozen_balance.toString(),
+                    account.balance.frozen.toString()
+                );
+                assert.deepStrictEqual(
+                    unfreeze_builder.summary.items[0].total_balance.toString(),
+                    account.balance.balance.toString()
+                );
             }
 
             // Build Transaction

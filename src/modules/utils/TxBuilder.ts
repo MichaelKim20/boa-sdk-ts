@@ -15,6 +15,7 @@ import { Amount } from "../common/Amount";
 import { Hash } from "../common/Hash";
 import { Height } from "../common/Height";
 import { KeyPair, PublicKey, SecretKey } from "../common/KeyPair";
+import { Constant } from "../data/Constant";
 import { Transaction } from "../data/Transaction";
 import { TxInput } from "../data/TxInput";
 import { OutputType, TxOutput } from "../data/TxOutput";
@@ -65,19 +66,21 @@ export class TxBuilder {
 
     /**
      * Adds information to create and sign transaction inputs
+     * @param type The type of the transaction output
      * @param utxo   The hash of the UTXO to be spent
      * @param amount The value of UTXO to be spent
      * @param secret The key pair to spend UTXO.
      */
-    public addInput(utxo: Hash, amount: Amount | JSBI, secret?: SecretKey): TxBuilder {
+    public addInput(type: OutputType, utxo: Hash, amount: Amount | JSBI, secret?: SecretKey): TxBuilder {
         const utxo_amount = amount instanceof Amount ? amount : Amount.make(amount);
         if (Amount.lessThanOrEqual(utxo_amount, Amount.ZERO_BOA))
             throw new Error(`Positive amount expected, not ${amount.toString()}`);
 
-        if (secret === undefined) this.inputs.push(new RawInput(utxo, this.owner_keypair.secret));
-        else this.inputs.push(new RawInput(utxo, secret));
+        if (secret === undefined) this.inputs.push(new RawInput(type, utxo, this.owner_keypair.secret));
+        else this.inputs.push(new RawInput(type, utxo, secret));
 
         this.amount = Amount.add(this.amount, utxo_amount);
+        if (type === OutputType.Freeze) this.amount = Amount.add(this.amount, Constant.SlashPenaltyAmount);
 
         return this;
     }
@@ -195,6 +198,11 @@ export class TxBuilder {
  */
 export class RawInput {
     /**
+     * The type of the transaction output
+     */
+    public readonly type: OutputType;
+
+    /**
      * The hash of the UTXO to be spent
      */
     public readonly utxo: Hash;
@@ -206,10 +214,12 @@ export class RawInput {
 
     /**
      * Constructor
+     * @param type The type of the transaction output
      * @param utxo The hash of the UTXO to be spent
      * @param key  The secret key to sign when using UTXO
      */
-    constructor(utxo: Hash, key: SecretKey) {
+    constructor(type: OutputType, utxo: Hash, key: SecretKey) {
+        this.type = type;
         this.utxo = utxo;
         this.key = key;
     }

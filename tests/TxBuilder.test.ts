@@ -47,7 +47,7 @@ describe("TxBuilder", () => {
         const destination = new sdk.PublicKey("boa1xrdwryl0ajdd86c45w4zrjf8spmrt7u4l7s5jy64ac3dc78x2ucd7wkakac");
         const builder = new sdk.TxBuilder(owner);
         const amount = sdk.JSBI.BigInt(0);
-        builder.addInput(utxo_data1.utxo, utxo_data1.amount);
+        builder.addInput(sdk.OutputType.Payment, utxo_data1.utxo, utxo_data1.amount);
         assert.throws(() => {
             builder.addOutput(destination, amount);
         }, new Error(`Positive amount expected, not ${amount.toString()}`));
@@ -57,7 +57,7 @@ describe("TxBuilder", () => {
         const destination = new sdk.PublicKey("boa1xrdwryl0ajdd86c45w4zrjf8spmrt7u4l7s5jy64ac3dc78x2ucd7wkakac");
         const builder = new sdk.TxBuilder(owner);
         const amount = utxo_data1.amount + BigInt(1);
-        builder.addInput(utxo_data1.utxo, utxo_data1.amount);
+        builder.addInput(sdk.OutputType.Payment, utxo_data1.utxo, utxo_data1.amount);
         assert.throws(() => {
             builder.addOutput(destination, amount);
         }, new Error(`Insufficient amount. ${amount.toString()}:${utxo_data1.amount.toString()}`));
@@ -69,8 +69,8 @@ describe("TxBuilder", () => {
         let tx: sdk.Transaction;
         try {
             tx = builder
-                .addInput(utxo_data1.utxo, utxo_data1.amount)
-                .addInput(utxo_data2.utxo, utxo_data2.amount)
+                .addInput(sdk.OutputType.Payment, utxo_data1.utxo, utxo_data1.amount)
+                .addInput(sdk.OutputType.Payment, utxo_data2.utxo, utxo_data2.amount)
                 .addOutput(destination, sdk.JSBI.BigInt(20000000))
                 .sign(sdk.OutputType.Payment);
         } catch (error) {
@@ -128,8 +128,8 @@ describe("TxBuilder", () => {
 
         try {
             tx = builder
-                .addInput(utxo_data1.utxo, utxo_data1.amount)
-                .addInput(utxo_data2.utxo, utxo_data2.amount)
+                .addInput(sdk.OutputType.Payment, utxo_data1.utxo, utxo_data1.amount)
+                .addInput(sdk.OutputType.Payment, utxo_data2.utxo, utxo_data2.amount)
                 .assignPayload(payload)
                 .sign(sdk.OutputType.Payment, tx_fee, payload_fee);
         } catch (error) {
@@ -182,7 +182,7 @@ describe("TxBuilder", () => {
 
         assert.throws(() => {
             tx = builder
-                .addInput(utxo_data1.utxo, utxo_data1.amount)
+                .addInput(sdk.OutputType.Payment, utxo_data1.utxo, utxo_data1.amount)
                 .assignPayload(payload)
                 .sign(sdk.OutputType.Payment, tx_fee, payload_fee);
         }, new Error("No output for transaction."));
@@ -197,8 +197,8 @@ describe("TxBuilder", () => {
 
         assert.doesNotThrow(() => {
             tx = builder
-                .addInput(utxo_data1.utxo, utxo_data1.amount)
-                .addInput(utxo_data2.utxo, utxo_data2.amount)
+                .addInput(sdk.OutputType.Payment, utxo_data1.utxo, utxo_data1.amount)
+                .addInput(sdk.OutputType.Payment, utxo_data2.utxo, utxo_data2.amount)
                 .assignPayload(payload)
                 .sign(sdk.OutputType.Payment, tx_fee, payload_fee);
         }, new Error("No output for transaction."));

@@ -37,12 +37,14 @@ describe("TxCanceller", () => {
         if (sdk.JSBI.lessThan(tx_fee, minimum)) tx_fee = sdk.JSBI.BigInt(minimum);
 
         builder.addInput(
+            sdk.OutputType.Payment,
             new sdk.Hash(
                 "0x75283072696d82d8bca2fe45471906a26df1dbe0736e41a9f78e02a14e2bfced6e0cb671f023626f890f28204556aca217f3023c891fe64b9f4b3450cb3e80ad"
             ),
             in_amount
         );
         builder.addInput(
+            sdk.OutputType.Payment,
             new sdk.Hash(
                 "0x6fbcdb2573e0f5120f21f1875b6dc281c2eca3646ec2c39d703623d89b0eb83cd4b12b73f18db6bc6e8cbcaeb100741f6384c498ff4e61dd189e728d80fb9673"
             ),

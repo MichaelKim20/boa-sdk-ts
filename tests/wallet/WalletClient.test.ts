@@ -334,7 +334,7 @@ describe("Wallet Client", () => {
         assert.deepStrictEqual(utxo_res.code, sdk.WalletResultCode.Success);
         assert.ok(utxo_res.data !== undefined);
         const utxos = utxo_res.data;
-        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
 
         const expected = {
             inputs: [
@@ -408,7 +408,7 @@ describe("Wallet Client", () => {
         assert.deepStrictEqual(utxo_res.code, sdk.WalletResultCode.Success);
         assert.ok(utxo_res.data !== undefined);
         const utxos = utxo_res.data;
-        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
 
         assert.throws(() => {
             const tx = builder.assignPayload(vote_data).sign(sdk.OutputType.Payment, tx_fee, payload_fee);
@@ -441,7 +441,7 @@ describe("Wallet Client", () => {
         assert.deepStrictEqual(utxo_res.code, sdk.WalletResultCode.Success);
         assert.ok(utxo_res.data !== undefined);
         const utxos = utxo_res.data;
-        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.utxo, u.amount));
+        utxos.forEach((u: sdk.UnspentTxOutput) => builder.addInput(u.type, u.utxo, u.amount));
 
         const tx = builder.assignPayload(vote_data).sign(sdk.OutputType.Payment, tx_fee, payload_fee);
 
