@@ -19,6 +19,7 @@ import * as assert from "assert";
 
 describe("Test of ECC", () => {
     before("Wait for the package libsodium to finish loading", () => {
+        sdk.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
@@ -45,7 +46,7 @@ describe("Test of ECC", () => {
     it("Test of Scalar.fromHash", () => {
         const message = "BOSAGORA for the win";
         const c = sdk.Scalar.fromHash(sdk.hashFull(message)); // challenge
-        assert.strictEqual(c.toString(false), "0x07c51164f99d03f143cfafdfb8638826b87f86c73b82180c33cfb11dbaba1df3");
+        assert.strictEqual(c.toString(false), "0x023107b120bb7f00305c37cc9eab065bb956fd554b1b67060793f46f0d9b9c15");
     });
 
     it("Test of Scalar function", () => {

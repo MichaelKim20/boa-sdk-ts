@@ -245,7 +245,7 @@ export class TestStoa {
                             ),
                         ],
                         Buffer.from(
-                            "CEJBTExPVCAgBlZvdGVyYQxJRDEyMzQ1Njc4OTApadJyWsl6W0jtPSAbVd/480x8QP4w75B04GJ1PctWghJ0SFXQBu/6DdPFrSKdkwbnyCSISJw+l76oyJmY8Vncx0mYjWFV1big5setAqNd51Ay94fqSlwrBuOtBR0YA2VpyRX02J3If7S4FDIwMjEtMDQtMTVUMDA6MDA6MDBa9i0ApJ9uClkCpExqGNYxlCL/l3xvcKNrG883y6C8Jg/a37ck9+mAFwPYHZt8nIaPialBd+7hiGiQ9TGDOX99s2Q9y7mHo7hjXUxVCb5G7dKxPe0D47FCOQXVBaQ9xJ8OC20P62WjgBZy3vNHxvh9Fx4vxkMEjA2mw8Iq6Ajr6YJd",
+                            "CEJBTExPVCAgBlZvdGVyYQxJRDEyMzQ1Njc4OTApJYEySUD5nLZsgi2nA0jtrMx9mzujQpSmW1NsxI2yFEvqv7b4GydsZELFrSKdkwbnyCSISJw+l76oyJmY8Vncx0mYjWFV1big5setAqNd51Ay94fqSlwrBuOtBR0YA2VpyRX02J3If7S4FDIwMjEtMDQtMTVUMDA6MDA6MDBa6wswf3ZlMmQ28ne1fOI/rccq85FNsVh9p8SafJHc0QDGntZQvGmxqgrf7NhNTT42CAshcy8ZQndbIgWsJGlDw2RYYc8CIBkRsgCwM6ZG7Aq6GrHP/nEnrYKhXlBMM7HSCUy7XnYG4pt/Hbh2uVqkYE5HU85YrIiGYwP7woJA7Av3",
                             "base64"
                         )
                     );
@@ -352,6 +352,7 @@ describe("Checking the proposal and ballot data", () => {
     const agora_port: string = "3210";
 
     before("Wait for the package libsodium to finish loading", async () => {
+        sdk.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         await sdk.SodiumHelper.init();
     });

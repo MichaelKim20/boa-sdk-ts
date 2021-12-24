@@ -20,6 +20,7 @@ import { SmartBuffer } from "smart-buffer";
 
 describe("Vote Data", () => {
     before("Wait for the package libsodium to finish loading", () => {
+        sdk.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
@@ -64,7 +65,7 @@ describe("Vote Data", () => {
         );
         assert.deepStrictEqual(
             sdk.hashFull(voter_card).toString(),
-            "0x4c06291fc7384fd760c562a35f637c87f6333153416ef6da4e0b547dcabedc411350b5281286780b95d9dcb6496ea90622283508ea3e7b06a13ea2d909c09e91"
+            "0x127ca0d5e8227c566fef7e48f6f725538dd21d740841889b97fe1eed86378254f003e670fa0e63836b2c6afffaf58fa15a839552328558df9658d8cc2a8ef395"
         );
     });
 
@@ -119,7 +120,7 @@ describe("Vote Data", () => {
         assert.ok(keypair.address.verify<sdk.EncryptionKey>(encryption_key.signature, encryption_key));
 
         const signature_agora = new sdk.Signature(
-            "0x5f3445d7788815ecabd181d6cea1f4ab501f196e5375e1359e12975c1081c88605012fdaa85754202b9bb83c8bc27ba1c1657dd0dc316b78ebe04aaed1dab7f3"
+            "0xf2c9ea243095bcc8873df56b1385b1603bdd18877bde9c825cc9213e5d2803ec035b9708839bf2fd65c8284b13497a0d5e88033b456f84243615f24243179bb3"
         );
         assert.ok(keypair.address.verify<sdk.EncryptionKey>(signature_agora, encryption_key));
     });
@@ -269,7 +270,7 @@ describe("Vote Data", () => {
         const link_data = ballot_data.getLinkData();
         const expected = {
             payload:
-                "CEJBTExPVCAgBlZvdGVyYQxJRDEyMzQ1Njc4OTApadJyWsl6W0jtPSAbVd/480x8QP4w75B04GJ1PctWghJ0SFXQBu/6DdPFrSKdkwbnyCSISJw+l76oyJmY8Vncx0mYjWFV1big5setAqNd51Ay94fqSlwrBuOtBR0YA2VpyRX02J3If7S4FDIwMjEtMDQtMTVUMDA6MDA6MDBa9i0ApJ9uClkCpExqGNYxlCL/l3xvcKNrG883y6C8Jg/a37ck9+mAFwPYHZt8nIaPialBd+7hiGiQ9TGDOX99s2Q9y7mHo7hjXUxVCb5G7dKxPe0D47FCOQXVBaQ9xJ8OC20P62WjgBZy3vNHxvh9Fx4vxkMEjA2mw8Iq6Ajr6YJd",
+                "CEJBTExPVCAgBlZvdGVyYQxJRDEyMzQ1Njc4OTApJYEySUD5nLZsgi2nA0jtrMx9mzujQpSmW1NsxI2yFEvqv7b4GydsZELFrSKdkwbnyCSISJw+l76oyJmY8Vncx0mYjWFV1big5setAqNd51Ay94fqSlwrBuOtBR0YA2VpyRX02J3If7S4FDIwMjEtMDQtMTVUMDA6MDA6MDBa6wswf3ZlMmQ28ne1fOI/rccq85FNsVh9p8SafJHc0QDGntZQvGmxqgrf7NhNTT42CAshcy8ZQndbIgWsJGlDw2RYYc8CIBkRsgCwM6ZG7Aq6GrHP/nEnrYKhXlBMM7HSCUy7XnYG4pt/Hbh2uVqkYE5HU85YrIiGYwP7woJA7Av3",
         };
 
         const deserialized_ballot_data = sdk.BallotData.deserialize(

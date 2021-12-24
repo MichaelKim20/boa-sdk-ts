@@ -65,13 +65,13 @@ describe("Hash", () => {
         // Check
         assert.strictEqual(
             h.toString(),
-            "0xe0343d063b14c52630563ec81b0f91a84ddb05f2cf05a2e4330ddc79bd3a06e57c2e756f276c112342ff1d6f1e74d05bdb9bf880abd74a2e512654e12d171a74"
+            "0xc8271ef13d23732fa4628f68325432a7df36b0deb0a089f536c7cf7eefe0615ee6598c9c790ebe14141d74546f49b2dd11171b0d39f4297db25af72ea024a250"
         );
 
         // Source 3 : "boa"
         const boa = sdk.hash(Buffer.from("boa"));
 
-        const h2 = sdk.hash(Buffer.concat([foo.data, bar.data, boa.data]));
+        const h2 = sdk.hash(Buffer.concat([Buffer.from([0, 0, 0, 0, 0, 0, 0, 0]), foo.data, bar.data, boa.data]));
         const h3 = sdk.hashMulti(foo, bar, boa);
 
         // Check
@@ -131,7 +131,7 @@ describe("Hash", () => {
         // Check
         assert.strictEqual(
             key.toString(),
-            "0x4c4e169e6619207b6613496c777b21431c5e14a29c44b316a55c8132416823bf9d202b8335d4c90810783e139ac0795b9a58993bf4bd10d1bc0b1a131fd09c64"
+            "0xebf52984772aed2ad1bf97252e7f204f7607182cbf55c7d7a3bbf6649fb3a7ee79a7810ce31c831da830a6c7f6c84c4129f14d1e93a9b5afe3b91fd2aaf9c6de"
         );
     });
 
@@ -143,19 +143,19 @@ describe("Hash", () => {
         // UInt8
         assert.strictEqual(
             sdk.hashMulti(foo, sdk.VariableBytes.fromUInt8(45)).toString(),
-            "0xf61564563b39715729ced8bff16b50b622d3ae38bc41f40d2f131961cf68ad8b931906921ff40e9e024fae067bea3bc48a86be5729713952b64d1f15b03a9f62"
+            "0x4302de357edbf92bbc7ab1fa6c0725c882e9fdc7cbf1a7647b72e46355ebbbec72e90eaeb8378ce536d4da84bef86ed44baf942d94e52b2f289edde7ff0d3fef"
         );
 
         // UInt16
         assert.strictEqual(
             sdk.hashMulti(foo, sdk.VariableBytes.fromUInt16(45)).toString(),
-            "0x605ca7649eda97e108ade8f1c390ad109dd39ac3824369c31a9647d234dafda65d8159ec5f9f7808052abed8e95bc9d86fc7f612632a156b81b4082aa2da4435"
+            "0x85be6919b5276738562c070c635f51af884589f9a65d9d2fa179e38d5fc31a6d1fc3a9a337c085565d91319f8b01f89751aa1b9efafc570964a30d5d87cc5644"
         );
 
         // UInt32
         assert.strictEqual(
             sdk.hashMulti(foo, sdk.VariableBytes.fromUInt32(45)).toString(),
-            "0xfd36a5e3a160b516c459a0ab08f65e352bd63b1ec3ceea393a04d7009b3c301c150057ca5a6363607c7c0cc37bffba853c3351ed6b953e7c947e82c810f453b9"
+            "0xa8fe8e8d0a416d96e56226ef22b8ae1eef5487cf057dbb82e4ba16f60e9dacd058a364721266d5f9cdae6f9f9166f8f44357efb347783ae77576c01332459fa9"
         );
     });
 
@@ -167,7 +167,7 @@ describe("Hash", () => {
         const hash = sdk.makeUTXOKey(tx_hash, sdk.JSBI.BigInt(1));
         assert.strictEqual(
             hash.toString(),
-            "0x7c95c29b184e47fbd32e58e5abd42c6e22e8bd5a7e934ab049d21df545e09c2e33bb2b89df2e59ee01eb2519b1508284b577f66a76d42546b65a6813e592bb84"
+            "0x35f0a7e120738d87431507d168a44c9b16b0381d0c6d7a62b5eb6ec5070fcfc46ebf753a8da5623cef1a2a80e03174cbd63be0ed3143311a1e19524940460c14"
         );
     });
 
@@ -188,7 +188,7 @@ describe("Hash", () => {
         );
         assert.strictEqual(
             sdk.hashFull(header).toString(),
-            "0xbcf8118c75dfab48ef62235a2908aa4a659feee8cee513dd3329b7eee5a4feab16c4802abb819b884fc2e845c65ecc348f1b5d1f5de7350b24fc08fc6c702107"
+            "0x08e3eac0394512060fb6d47a28092888c9b100149ab0c925d36ba554c90d8ebee0269789bb0f6d03117b43117a05ecc24849f0a6020dd7bce0a66065379eb9a3"
         );
     });
 
@@ -213,7 +213,7 @@ describe("Hash", () => {
         );
         assert.strictEqual(
             sdk.hashFull(header).toString(),
-            "0xabb03b214d7568274253e1a95c3f928165b8fb643249a2eaf9f7c19b2f9041a9666bf8a2961f9c56f25fe8a5f6c780ead8651cee5c412f53849086c062dda964"
+            "0x9df8acdbece16d9f690fb6c81bd65b5ff5840619a79fc357b6a4667211a73add8915e557950281d95612eb875a9d490583fb8190fabe893279716bfc440b0e3d"
         );
     });
 
@@ -222,7 +222,7 @@ describe("Hash", () => {
         const scalar = new sdk.Scalar("0x0e00a8df701806cb4deac9bb09cc85b097ee713e055b9d2bf1daf668b3f63778");
         assert.deepStrictEqual(
             sdk.hashFull(scalar).toString(),
-            "0x4f895cc641b2bfe4541f53b83445add00a7a81ad340312c51cbf15c53ddebcc7ea7dcd11a97e085d28552026952e7c7c8d4276d5901d33605a3ea21027a673d4"
+            "0x0528f5a8f7d6298e6f560d05283e6256911cbb6ffb18eee5a3a9e8f423ec468cb49a89d6f78fac459668ed819610d6e6b323391675271243f9fbf7036a4512fe"
         );
     });
 
@@ -231,7 +231,7 @@ describe("Hash", () => {
         const point = new sdk.Point("0xdb445140a72012a177535f43e6bbb8523ff21de465a7c35b42be1a447e5e2908");
         assert.deepStrictEqual(
             sdk.hashFull(point).toString(),
-            "0xa0ad987cffcf2e3f96af64dd197d95d4e8e41be4448f6abebd8953b3c37b3132a1a1917c2046f6d3550cac70299110b28f23454d6124892ab2b8a6508f2bfe47"
+            "0x2358dd06aeca72e8bcb5918f1c4abae9eee8174e5af68e02b17d3c035b459663baee8c0cf6f7e4a1a7944d2494243a69d6f6db182071ddc25b5b5a7c7e42a635"
         );
     });
 
@@ -240,7 +240,19 @@ describe("Hash", () => {
         const publicKey = new sdk.PublicKey("boa1xrr66q4rthn4qvhhsl4y5hptqm366pgarqpk26wfzh6d38wg076tsqqesgg");
         assert.deepStrictEqual(
             sdk.hashFull(publicKey).toString(),
-            "0x774d28bb3dc06a1418a4165109f4e8e4e05b4b283c798dd10aa70050a9b095408b3d1c6c1017b69912e94a4a58c5cb522e78b9741e1380bb5d2d705116f886ef"
+            "0xd7935c2af683f3b28f2040ca41e3d5ee352b30237f1aabba85d09c01262e88b84ae8f37057a33f4bb14968dd97e86119f436a7a7ebe2fd1be0ce9eeb888a02ad"
         );
+    });
+
+    it("Test of ChainId", () => {
+        const secret: sdk.JSBI = sdk.JSBI.BigInt(0x1337);
+        assert.notDeepStrictEqual(sdk.hashFull(secret, true, 0xdead), sdk.hashFull(secret, true, 0xbeef));
+        assert.notDeepStrictEqual(sdk.hashFull(secret, true, 0xdead), sdk.hashFullNoMagic(secret));
+        const secret2: sdk.JSBI = sdk.JSBI.BigInt(0x0f0f);
+        const multi_hash = sdk.hashMulti(secret, secret2);
+
+        sdk.setChainId(0xdead);
+        assert.deepStrictEqual(sdk.hashFull(secret, true, 0xdead), sdk.hashFull(secret));
+        assert.notDeepStrictEqual(multi_hash, sdk.hashMulti(secret, secret2));
     });
 });
