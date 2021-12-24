@@ -38,6 +38,7 @@ describe("BOA Client", () => {
     const agora_port: string = "2100";
 
     before("Wait for the package libsodium to finish loading", async () => {
+        sdk.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         await sdk.SodiumHelper.init();
     });

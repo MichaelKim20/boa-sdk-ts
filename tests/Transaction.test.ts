@@ -19,6 +19,7 @@ import * as assert from "assert";
 
 describe("Transaction", () => {
     before("Wait for the package libsodium to finish loading", () => {
+        sdk.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
@@ -32,7 +33,7 @@ describe("Transaction", () => {
         );
         assert.strictEqual(
             sdk.hashFull(payment_tx).toString(),
-            "0xbf16b1bb63c50170ce0e2624e13bda540c268c74a677d2d8a0571eb79cd8a3b28c408793d43e3bbee0ffd39913903c77fbd1b0cbe36b6a0b503514bbbe84b492"
+            "0xadbc0332bd71d64d134e77f3c1e1828b1b4543f4922dc93bd6c3eff1c1c29f33f9cdb3980b1a6dddd6ac483b7766c8e21a3334f48eac39bec18802637e457a2f"
         );
 
         assert.ok(payment_tx.isPayment());
@@ -47,7 +48,7 @@ describe("Transaction", () => {
 
         assert.strictEqual(
             sdk.hashFull(freeze_tx).toString(),
-            "0x415e67be1be0ae5d93c39198682e7202047e884542fbb1f88360895ad98195067f59f21a1bf8a57f364aaaed7ba8ce9196927a81262db5df0912ac0bf068307e"
+            "0x7958451244fd136328f75514ebb54eda51320b36835ed024582abc2238baf40d3edf813dd7fc8d9b2b1c89c015f89d09ccc2cd73de58512a7202fe850c0eed0d"
         );
 
         assert.ok(!freeze_tx.isPayment());
@@ -61,7 +62,7 @@ describe("Transaction", () => {
         );
         assert.strictEqual(
             sdk.hashFull(payload_tx).toString(),
-            "0x44590847e54f0e67c3365540115204df7730ddde5fdef306c5fd66af6a7d6f311f65de5058ce3f297f8e665a6c2b6d75a39207075a45b364a5dfba74fecf7547"
+            "0x4c8f4f2b1516d94cee686547d279c617a35734f11f4cb3d90bd9c1325a91c68a6146dc7018ff27368e6e07126a82f991a52aad40a04ac01b0a57605e14f55e4b"
         );
     });
 
@@ -84,8 +85,7 @@ describe("Transaction", () => {
         );
         assert.strictEqual(
             sdk.hashFull(tx1).toString(),
-            "0x8ae9a3478433a8602e6f75aabbc2c7bcb3d17afb0ef7e5b5645cbadb68021d1" +
-                "947d2a57020d45b79c8834e92eb04976b972ef542a589790fa593e33dc341f07b"
+            "0x2db765b318d83e32c70fbc2b0daa5a56158b089da0be4e8477cab6b9c3d460b5c382f8c16af834284f4a06c4a416550be6a707fe0544cbd261c59a11b991915d"
         );
 
         const tx2 = new sdk.Transaction(
@@ -106,7 +106,7 @@ describe("Transaction", () => {
         );
         assert.strictEqual(
             sdk.hashFull(tx2).toString(),
-            "0x8ae9a3478433a8602e6f75aabbc2c7bcb3d17afb0ef7e5b5645cbadb68021d1947d2a57020d45b79c8834e92eb04976b972ef542a589790fa593e33dc341f07b"
+            "0x2db765b318d83e32c70fbc2b0daa5a56158b089da0be4e8477cab6b9c3d460b5c382f8c16af834284f4a06c4a416550be6a707fe0544cbd261c59a11b991915d"
         );
     });
 
@@ -133,7 +133,7 @@ describe("Transaction", () => {
         );
         assert.strictEqual(
             sdk.hashFull(tx1).toString(),
-            "0x559613a7a8d5e15275312256ba3205333e038a23f07c4c2bd0ef193c16cac114bd72f02183731c51132e9ee9471a1ae9495a84f86837d8917792fee9db713877"
+            "0xf5f72ceb5d5b19f3d6a54649ec25dd8f331881d19056631a92449da13f566da70bba365e3a351e849a0f8a6012f31f31ca212570a9cef10a25e0e4f57343956f"
         );
 
         const tx2 = new sdk.Transaction(
@@ -158,7 +158,7 @@ describe("Transaction", () => {
         );
         assert.strictEqual(
             sdk.hashFull(tx2).toString(),
-            "0x559613a7a8d5e15275312256ba3205333e038a23f07c4c2bd0ef193c16cac114bd72f02183731c51132e9ee9471a1ae9495a84f86837d8917792fee9db713877"
+            "0xf5f72ceb5d5b19f3d6a54649ec25dd8f331881d19056631a92449da13f566da70bba365e3a351e849a0f8a6012f31f31ca212570a9cef10a25e0e4f57343956f"
         );
     });
 
@@ -185,7 +185,7 @@ describe("Transaction", () => {
         );
         assert.strictEqual(
             sdk.hashFull(tx1).toString(),
-            "0xf7930aeb05490a1a3cf42bb87f1ef22685dde78bb3554c4f46da2c69f47d584cac620a3f4d482d605c7917918c18bf30b4b3a542efcaa16a22b5582022c6b2b7"
+            "0x048418fe03f13fb0094ec50252d4aa530fbeb4929d09763a35fbb8d17fe3ee8d370a6b5d5ceb1f2e85f77175bd43f7dc409133fd4500d56b77de4d481730f771"
         );
 
         const tx2 = new sdk.Transaction(
@@ -210,7 +210,7 @@ describe("Transaction", () => {
         );
         assert.strictEqual(
             sdk.hashFull(tx2).toString(),
-            "0xf7930aeb05490a1a3cf42bb87f1ef22685dde78bb3554c4f46da2c69f47d584cac620a3f4d482d605c7917918c18bf30b4b3a542efcaa16a22b5582022c6b2b7"
+            "0x048418fe03f13fb0094ec50252d4aa530fbeb4929d09763a35fbb8d17fe3ee8d370a6b5d5ceb1f2e85f77175bd43f7dc409133fd4500d56b77de4d481730f771"
         );
     });
 
@@ -260,7 +260,7 @@ describe("Transaction", () => {
         );
         assert.deepStrictEqual(
             tx.getChallenge().toString(),
-            "0xcea9497ef31f10007215455d20b25d3857100fb07395a4dea9015465a3d916bd82a3ab3fadce98673f1ca913f50e49460d88c2f704ebb2badc435af5699e3b80"
+            "0x4a150c933fb180f64491cdcc31bba89cf30363c93d67ac79e098a7ef265303b06c2909781d20396dcb1e1f370633ec3fbc027c4a540b115eef0b5709afe6cc4e"
         );
     });
 

@@ -250,6 +250,31 @@ export class VariableBytes {
 }
 
 /**
+ * A definition of various chain ID.
+ */
+export enum ChainId {
+    TestNet = 0,
+    CoinNet = 1,
+}
+
+let g_chain_id: ChainId = ChainId.TestNet;
+
+/**
+ * Set Chain ID
+ * @param value The chain ID to be designated.
+ */
+export function setChainId(value: ChainId) {
+    g_chain_id = value;
+}
+
+/**
+ * Returns the chain ID.
+ */
+export function getChainId(): ChainId {
+    return g_chain_id;
+}
+
+/**
  * Creates a hash and stores it in buffer.
  * @param source Original for creating hash
  * @returns Instance of Hash
@@ -266,6 +291,7 @@ export function hash(source: Buffer): Hash {
  */
 export function hashMulti(...args: any[]): Hash {
     const buffer = new SmartBuffer();
+    hashPart(JSBI.BigInt(g_chain_id), buffer);
     for (const m of args) hashPart(m, buffer);
     return new Hash(Buffer.from(SodiumHelper.sodium.crypto_generichash(Hash.Width, buffer.toBuffer())));
 }
@@ -286,14 +312,28 @@ export function makeUTXOKey(h: Hash, index: JSBI): Hash {
  * Calculates the hash of the buffer.
  * @param record The object to serialize for the hash for creation.
  * The object has a method named `computeHash`.
+ * @param use_chan_id If this value is true, the chain ID will be included in the hash.
+ * @param chain_id The chain ID
  * @returns The instance of the hash
  */
-export function hashFull(record: any): Hash {
+export function hashFull(record: any, use_chan_id: boolean = true, chain_id: ChainId = g_chain_id): Hash {
     if (record === null || record === undefined) return Hash.Null;
 
     const buffer = new SmartBuffer();
+    if (use_chan_id) hashPart(JSBI.BigInt(chain_id), buffer);
     hashPart(record, buffer);
     return hash(buffer.readBuffer());
+}
+
+/**
+ * Serializes all internal objects that the instance contains in a buffer.
+ * Calculates the hash of the buffer.
+ * @param record The object to serialize for the hash for creation.
+ * The object has a method named `computeHash`.
+ * @returns The instance of the hash
+ */
+export function hashFullNoMagic(record: any): Hash {
+    return hashFull(record, false);
 }
 
 /**

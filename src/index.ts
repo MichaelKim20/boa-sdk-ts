@@ -24,7 +24,11 @@ export {
     hashMulti,
     makeUTXOKey,
     hashFull,
+    hashFullNoMagic,
     hashPart,
+    setChainId,
+    getChainId,
+    ChainId,
 } from "./modules/common/Hash";
 export { Height } from "./modules/common/Height";
 export { KeyPair, PublicKey, SecretKey, VersionByte } from "./modules/common/KeyPair";
