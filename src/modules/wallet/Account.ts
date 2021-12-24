@@ -238,6 +238,20 @@ export class AccountContainer extends EventDispatcher {
     }
 
     /**
+     * The getter of un_selected_accounts
+     */
+    public get un_select_accounts(): Account[] | null {
+        if (this._selected_index < 0) return null;
+        if (this._items.length <= 1) return null;
+        const selAccount = this.selected_account;
+        if (selAccount){
+            return this._items.filter((m) => !PublicKey.equal(m.address, selAccount.address));
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Add one account.
      * @param name The name of the account
      * @param key  The public key or secret key of the account
