@@ -28,6 +28,7 @@ export enum OutputType {
     Payment = 0,
     Freeze = 1,
     Coinbase = 2,
+    New = 3,
 }
 
 /**
