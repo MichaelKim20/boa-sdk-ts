@@ -38,7 +38,7 @@ describe("BOA Client", () => {
     const agora_port: string = "2100";
 
     before("Wait for the package libsodium to finish loading", async () => {
-        sdk.setChainId(sdk.ChainId.TestNet);
+        sdk.Hasher.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         await sdk.SodiumHelper.init();
     });
@@ -236,9 +236,9 @@ describe("BOA Client", () => {
 
         let pre_images: sdk.Hash[] = [];
 
-        pre_images.push(sdk.hash(Buffer.from(sdk.SodiumHelper.sodium.randombytes_buf(sdk.Hash.Width))));
+        pre_images.push(sdk.Hasher.hash(Buffer.from(sdk.SodiumHelper.sodium.randombytes_buf(sdk.Hash.Width))));
         for (let idx = 0; idx < 20; idx++) {
-            pre_images.push(sdk.hash(pre_images[idx].data));
+            pre_images.push(sdk.Hasher.hash(pre_images[idx].data));
         }
         pre_images = pre_images.reverse();
 

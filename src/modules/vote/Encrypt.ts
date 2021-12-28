@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-import { hashMulti } from "../common/Hash";
+import { Hasher } from "../common/Hash";
 import { SodiumHelper } from "../utils/SodiumHelper";
 
 /**
@@ -29,7 +29,7 @@ export class Encrypt {
      * @param proposal_id   The ID of proposal
      */
     public static createKey(first_key: Buffer, proposal_id: string): Buffer {
-        const key_proposal = hashMulti(first_key, Buffer.from(proposal_id));
+        const key_proposal = Hasher.hashMulti(first_key, Buffer.from(proposal_id));
         const key_size = SodiumHelper.sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
 
         return Buffer.from(SodiumHelper.sodium.crypto_generichash(key_size, key_proposal.data));

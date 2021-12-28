@@ -1506,7 +1506,7 @@ describe("Test for the class WalletCancelBuilder", function () {
         assert.ok(res_transaction.data !== undefined);
 
         sample_transaction = res_transaction.data;
-        sample_transaction_hash = sdk.hashFull(sample_transaction);
+        sample_transaction_hash = sdk.Hasher.hashFull(sample_transaction);
     });
 
     it("Test for the class WalletCancelBuilder", async () => {

@@ -20,7 +20,7 @@ import { SmartBuffer } from "smart-buffer";
 
 describe("Vote Data", () => {
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.setChainId(sdk.ChainId.TestNet);
+        sdk.Hasher.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
@@ -64,7 +64,7 @@ describe("Vote Data", () => {
             "2021-07-14T00:21:50Z"
         );
         assert.deepStrictEqual(
-            sdk.hashFull(voter_card).toString(),
+            sdk.Hasher.hashFull(voter_card).toString(),
             "0x127ca0d5e8227c566fef7e48f6f725538dd21d740841889b97fe1eed86378254f003e670fa0e63836b2c6afffaf58fa15a839552328558df9658d8cc2a8ef395"
         );
     });
@@ -131,7 +131,7 @@ describe("Vote Data", () => {
         );
         const app_name = "Votera";
         const proposal_id = "ID1234567890";
-        const key_agora_admin = sdk.hashMulti(pre_image, Buffer.from(app_name));
+        const key_agora_admin = sdk.Hasher.hashMulti(pre_image, Buffer.from(app_name));
         const key_encrypt = sdk.Encrypt.createKey(key_agora_admin.data, proposal_id);
 
         const message = Buffer.from([sdk.BallotData.YES]);
@@ -169,7 +169,7 @@ describe("Vote Data", () => {
         );
         const app_name = "Votera";
         const proposal_id = "ID1234567890";
-        const key_agora_admin = sdk.hashMulti(pre_image, Buffer.from(app_name));
+        const key_agora_admin = sdk.Hasher.hashMulti(pre_image, Buffer.from(app_name));
         const key_encrypt = sdk.Encrypt.createKey(key_agora_admin.data, proposal_id);
         const ballot = sdk.Encrypt.encrypt(Buffer.from([sdk.BallotData.BLANK]), key_encrypt);
         const ballot_data = new sdk.BallotData(app_name, proposal_id, ballot, voter_card, 100);
@@ -261,7 +261,7 @@ describe("Vote Data", () => {
         );
         const app_name = "Votera";
         const proposal_id = "ID1234567890";
-        const key_agora_admin = sdk.hashMulti(pre_image, Buffer.from(app_name));
+        const key_agora_admin = sdk.Hasher.hashMulti(pre_image, Buffer.from(app_name));
         const key_encrypt = sdk.Encrypt.createKey(key_agora_admin.data, proposal_id);
         const ballot = sdk.Encrypt.encrypt(Buffer.from([sdk.BallotData.YES]), key_encrypt);
         const ballot_data = new sdk.BallotData(app_name, "ID1234567890", ballot, voter_card, 100);

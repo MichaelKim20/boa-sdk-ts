@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-import { hashPart } from "../common/Hash";
+import { Hasher } from "../common/Hash";
 import { PublicKey } from "../common/KeyPair";
 import { Signature } from "../common/Signature";
 import { Utils } from "../utils/Utils";
@@ -76,7 +76,7 @@ export class VoterCard {
     public computeHash(buffer: SmartBuffer) {
         this.validator_address.computeHash(buffer);
         this.address.computeHash(buffer);
-        hashPart(this.expires, buffer);
+        Hasher.hashPart(this.expires, buffer);
     }
 
     /**
@@ -181,8 +181,8 @@ export class BallotData {
      * @param buffer The buffer where collected data is stored
      */
     public computeHash(buffer: SmartBuffer) {
-        hashPart(Buffer.from(this.app_name), buffer);
-        hashPart(Buffer.from(this.proposal_id), buffer);
+        Hasher.hashPart(Buffer.from(this.app_name), buffer);
+        Hasher.hashPart(Buffer.from(this.proposal_id), buffer);
         buffer.writeBuffer(this.ballot);
         this.card.computeHash(buffer);
         buffer.writeUInt32LE(this.sequence);

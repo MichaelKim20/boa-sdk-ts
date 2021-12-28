@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-import { Hash, hashPart } from "../common/Hash";
+import { Hash, Hasher } from "../common/Hash";
 import { Height } from "../common/Height";
 import { Signature } from "../common/Signature";
 import { JSONValidator } from "../utils/JSONValidator";
@@ -145,7 +145,7 @@ export class BlockHeader {
         this.prev_block.computeHash(buffer);
         this.merkle_root.computeHash(buffer);
         this.height.computeHash(buffer);
-        for (const elem of this.preimages) hashPart(elem, buffer);
+        for (const elem of this.preimages) Hasher.hashPart(elem, buffer);
         for (const elem of this.enrollments) elem.computeHash(buffer);
     }
 

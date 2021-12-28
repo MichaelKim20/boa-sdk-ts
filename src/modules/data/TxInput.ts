@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-import { Hash, hashPart, makeUTXOKey } from "../common/Hash";
+import { Hash, Hasher } from "../common/Hash";
 import { Signature } from "../common/Signature";
 import { Unlock } from "../script/Lock";
 import { JSONValidator } from "../utils/JSONValidator";
@@ -61,7 +61,7 @@ export class TxInput {
     }
 
     public static fromTxHash(hash: Hash, index: JSBI, unlock: Unlock = Unlock.Null, unlock_age: number = 0) {
-        return new TxInput(makeUTXOKey(hash, index), unlock, unlock_age);
+        return new TxInput(Hasher.makeUTXOKey(hash, index), unlock, unlock_age);
     }
 
     /**
@@ -87,7 +87,7 @@ export class TxInput {
      */
     public computeHash(buffer: SmartBuffer) {
         this.utxo.computeHash(buffer);
-        hashPart(this.unlock_age, buffer);
+        Hasher.hashPart(this.unlock_age, buffer);
     }
 
     /**

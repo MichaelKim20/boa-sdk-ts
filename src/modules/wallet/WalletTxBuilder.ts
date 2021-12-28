@@ -14,7 +14,7 @@
 
 import { Amount } from "../common/Amount";
 import { Scalar } from "../common/ECC";
-import { Hash, hashFull, makeUTXOKey } from "../common/Hash";
+import { Hash, Hasher } from "../common/Hash";
 import { KeyPair, PublicKey, SecretKey } from "../common/KeyPair";
 import { Constant } from "../data/Constant";
 import { Transaction } from "../data/Transaction";
@@ -1176,11 +1176,11 @@ export class WalletTxBuilder extends EventDispatcher {
             };
 
         const tx = res.data;
-        const tx_hash = hashFull(tx);
+        const tx_hash = Hasher.hashFull(tx);
         const r: ITransactionOverviewReceiver[] = [];
         for (let idx = 0; idx < tx.outputs.length; idx++) {
             r.push({
-                utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
+                utxo: Hasher.makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
                 address: tx.outputs[idx].address,
                 amount: tx.outputs[idx].value,
             });
@@ -1718,11 +1718,11 @@ export class WalletUnfreezeBuilder extends WalletTxBuilder {
             };
 
         const tx = res.data;
-        const tx_hash = hashFull(tx);
+        const tx_hash = Hasher.hashFull(tx);
         const r: ITransactionOverviewReceiver[] = [];
         for (let idx = 0; idx < tx.outputs.length; idx++) {
             r.push({
-                utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
+                utxo: Hasher.makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
                 address: tx.outputs[idx].address,
                 amount: tx.outputs[idx].value,
             });
@@ -2040,11 +2040,11 @@ export class WalletCancelBuilder extends WalletTxBuilder {
             };
 
         const tx = res.data;
-        const tx_hash = hashFull(tx);
+        const tx_hash = Hasher.hashFull(tx);
         const r: ITransactionOverviewReceiver[] = [];
         for (let idx = 0; idx < tx.outputs.length; idx++) {
             r.push({
-                utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
+                utxo: Hasher.makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
                 address: tx.outputs[idx].address,
                 amount: tx.outputs[idx].value,
             });
@@ -2091,11 +2091,11 @@ export class WalletCancelBuilder extends WalletTxBuilder {
             };
         }
         const tx = this._tx;
-        const tx_hash = hashFull(tx);
+        const tx_hash = Hasher.hashFull(tx);
         const r: ITransactionOverviewReceiver[] = [];
         for (let idx = 0; idx < tx.outputs.length; idx++) {
             r.push({
-                utxo: makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
+                utxo: Hasher.makeUTXOKey(tx_hash, JSBI.BigInt(idx)),
                 address: tx.outputs[idx].address,
                 amount: tx.outputs[idx].value,
             });

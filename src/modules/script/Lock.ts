@@ -35,7 +35,7 @@
 
 *******************************************************************************/
 
-import { hashPart } from "../common/Hash";
+import { Hasher } from "../common/Hash";
 import { PublicKey } from "../common/KeyPair";
 import { Signature } from "../common/Signature";
 import { JSONValidator } from "../utils/JSONValidator";
@@ -107,7 +107,7 @@ export class Lock {
      */
     public computeHash(buffer: SmartBuffer) {
         buffer.writeUInt8(this.type);
-        hashPart(this.bytes, buffer);
+        Hasher.hashPart(this.bytes, buffer);
     }
 
     /**

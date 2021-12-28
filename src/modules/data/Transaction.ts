@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-import { Hash, hashMulti, hashPart, VariableBytes } from "../common/Hash";
+import { Hash, Hasher, VariableBytes } from "../common/Hash";
 import { Height } from "../common/Height";
 import { SigHash } from "../script/Signature";
 import { JSONValidator } from "../utils/JSONValidator";
@@ -100,10 +100,10 @@ export class Transaction {
      */
     public computeHash(buffer: SmartBuffer) {
         this.sort();
-        hashPart(this.inputs, buffer);
-        hashPart(this.outputs, buffer);
-        hashPart(this.payload, buffer);
-        hashPart(this.lock_height, buffer);
+        Hasher.hashPart(this.inputs, buffer);
+        Hasher.hashPart(this.outputs, buffer);
+        Hasher.hashPart(this.payload, buffer);
+        Hasher.hashPart(this.lock_height, buffer);
     }
 
     /**
@@ -245,7 +245,7 @@ export class Transaction {
                     throw new Error("Output index is out of range");
         }
 
-        if (sig_hash === SigHash.All) return hashMulti(this, VariableBytes.fromUInt8(sig_hash));
+        if (sig_hash === SigHash.All) return Hasher.hashMulti(this, VariableBytes.fromUInt8(sig_hash));
 
         const dup: Transaction = this.clone();
         switch (sig_hash) {
@@ -253,22 +253,22 @@ export class Transaction {
                 dup.inputs.length = 0;
                 dup.inputs.push(...this.inputs.slice(0, input_idx));
                 dup.inputs.push(...this.inputs.slice(input_idx + 1));
-                return hashMulti(dup, VariableBytes.fromUInt8(sig_hash));
+                return Hasher.hashMulti(dup, VariableBytes.fromUInt8(sig_hash));
             case SigHash.Single:
                 dup.outputs.length = 0;
                 dup.outputs.push(...this.outputs.slice(output_idx, output_idx + 1));
-                return hashMulti(dup, VariableBytes.fromUInt8(sig_hash));
+                return Hasher.hashMulti(dup, VariableBytes.fromUInt8(sig_hash));
             case SigHash.Single_AnyoneCanPay:
                 dup.inputs.length = 0;
                 dup.outputs.length = 0;
                 dup.inputs.push(...this.inputs.slice(input_idx, input_idx + 1));
                 dup.outputs.push(...this.outputs.slice(output_idx, output_idx + 1));
-                return hashMulti(dup, VariableBytes.fromUInt8(sig_hash));
+                return Hasher.hashMulti(dup, VariableBytes.fromUInt8(sig_hash));
             case SigHash.Single_NoInput_AnyoneCanPay:
                 dup.inputs.length = 0;
                 dup.outputs.length = 0;
                 dup.outputs.push(...this.outputs.slice(output_idx, output_idx + 1));
-                return hashMulti(dup, VariableBytes.fromUInt8(sig_hash));
+                return Hasher.hashMulti(dup, VariableBytes.fromUInt8(sig_hash));
             case SigHash.AnyoneCanPay:
             default:
                 throw new Error("Invalid SigHash");

@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-import { Hash, hashPart } from "../common/Hash";
+import { Hash, Hasher } from "../common/Hash";
 import { Height } from "../common/Height";
 import { PublicKey } from "../common/KeyPair";
 import { Signature } from "../common/Signature";
@@ -66,7 +66,7 @@ export class EncryptionKey {
      * @param buffer The buffer where collected data is stored
      */
     public computeHash(buffer: SmartBuffer) {
-        hashPart(Buffer.from(this.app_name), buffer);
+        Hasher.hashPart(Buffer.from(this.app_name), buffer);
         this.height.computeHash(buffer);
         this.value.computeHash(buffer);
         this.validator.computeHash(buffer);

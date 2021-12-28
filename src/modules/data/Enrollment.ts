@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-import { Hash, hashPart } from "../common/Hash";
+import { Hash } from "../common/Hash";
 import { Signature } from "../common/Signature";
 import { JSONValidator } from "../utils/JSONValidator";
 

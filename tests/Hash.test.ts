@@ -42,7 +42,7 @@ describe("Hash", () => {
     // The test codes below compare with the values calculated in Agora.
     it("Test of hash('abc')", () => {
         // Hash
-        const h = sdk.hash(Buffer.from("abc"));
+        const h = sdk.Hasher.hash(Buffer.from("abc"));
 
         // Check
         assert.strictEqual(
@@ -54,13 +54,13 @@ describe("Hash", () => {
     // The test codes below compare with the values calculated in Agora.
     it("Test of multi hash", () => {
         // Source 1 : "foo"
-        const foo = sdk.hash(Buffer.from("foo"));
+        const foo = sdk.Hasher.hash(Buffer.from("foo"));
 
         // Source 2 : "bar"
-        const bar = sdk.hash(Buffer.from("bar"));
+        const bar = sdk.Hasher.hash(Buffer.from("bar"));
 
         // Hash Multi
-        const h = sdk.hashMulti(foo, bar);
+        const h = sdk.Hasher.hashMulti(foo, bar);
 
         // Check
         assert.strictEqual(
@@ -69,10 +69,12 @@ describe("Hash", () => {
         );
 
         // Source 3 : "boa"
-        const boa = sdk.hash(Buffer.from("boa"));
+        const boa = sdk.Hasher.hash(Buffer.from("boa"));
 
-        const h2 = sdk.hash(Buffer.concat([Buffer.from([0, 0, 0, 0, 0, 0, 0, 0]), foo.data, bar.data, boa.data]));
-        const h3 = sdk.hashMulti(foo, bar, boa);
+        const h2 = sdk.Hasher.hash(
+            Buffer.concat([Buffer.from([0, 0, 0, 0, 0, 0, 0, 0]), foo.data, bar.data, boa.data])
+        );
+        const h3 = sdk.Hasher.hashMulti(foo, bar, boa);
 
         // Check
         assert.strictEqual(h3.toString(), h2.toString());
@@ -126,7 +128,7 @@ describe("Hash", () => {
         const app_name = "Votera";
 
         // Hash Multi
-        const key = sdk.hashMulti(pre_image, app_name);
+        const key = sdk.Hasher.hashMulti(pre_image, app_name);
 
         // Check
         assert.strictEqual(
@@ -138,23 +140,23 @@ describe("Hash", () => {
     // The test codes below compare with the values calculated in Agora.
     it("Test of multi hash of variables", () => {
         // Source 1 : "foo"
-        const foo = sdk.hash(Buffer.from("foo"));
+        const foo = sdk.Hasher.hash(Buffer.from("foo"));
 
         // UInt8
         assert.strictEqual(
-            sdk.hashMulti(foo, sdk.VariableBytes.fromUInt8(45)).toString(),
+            sdk.Hasher.hashMulti(foo, sdk.VariableBytes.fromUInt8(45)).toString(),
             "0x4302de357edbf92bbc7ab1fa6c0725c882e9fdc7cbf1a7647b72e46355ebbbec72e90eaeb8378ce536d4da84bef86ed44baf942d94e52b2f289edde7ff0d3fef"
         );
 
         // UInt16
         assert.strictEqual(
-            sdk.hashMulti(foo, sdk.VariableBytes.fromUInt16(45)).toString(),
+            sdk.Hasher.hashMulti(foo, sdk.VariableBytes.fromUInt16(45)).toString(),
             "0x85be6919b5276738562c070c635f51af884589f9a65d9d2fa179e38d5fc31a6d1fc3a9a337c085565d91319f8b01f89751aa1b9efafc570964a30d5d87cc5644"
         );
 
         // UInt32
         assert.strictEqual(
-            sdk.hashMulti(foo, sdk.VariableBytes.fromUInt32(45)).toString(),
+            sdk.Hasher.hashMulti(foo, sdk.VariableBytes.fromUInt32(45)).toString(),
             "0xa8fe8e8d0a416d96e56226ef22b8ae1eef5487cf057dbb82e4ba16f60e9dacd058a364721266d5f9cdae6f9f9166f8f44357efb347783ae77576c01332459fa9"
         );
     });
@@ -164,7 +166,7 @@ describe("Hash", () => {
         const tx_hash = new sdk.Hash(
             "0x5d7f6a7a30f7ff591c8649f61eb8a35d034824ed5cd252c2c6f10cdbd2236713dc369ef2a44b62ba113814a9d819a276ff61582874c9aee9c98efa2aa1f10d73"
         );
-        const hash = sdk.makeUTXOKey(tx_hash, sdk.JSBI.BigInt(1));
+        const hash = sdk.Hasher.makeUTXOKey(tx_hash, sdk.JSBI.BigInt(1));
         assert.strictEqual(
             hash.toString(),
             "0x35f0a7e120738d87431507d168a44c9b16b0381d0c6d7a62b5eb6ec5070fcfc46ebf753a8da5623cef1a2a80e03174cbd63be0ed3143311a1e19524940460c14"
@@ -179,7 +181,7 @@ describe("Hash", () => {
 
         const header: sdk.BlockHeader = new sdk.BlockHeader(
             new sdk.Hash(Buffer.alloc(sdk.Hash.Width)),
-            sdk.hashFull(tx),
+            sdk.Hasher.hashFull(tx),
             new sdk.Signature(Buffer.alloc(sdk.Signature.Width)),
             sdk.BitMask.fromString("0"),
             new sdk.Height("0"),
@@ -187,7 +189,7 @@ describe("Hash", () => {
             []
         );
         assert.strictEqual(
-            sdk.hashFull(header).toString(),
+            sdk.Hasher.hashFull(header).toString(),
             "0x08e3eac0394512060fb6d47a28092888c9b100149ab0c925d36ba554c90d8ebee0269789bb0f6d03117b43117a05ecc24849f0a6020dd7bce0a66065379eb9a3"
         );
     });
@@ -200,7 +202,7 @@ describe("Hash", () => {
 
         const header: sdk.BlockHeader = new sdk.BlockHeader(
             new sdk.Hash(Buffer.alloc(sdk.Hash.Width)),
-            sdk.hashFull(tx),
+            sdk.Hasher.hashFull(tx),
             new sdk.Signature(Buffer.alloc(sdk.Signature.Width)),
             sdk.BitMask.fromString("0"),
             new sdk.Height("0"),
@@ -212,7 +214,7 @@ describe("Hash", () => {
             []
         );
         assert.strictEqual(
-            sdk.hashFull(header).toString(),
+            sdk.Hasher.hashFull(header).toString(),
             "0x9df8acdbece16d9f690fb6c81bd65b5ff5840619a79fc357b6a4667211a73add8915e557950281d95612eb875a9d490583fb8190fabe893279716bfc440b0e3d"
         );
     });
@@ -221,7 +223,7 @@ describe("Hash", () => {
     it("Test for hash value of Scalar", () => {
         const scalar = new sdk.Scalar("0x0e00a8df701806cb4deac9bb09cc85b097ee713e055b9d2bf1daf668b3f63778");
         assert.deepStrictEqual(
-            sdk.hashFull(scalar).toString(),
+            sdk.Hasher.hashFull(scalar).toString(),
             "0x0528f5a8f7d6298e6f560d05283e6256911cbb6ffb18eee5a3a9e8f423ec468cb49a89d6f78fac459668ed819610d6e6b323391675271243f9fbf7036a4512fe"
         );
     });
@@ -230,7 +232,7 @@ describe("Hash", () => {
     it("Test for hash value of Point", () => {
         const point = new sdk.Point("0xdb445140a72012a177535f43e6bbb8523ff21de465a7c35b42be1a447e5e2908");
         assert.deepStrictEqual(
-            sdk.hashFull(point).toString(),
+            sdk.Hasher.hashFull(point).toString(),
             "0x2358dd06aeca72e8bcb5918f1c4abae9eee8174e5af68e02b17d3c035b459663baee8c0cf6f7e4a1a7944d2494243a69d6f6db182071ddc25b5b5a7c7e42a635"
         );
     });
@@ -239,20 +241,20 @@ describe("Hash", () => {
     it("Test for hash value of PublicKey", () => {
         const publicKey = new sdk.PublicKey("boa1xrr66q4rthn4qvhhsl4y5hptqm366pgarqpk26wfzh6d38wg076tsqqesgg");
         assert.deepStrictEqual(
-            sdk.hashFull(publicKey).toString(),
+            sdk.Hasher.hashFull(publicKey).toString(),
             "0xd7935c2af683f3b28f2040ca41e3d5ee352b30237f1aabba85d09c01262e88b84ae8f37057a33f4bb14968dd97e86119f436a7a7ebe2fd1be0ce9eeb888a02ad"
         );
     });
 
     it("Test of ChainId", () => {
         const secret: sdk.JSBI = sdk.JSBI.BigInt(0x1337);
-        assert.notDeepStrictEqual(sdk.hashFull(secret, true, 0xdead), sdk.hashFull(secret, true, 0xbeef));
-        assert.notDeepStrictEqual(sdk.hashFull(secret, true, 0xdead), sdk.hashFullNoMagic(secret));
+        assert.notDeepStrictEqual(sdk.Hasher.hashFull(secret, true, 0xdead), sdk.Hasher.hashFull(secret, true, 0xbeef));
+        assert.notDeepStrictEqual(sdk.Hasher.hashFull(secret, true, 0xdead), sdk.Hasher.hashFull(secret, false));
         const secret2: sdk.JSBI = sdk.JSBI.BigInt(0x0f0f);
-        const multi_hash = sdk.hashMulti(secret, secret2);
+        const multi_hash = sdk.Hasher.hashMulti(secret, secret2);
 
-        sdk.setChainId(0xdead);
-        assert.deepStrictEqual(sdk.hashFull(secret, true, 0xdead), sdk.hashFull(secret));
-        assert.notDeepStrictEqual(multi_hash, sdk.hashMulti(secret, secret2));
+        sdk.Hasher.setChainId(0xdead);
+        assert.deepStrictEqual(sdk.Hasher.hashFull(secret, true, 0xdead), sdk.Hasher.hashFull(secret));
+        assert.notDeepStrictEqual(multi_hash, sdk.Hasher.hashMulti(secret, secret2));
     });
 });

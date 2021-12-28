@@ -15,7 +15,7 @@
 *******************************************************************************/
 
 import { Amount } from "../common/Amount";
-import { Hash, hash } from "../common/Hash";
+import { Hash, Hasher } from "../common/Hash";
 import { PublicKey } from "../common/KeyPair";
 import { Transaction } from "../data/Transaction";
 import { TxPayloadFee } from "../utils/TxPayloadFee";
@@ -178,7 +178,7 @@ export class BOAClient {
             };
 
         let temp_hash = new Hash(new_image.data);
-        for (let idx = original_image_height; idx < new_image_height; idx++) temp_hash = hash(temp_hash.data);
+        for (let idx = original_image_height; idx < new_image_height; idx++) temp_hash = Hasher.hash(temp_hash.data);
 
         if (!original_image.data.equals(temp_hash.data))
             return {

@@ -14,7 +14,7 @@
 import { SmartBuffer } from "smart-buffer";
 import { Utils } from "../utils/Utils";
 import { VarInt } from "../utils/VarInt";
-import { hashPart } from "./Hash";
+import { Hasher } from "./Hash";
 
 import JSBI from "jsbi";
 
@@ -40,7 +40,7 @@ export class Height {
      * @param buffer The buffer where collected data is stored
      */
     public computeHash(buffer: SmartBuffer) {
-        hashPart(this.value, buffer);
+        Hasher.hashPart(this.value, buffer);
     }
 
     /**

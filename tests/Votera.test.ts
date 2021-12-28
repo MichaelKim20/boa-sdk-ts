@@ -352,7 +352,7 @@ describe("Checking the proposal and ballot data", () => {
     const agora_port: string = "3210";
 
     before("Wait for the package libsodium to finish loading", async () => {
-        sdk.setChainId(sdk.ChainId.TestNet);
+        sdk.Hasher.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         await sdk.SodiumHelper.init();
     });
@@ -487,7 +487,7 @@ describe("Checking the proposal and ballot data", () => {
                         );
                         const app_name = "Votera";
                         const proposal_id = payload.proposal_id;
-                        const key_agora_admin = sdk.hashMulti(pre_image, Buffer.from(app_name));
+                        const key_agora_admin = sdk.Hasher.hashMulti(pre_image, Buffer.from(app_name));
                         const key_encrypt = sdk.Encrypt.createKey(key_agora_admin.data, proposal_id);
                         assert.deepStrictEqual(
                             sdk.Encrypt.decrypt(payload.ballot, key_encrypt),

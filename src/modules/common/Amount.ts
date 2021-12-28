@@ -15,7 +15,7 @@
 *******************************************************************************/
 
 import { VarInt } from "../utils/VarInt";
-import { hashPart } from "./Hash";
+import { Hasher } from "./Hash";
 
 import JSBI from "jsbi";
 import { SmartBuffer } from "smart-buffer";
@@ -104,7 +104,7 @@ export class Amount {
      * @param buffer The buffer where collected data is stored
      */
     public computeHash(buffer: SmartBuffer) {
-        hashPart(this.value, buffer);
+        Hasher.hashPart(this.value, buffer);
     }
 
     /**

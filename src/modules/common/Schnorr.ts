@@ -38,7 +38,7 @@
 *******************************************************************************/
 
 import { Point, Scalar } from "./ECC";
-import { hashFull, hashPart } from "./Hash";
+import { Hasher } from "./Hash";
 import { Signature } from "./Signature";
 
 import { SmartBuffer } from "smart-buffer";
@@ -82,7 +82,7 @@ export class Message<T> {
     public computeHash(buffer: SmartBuffer) {
         this.X.computeHash(buffer);
         this.R.computeHash(buffer);
-        hashPart(this.message, buffer);
+        Hasher.hashPart(this.message, buffer);
     }
 }
 
@@ -237,7 +237,7 @@ export class Schnorr {
      */
     public static sign<T>(x: Scalar, X: Point, r: Scalar, R: Point, data: T): Signature {
         // Compute the challenge and reduce the hash to a scalar
-        const c = Scalar.fromHash(hashFull(new Message<T>(X, R, data)));
+        const c = Scalar.fromHash(Hasher.hashFull(new Message<T>(X, R, data)));
 
         // Compute `s` part of the proof
         const s: Scalar = Scalar.add(r, Scalar.mul(c, x));
@@ -277,7 +277,7 @@ export class Schnorr {
         if (!signature.R.isValid()) return false;
 
         // Compute the challenge and reduce the hash to a scalar
-        const c: Scalar = Scalar.fromHash(hashFull(new Message<T>(X, signature.R, data)));
+        const c: Scalar = Scalar.fromHash(Hasher.hashFull(new Message<T>(X, signature.R, data)));
 
         // Compute `R + c*X`
         const RcX: Point = Point.add(signature.R, Point.scalarMul(c, X));

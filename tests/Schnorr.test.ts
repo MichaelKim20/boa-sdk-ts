@@ -19,7 +19,7 @@ import * as assert from "assert";
 
 describe("Test of Schnorr", () => {
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.setChainId(sdk.ChainId.TestNet);
+        sdk.Hasher.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
@@ -150,7 +150,7 @@ describe("Test of Schnorr", () => {
     it("Example of extracting the private key from an insecure signature scheme", () => {
         const message = "BOSAGORA for the win";
         const kp: sdk.Pair = sdk.Pair.random(); // key-pair
-        const c: sdk.Scalar = sdk.Scalar.fromHash(sdk.hashFull(message)); // challenge
+        const c: sdk.Scalar = sdk.Scalar.fromHash(sdk.Hasher.hashFull(message)); // challenge
         const s: sdk.Scalar = sdk.Scalar.mul(kp.v, c); // signature
 
         // known public data of the node
@@ -168,7 +168,7 @@ describe("Test of Schnorr", () => {
         const message = "BOSAGORA for the win";
         const kp: sdk.Pair = sdk.Pair.random(); // key-pair
         const Rp: sdk.Pair = sdk.Pair.random(); // (R, r), the public and private nonce
-        const c: sdk.Scalar = sdk.Scalar.fromHash(sdk.hashFull(message)); // challenge
+        const c: sdk.Scalar = sdk.Scalar.fromHash(sdk.Hasher.hashFull(message)); // challenge
         const s: sdk.Scalar = sdk.Scalar.add(Rp.v, sdk.Scalar.mul(kp.v, c)); // signature
 
         // known public data of the node
@@ -199,7 +199,7 @@ describe("Test of Schnorr", () => {
 
         let R = sdk.Point.add(R1.V, R2.V);
         let X = sdk.Point.add(kp1.V, kp2.V);
-        let c = sdk.Scalar.fromHash(sdk.hashFull(new sdk.Message(X, R, message))); // challenge
+        let c = sdk.Scalar.fromHash(sdk.Hasher.hashFull(new sdk.Message(X, R, message))); // challenge
 
         const s1 = sdk.Scalar.add(R1.v, sdk.Scalar.mul(kp1.v, c));
         const s2 = sdk.Scalar.add(R2.v, sdk.Scalar.mul(kp2.v, c));
@@ -211,7 +211,7 @@ describe("Test of Schnorr", () => {
         const bobR = sdk.Point.sub(R2.V, R1.V);
         X = sdk.Point.add(kp1.V, bobV);
         R = sdk.Point.add(R1.V, bobR);
-        c = sdk.Scalar.fromHash(sdk.hashFull(new sdk.Message(X, R, message)));
+        c = sdk.Scalar.fromHash(sdk.Hasher.hashFull(new sdk.Message(X, R, message)));
 
         // bob signed the message alone, without co-operation from alice. it passes!
         const bob_sig = sdk.Scalar.add(R2.v, sdk.Scalar.mul(c, kp2.v));
@@ -222,7 +222,7 @@ describe("Test of Schnorr", () => {
     it("rogue-key attack, but using multi-sig", () => {
         const message = "BOSAGORA for the win";
 
-        const c = sdk.Scalar.fromHash(sdk.hashFull(message)); // challenge
+        const c = sdk.Scalar.fromHash(sdk.Hasher.hashFull(message)); // challenge
 
         const kp_1 = sdk.Pair.random(); // key-pair
         const Rp_1 = sdk.Pair.random(); // (R, r), the public and private nonce

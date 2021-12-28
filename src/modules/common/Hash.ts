@@ -257,156 +257,150 @@ export enum ChainId {
     CoinNet = 1,
 }
 
-let g_chain_id: ChainId = ChainId.TestNet;
-
 /**
- * Set Chain ID
- * @param value The chain ID to be designated.
+ * The class that has static functions that make hash.
  */
-export function setChainId(value: ChainId) {
-    g_chain_id = value;
-}
+export class Hasher {
+    public static chain_id: ChainId = ChainId.TestNet;
 
-/**
- * Returns the chain ID.
- */
-export function getChainId(): ChainId {
-    return g_chain_id;
-}
-
-/**
- * Creates a hash and stores it in buffer.
- * @param source Original for creating hash
- * @returns Instance of Hash
- */
-export function hash(source: Buffer): Hash {
-    return new Hash(Buffer.from(SodiumHelper.sodium.crypto_generichash(Hash.Width, source)));
-}
-
-/**
- * Creates a hash of the two buffer combined.
- * @param args The array of any for creating hash
- * @returns The instance of Hash
- * See_Also https://github.com/bosagora/agora/blob/93c31daa616e76011deee68a8645e1b86624ce3d/source/agora/common/Hash.d#L239-L255
- */
-export function hashMulti(...args: any[]): Hash {
-    const buffer = new SmartBuffer();
-    hashPart(JSBI.BigInt(g_chain_id), buffer);
-    for (const m of args) hashPart(m, buffer);
-    return new Hash(Buffer.from(SodiumHelper.sodium.crypto_generichash(Hash.Width, buffer.toBuffer())));
-}
-
-/**
- * Makes a UTXOKey
- * @param h     The instance of transaction's Hash
- * @param index The index of the output
- * @returns The instance of Hash
- * See_Also https://github.com/bosagora/agora/blob/93c31daa616e76011deee68a8645e1b86624ce3d/source/agora/consensus/data/UTXOSetValue.d#L50-L53
- */
-export function makeUTXOKey(h: Hash, index: JSBI): Hash {
-    return hashMulti(h, index);
-}
-
-/**
- * Serializes all internal objects that the instance contains in a buffer.
- * Calculates the hash of the buffer.
- * @param record The object to serialize for the hash for creation.
- * The object has a method named `computeHash`.
- * @param use_chan_id If this value is true, the chain ID will be included in the hash.
- * @param chain_id The chain ID
- * @returns The instance of the hash
- */
-export function hashFull(record: any, use_chan_id: boolean = true, chain_id: ChainId = g_chain_id): Hash {
-    if (record === null || record === undefined) return Hash.Null;
-
-    const buffer = new SmartBuffer();
-    if (use_chan_id) hashPart(JSBI.BigInt(chain_id), buffer);
-    hashPart(record, buffer);
-    return hash(buffer.readBuffer());
-}
-
-/**
- * Serializes all internal objects that the instance contains in a buffer.
- * Calculates the hash of the buffer.
- * @param record The object to serialize for the hash for creation.
- * The object has a method named `computeHash`.
- * @returns The instance of the hash
- */
-export function hashFullNoMagic(record: any): Hash {
-    return hashFull(record, false);
-}
-
-/**
- * Serializes all internal objects that the instance contains in the buffer.
- * @param record The object to serialize for the hash for creation
- * @param buffer The storage of serialized data for creating the hash
- */
-export function hashPart(record: any, buffer: SmartBuffer) {
-    if (record === null || record === undefined) return;
-
-    // If the record has a method called `computeHash`,
-    if (typeof record.computeHash === "function") {
-        record.computeHash(buffer);
-        return;
+    /**
+     * Set Chain ID
+     * @param value The chain ID to be designated.
+     */
+    public static setChainId(value: ChainId) {
+        Hasher.chain_id = value;
     }
 
-    if (typeof record === "string") {
-        const buf = Buffer.from(record);
-        hashVarInt(JSBI.BigInt(buf.length), buffer);
-        buffer.writeBuffer(buf);
-        return;
+    /**
+     * Returns the chain ID.
+     */
+    public static getChainId(): ChainId {
+        return Hasher.chain_id;
     }
 
-    if (typeof record === "number") {
-        buffer.writeUInt32LE(record);
-        return;
+    /**
+     * Creates a hash and stores it in buffer.
+     * @param source Original for creating hash
+     * @returns Instance of Hash
+     */
+    public static hash(source: Buffer): Hash {
+        return new Hash(Buffer.from(SodiumHelper.sodium.crypto_generichash(Hash.Width, source)));
     }
 
-    if (record instanceof JSBI) {
-        const buf = Buffer.allocUnsafe(8);
-        Utils.writeJSBigIntLE(buf, record);
-        buffer.writeBuffer(buf);
-        return;
+    /**
+     * Creates a hash of the two buffer combined.
+     * @param args The array of any for creating hash
+     * @returns The instance of Hash
+     * See_Also https://github.com/bosagora/agora/blob/93c31daa616e76011deee68a8645e1b86624ce3d/source/agora/common/Hash.d#L239-L255
+     */
+    public static hashMulti(...args: any[]): Hash {
+        const buffer = new SmartBuffer();
+        Hasher.hashPart(JSBI.BigInt(Hasher.chain_id), buffer);
+        for (const m of args) Hasher.hashPart(m, buffer);
+        return new Hash(Buffer.from(SodiumHelper.sodium.crypto_generichash(Hash.Width, buffer.toBuffer())));
     }
 
-    if (record instanceof Buffer) {
-        hashVarInt(JSBI.BigInt(record.length), buffer);
-        buffer.writeBuffer(record);
-        return;
+    /**
+     * Makes a UTXOKey
+     * @param h     The instance of transaction's Hash
+     * @param index The index of the output
+     * @returns The instance of Hash
+     * See_Also https://github.com/bosagora/agora/blob/93c31daa616e76011deee68a8645e1b86624ce3d/source/agora/consensus/data/UTXOSetValue.d#L50-L53
+     */
+    public static makeUTXOKey(h: Hash, index: JSBI): Hash {
+        return Hasher.hashMulti(h, index);
     }
 
-    if (Array.isArray(record)) {
-        hashVarInt(JSBI.BigInt(record.length), buffer);
-        for (const elem of record) {
-            hashPart(elem, buffer);
+    /**
+     * Serializes all internal objects that the instance contains in a buffer.
+     * Calculates the hash of the buffer.
+     * @param record The object to serialize for the hash for creation.
+     * The object has a method named `computeHash`.
+     * @param use_chan_id If this value is true, the chain ID will be included in the hash.
+     * @param chain_id The chain ID
+     * @returns The instance of the hash
+     */
+    public static hashFull(record: any, use_chan_id: boolean = true, chain_id: ChainId = Hasher.chain_id): Hash {
+        if (record === null || record === undefined) return Hash.Null;
+
+        const buffer = new SmartBuffer();
+        if (use_chan_id) Hasher.hashPart(JSBI.BigInt(chain_id), buffer);
+        Hasher.hashPart(record, buffer);
+        return Hasher.hash(buffer.readBuffer());
+    }
+
+    /**
+     * Serializes all internal objects that the instance contains in the buffer.
+     * @param record The object to serialize for the hash for creation
+     * @param buffer The storage of serialized data for creating the hash
+     */
+    public static hashPart(record: any, buffer: SmartBuffer) {
+        if (record === null || record === undefined) return;
+
+        // If the record has a method called `computeHash`,
+        if (typeof record.computeHash === "function") {
+            record.computeHash(buffer);
+            return;
         }
-    } else {
-        for (const key in record) {
-            if (record.hasOwnProperty(key)) {
-                hashPart(record[key], buffer);
+
+        if (typeof record === "string") {
+            const buf = Buffer.from(record);
+            Hasher.hashVarInt(JSBI.BigInt(buf.length), buffer);
+            buffer.writeBuffer(buf);
+            return;
+        }
+
+        if (typeof record === "number") {
+            buffer.writeUInt32LE(record);
+            return;
+        }
+
+        if (record instanceof JSBI) {
+            const buf = Buffer.allocUnsafe(8);
+            Utils.writeJSBigIntLE(buf, record);
+            buffer.writeBuffer(buf);
+            return;
+        }
+
+        if (record instanceof Buffer) {
+            Hasher.hashVarInt(JSBI.BigInt(record.length), buffer);
+            buffer.writeBuffer(record);
+            return;
+        }
+
+        if (Array.isArray(record)) {
+            Hasher.hashVarInt(JSBI.BigInt(record.length), buffer);
+            for (const elem of record) {
+                Hasher.hashPart(elem, buffer);
+            }
+        } else {
+            for (const key in record) {
+                if (record.hasOwnProperty(key)) {
+                    Hasher.hashPart(record[key], buffer);
+                }
             }
         }
     }
-}
 
-/**
- * Serializes array length information into buffers.
- * @param value The length of the Array
- * @param buffer The storage of serialized data for creating the hash
- */
-export function hashVarInt(value: JSBI, buffer: SmartBuffer) {
-    if (JSBI.lessThanOrEqual(value, JSBI.BigInt(0xfc))) {
-        buffer.writeUInt8(JSBI.toNumber(value));
-    } else if (JSBI.lessThanOrEqual(value, JSBI.BigInt(0xffff))) {
-        buffer.writeUInt8(0xfd);
-        buffer.writeUInt16LE(JSBI.toNumber(value));
-    } else if (JSBI.lessThanOrEqual(value, JSBI.BigInt(0xffffffff))) {
-        buffer.writeUInt8(0xfe);
-        buffer.writeUInt32LE(JSBI.toNumber(value));
-    } else {
-        buffer.writeUInt8(0xff);
-        const buf = Buffer.allocUnsafe(8);
-        Utils.writeJSBigIntLE(buf, value);
-        buffer.writeBuffer(buf);
+    /**
+     * Serializes array length information into buffers.
+     * @param value The length of the Array
+     * @param buffer The storage of serialized data for creating the hash
+     */
+    public static hashVarInt(value: JSBI, buffer: SmartBuffer) {
+        if (JSBI.lessThanOrEqual(value, JSBI.BigInt(0xfc))) {
+            buffer.writeUInt8(JSBI.toNumber(value));
+        } else if (JSBI.lessThanOrEqual(value, JSBI.BigInt(0xffff))) {
+            buffer.writeUInt8(0xfd);
+            buffer.writeUInt16LE(JSBI.toNumber(value));
+        } else if (JSBI.lessThanOrEqual(value, JSBI.BigInt(0xffffffff))) {
+            buffer.writeUInt8(0xfe);
+            buffer.writeUInt32LE(JSBI.toNumber(value));
+        } else {
+            buffer.writeUInt8(0xff);
+            const buf = Buffer.allocUnsafe(8);
+            Utils.writeJSBigIntLE(buf, value);
+            buffer.writeBuffer(buf);
+        }
     }
 }

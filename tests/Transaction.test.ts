@@ -19,7 +19,7 @@ import * as assert from "assert";
 
 describe("Transaction", () => {
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.setChainId(sdk.ChainId.TestNet);
+        sdk.Hasher.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
@@ -32,7 +32,7 @@ describe("Transaction", () => {
             Buffer.alloc(0)
         );
         assert.strictEqual(
-            sdk.hashFull(payment_tx).toString(),
+            sdk.Hasher.hashFull(payment_tx).toString(),
             "0xadbc0332bd71d64d134e77f3c1e1828b1b4543f4922dc93bd6c3eff1c1c29f33f9cdb3980b1a6dddd6ac483b7766c8e21a3334f48eac39bec18802637e457a2f"
         );
 
@@ -47,7 +47,7 @@ describe("Transaction", () => {
         );
 
         assert.strictEqual(
-            sdk.hashFull(freeze_tx).toString(),
+            sdk.Hasher.hashFull(freeze_tx).toString(),
             "0x7958451244fd136328f75514ebb54eda51320b36835ed024582abc2238baf40d3edf813dd7fc8d9b2b1c89c015f89d09ccc2cd73de58512a7202fe850c0eed0d"
         );
 
@@ -61,7 +61,7 @@ describe("Transaction", () => {
             Buffer.from([1, 2, 3])
         );
         assert.strictEqual(
-            sdk.hashFull(payload_tx).toString(),
+            sdk.Hasher.hashFull(payload_tx).toString(),
             "0x4c8f4f2b1516d94cee686547d279c617a35734f11f4cb3d90bd9c1325a91c68a6146dc7018ff27368e6e07126a82f991a52aad40a04ac01b0a57605e14f55e4b"
         );
     });
@@ -84,7 +84,7 @@ describe("Transaction", () => {
             Buffer.alloc(0)
         );
         assert.strictEqual(
-            sdk.hashFull(tx1).toString(),
+            sdk.Hasher.hashFull(tx1).toString(),
             "0x2db765b318d83e32c70fbc2b0daa5a56158b089da0be4e8477cab6b9c3d460b5c382f8c16af834284f4a06c4a416550be6a707fe0544cbd261c59a11b991915d"
         );
 
@@ -105,7 +105,7 @@ describe("Transaction", () => {
             Buffer.alloc(0)
         );
         assert.strictEqual(
-            sdk.hashFull(tx2).toString(),
+            sdk.Hasher.hashFull(tx2).toString(),
             "0x2db765b318d83e32c70fbc2b0daa5a56158b089da0be4e8477cab6b9c3d460b5c382f8c16af834284f4a06c4a416550be6a707fe0544cbd261c59a11b991915d"
         );
     });
@@ -132,7 +132,7 @@ describe("Transaction", () => {
             Buffer.alloc(0)
         );
         assert.strictEqual(
-            sdk.hashFull(tx1).toString(),
+            sdk.Hasher.hashFull(tx1).toString(),
             "0xf5f72ceb5d5b19f3d6a54649ec25dd8f331881d19056631a92449da13f566da70bba365e3a351e849a0f8a6012f31f31ca212570a9cef10a25e0e4f57343956f"
         );
 
@@ -157,7 +157,7 @@ describe("Transaction", () => {
             Buffer.alloc(0)
         );
         assert.strictEqual(
-            sdk.hashFull(tx2).toString(),
+            sdk.Hasher.hashFull(tx2).toString(),
             "0xf5f72ceb5d5b19f3d6a54649ec25dd8f331881d19056631a92449da13f566da70bba365e3a351e849a0f8a6012f31f31ca212570a9cef10a25e0e4f57343956f"
         );
     });
@@ -184,7 +184,7 @@ describe("Transaction", () => {
             Buffer.alloc(0)
         );
         assert.strictEqual(
-            sdk.hashFull(tx1).toString(),
+            sdk.Hasher.hashFull(tx1).toString(),
             "0x048418fe03f13fb0094ec50252d4aa530fbeb4929d09763a35fbb8d17fe3ee8d370a6b5d5ceb1f2e85f77175bd43f7dc409133fd4500d56b77de4d481730f771"
         );
 
@@ -209,7 +209,7 @@ describe("Transaction", () => {
             Buffer.alloc(0)
         );
         assert.strictEqual(
-            sdk.hashFull(tx2).toString(),
+            sdk.Hasher.hashFull(tx2).toString(),
             "0x048418fe03f13fb0094ec50252d4aa530fbeb4929d09763a35fbb8d17fe3ee8d370a6b5d5ceb1f2e85f77175bd43f7dc409133fd4500d56b77de4d481730f771"
         );
     });

@@ -25,7 +25,7 @@ const samples: any[] = (() => {
 
 describe("Test of Block", () => {
     before("Wait for the package libsodium to finish loading", async () => {
-        sdk.setChainId(sdk.ChainId.TestNet);
+        sdk.Hasher.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         await sdk.SodiumHelper.init();
     });
@@ -42,7 +42,7 @@ describe("Test of Block", () => {
 
         // Test for block header hash
         for (let idx = 0; idx < blocks.length - 1; idx++) {
-            assert.deepStrictEqual(sdk.hashFull(blocks[idx].header), blocks[idx + 1].header.prev_block);
+            assert.deepStrictEqual(sdk.Hasher.hashFull(blocks[idx].header), blocks[idx + 1].header.prev_block);
         }
     });
 });

@@ -19,7 +19,7 @@ import * as assert from "assert";
 
 describe("Test Script", () => {
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.setChainId(sdk.ChainId.TestNet);
+        sdk.Hasher.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
@@ -359,7 +359,7 @@ describe("Test Script", () => {
         const sig = sdk.Schnorr.signPair<string>(kp, "Hello world");
 
         // sanity checks
-        const key_hash = sdk.hashFull(kp.V);
+        const key_hash = sdk.Hasher.hashFull(kp.V);
         const lock_opcodes = createLockP2PKH(key_hash);
         assert.strictEqual(sdk.Script.validateScript(sdk.ScriptType.Lock, lock_opcodes, 512)[0], "");
         const unlock_opcodes = createUnlockP2PKH(sig, kp.V);

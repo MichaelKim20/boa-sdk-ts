@@ -16,20 +16,7 @@ import { IWalletEndpoint } from "./modules/wallet/Types";
 
 export { IBOASodium } from "boa-sodium-base-ts";
 export { Amount, BOA } from "./modules/common/Amount";
-export {
-    Hash,
-    VariableBytes,
-    VariableType,
-    hash,
-    hashMulti,
-    makeUTXOKey,
-    hashFull,
-    hashFullNoMagic,
-    hashPart,
-    setChainId,
-    getChainId,
-    ChainId,
-} from "./modules/common/Hash";
+export { Hash, VariableBytes, VariableType, Hasher, ChainId } from "./modules/common/Hash";
 export { Height } from "./modules/common/Height";
 export { KeyPair, PublicKey, SecretKey, VersionByte } from "./modules/common/KeyPair";
 export { Signature } from "./modules/common/Signature";

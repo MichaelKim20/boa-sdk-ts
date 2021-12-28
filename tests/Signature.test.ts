@@ -21,7 +21,7 @@ import { Hash } from "../src";
 describe("Signature", () => {
     let sample_tx: sdk.Transaction;
     before("Wait for the package libsodium to finish loading", () => {
-        sdk.setChainId(sdk.ChainId.TestNet);
+        sdk.Hasher.setChainId(sdk.ChainId.TestNet);
         if (!sdk.SodiumHelper.isAssigned()) sdk.SodiumHelper.assign(new BOASodium());
         return sdk.SodiumHelper.init();
     });
@@ -63,7 +63,7 @@ describe("Signature", () => {
     // The test codes below compare with the values calculated in Agora.
     it("Test for hash value of transaction data", () => {
         assert.strictEqual(
-            sdk.hashFull(sample_tx).toString(),
+            sdk.Hasher.hashFull(sample_tx).toString(),
             "0xadbc0332bd71d64d134e77f3c1e1828b1b4543f4922dc93bd6c3eff1c1c29f33f9cdb3980b1a6dddd6ac483b7766c8e21a3334f48eac39bec18802637e457a2f"
         );
         const seed = `SDV3GLVZ6W7R7UFB2EMMY4BBFJWNCQB5FTCXUMD5ZCFTDEVZZ3RQ2BZI`;
