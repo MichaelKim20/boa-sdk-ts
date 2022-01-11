@@ -369,21 +369,21 @@ describe("BOA Client", () => {
                 {
                     utxo: "0x4028965b7408566a66e4cf8c603a1cdebc7659a3e693d36d2fdcb39b196da967914f40ef4966d5b4b1f4b3aae00fbd68ffe8808b070464c2a101d44f4d7b0170",
                     unlock: {
-                        bytes: "BhQE+Ogjj97DeDbClaeDEqWS/fyLUtLTtTwS46KxbQJ5ZFnM5W6iKLJ5FKzHTn509u2BrdxTJiezItnm4kiigw==",
+                        bytes: "QRMyC/pbMltGfwhCc5OuWyLJisOauLj0zFzLtJaaUAJGEO3y9XeMpkXyeDho7OnQpXPPf9T4+7vj7+pRTW5SywE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0x81a326afa790003c32517a2a2556613004e6147edac28d576cf7bcc2daadf4bb60be1f644c229b775e7894844ec66b2d70ddf407b8196b46bc1dfe42061c7497",
                     unlock: {
-                        bytes: "JJwTBos7ViqFQbDFIfqgX36mfFnxwUAhUomj/ylw6Qk+mjYQZzxyg/fNjNThj+qcL/0mWg1o3veXgs9oiIUNlg==",
+                        bytes: "3atQAYEFbz2YMbRvBrr/dcTIqi0gm9PGBI+PUubgcw1JxV9pNutf0YENsaomNJ1jkaUxnoGJDf+xlAm8aETRKgE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0xb82cb96710af2e9804c59d1f1e1679f8b8b69f4c0f6cd79c8c12f365dd766c09aaa4febcc18b3665d33301cb248ac7afd343ac7b98b27beaf246ad12d3b3219a",
                     unlock: {
-                        bytes: "6dCFceum5yeO4jrufIlYPXDmsQJ7WVnjZrIfjS9Dkw9ZXGcAY6o3fCFKO1I6i0FCNhr/UYgULRj1oPFuYY1v9w==",
+                        bytes: "dVeHIXR+yvVL5DI+s3PIB+VdPQ6R0kcg52MQejiTQwyS9ww5p70UsVKv2lbEiT4vJMak2wb0l8k80MbzG/wuOQE=",
                     },
                     unlock_age: 0,
                 },
@@ -391,18 +391,18 @@ describe("BOA Client", () => {
             outputs: [
                 {
                     type: 0,
-                    value: "100000",
+                    value: "500000",
                     lock: {
                         type: 0,
-                        bytes: "wa1PiNOnmZYBpjfjXS58SZ6fJTaihHSRZRt86aWWRgE=",
+                        bytes: "Mb3OFIOnt8RdJR0g/RwOdU46rnt6kUGwAtwNIZG8f4E=",
                     },
                 },
                 {
                     type: 0,
-                    value: "500000",
+                    value: "100000",
                     lock: {
                         type: 0,
-                        bytes: "xOYx2v6aWx69nACIFINcMrCytXJmcWy99/N+ZlGEIWM=",
+                        bytes: "wa1PiNOnmZYBpjfjXS58SZ6fJTaihHSRZRt86aWWRgE=",
                     },
                 },
             ],
@@ -488,27 +488,34 @@ describe("BOA Client", () => {
                 {
                     utxo: "0x3451d94322524e3923fd26f0597fb8a9cdbf3a9427c38ed1ca61104796d39c5b9b5ea33d576f17c2dc17bebc5d84a0559de8c8c521dfe725d4c352255fc71e85",
                     unlock: {
-                        bytes: "Vh6I8RKAw+8lM0NulP9PotF9DS/+o6cKAPfVNVaZ6QHKg3gM7IOVo3JG5fxw8b1YledAEKqBD/jhQzFVg0LI5w==",
+                        bytes: "o9cyxNiqXwcDe8n69KeTxkWYIPWEUIWFhVT7oaRgEwo2afRhDm3TcmdIkya+fTQYcSdJvDpTw8/HOh/PmSmfhAE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0x7e1958dbe6839d8520d65013bbc85d36d47a9f64cf608cc66c0d816f0b45f5c8a85a8990725ffbb1ab13c3c65b45fdc06f4745d455e00e1068c4c5c0b661d685",
                     unlock: {
-                        bytes: "PlOoZA14zITTLDEc7rXmAN7mujRMRYl0y6B0bz3cew+sh0mAT5q0RJBmfRFdyWBjKUaDD1364pHdIaF79Pyhqg==",
+                        bytes: "kEpHAjZeUIMvknZ0aRldt3pASFPBO8Nar8O/vpIf/Q5quNVCgfMmWqm7TO2VlWkWrcoEbFVIhcJRyEh+iPxxFQE=",
                     },
                     unlock_age: 0,
                 },
                 {
                     utxo: "0xfca92fe76629311c6208a49e89cb26f5260777278cd8b272e7bb3021adf429957fd6844eb3b8ff64a1f6074126163fd636877fa92a1f4329c5116873161fbaf8",
                     unlock: {
-                        bytes: "wu4d7hTwbWTl8i6DHLxLN6ApLZwznOo/1eCowQlI9wzdTHaicUucykDomWv6E8aa31bgawJbGs5kkqKK3zMloA==",
+                        bytes: "x4uwQbqaPz2devDeR36CPYa3l4Jrdd8M4ePZWC16nwcIrsq08zh9Lj1+CbqFmjtJmI62yF5okm8v4R9bAe7iigE=",
                     },
                     unlock_age: 0,
                 },
             ],
             outputs: [
-                { type: 0, value: "100000", lock: { type: 0, bytes: "wa1PiNOnmZYBpjfjXS58SZ6fJTaihHSRZRt86aWWRgE=" } },
+                {
+                    type: 0,
+                    value: "100000",
+                    lock: {
+                        type: 0,
+                        bytes: "wa1PiNOnmZYBpjfjXS58SZ6fJTaihHSRZRt86aWWRgE=",
+                    },
+                },
             ],
             payload: "YXRhZCBldG92",
             lock_height: "0",
