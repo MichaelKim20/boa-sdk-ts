@@ -106,9 +106,11 @@ See Also : https://bosagora.github.io/boa-sdk-ts/classes/wallet.html#getbalance
         const keypair = sdk.KeyPair.fromSeed(new sdk.SecretKey("SAFRBTFVAB37EEJDIUGCDK5R3KSL3QDBO3SPS6GX752IILWB4NGQY7KJ"));
     
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://agora.bosagora.io:2826",
-            stoaEndpoint: "http://stoa.bosagora.io:3836",
-            fee: sdk.WalletFeeOption.Medium,
+            endpoint: {
+                agora: "http://agora.bosagora.io:2826",
+                stoa: "http://stoa.bosagora.io:3836",
+            },
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
     
         const res = await wallet.getBalance();
@@ -139,9 +141,11 @@ See Also : https://bosagora.github.io/boa-sdk-ts/classes/wallet.html#getbalance
                     const keypair = BoaSdk.KeyPair.fromSeed(new BoaSdk.SecretKey("SAFRBTFVAB37EEJDIUGCDK5R3KSL3QDBO3SPS6GX752IILWB4NGQY7KJ"));
     
                     const wallet = new BoaSdk.Wallet(keypair, {
-                        agoraEndpoint: "http://agora.bosagora.io:2826",
-                        stoaEndpoint: "http://stoa.bosagora.io:3836",
-                        fee: BoaSdk.WalletFeeOption.Medium,
+                        endpoint: {
+                            agora: "http://agora.bosagora.io:2826",
+                            stoa: "http://stoa.bosagora.io:3836",
+                        },
+                        fee: BoaSdk.WalletTransactionFeeOption.Medium,
                     });
     
                     const res = await wallet.getBalance();
@@ -198,9 +202,11 @@ See Also : https://bosagora.github.io/boa-sdk-ts/classes/wallet.html#transfer
         const keypair = sdk.KeyPair.fromSeed(new sdk.SecretKey("SAFRBTFVAB37EEJDIUGCDK5R3KSL3QDBO3SPS6GX752IILWB4NGQY7KJ"));
     
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://agora.bosagora.io:2826",
-            stoaEndpoint: "http://stoa.bosagora.io:3836",
-            fee: sdk.WalletFeeOption.Medium,
+            endpoint: {
+                agora: "http://agora.bosagora.io:2826",
+                stoa: "http://stoa.bosagora.io:3836",
+            },
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
     
         const res = await wallet.transfer([
@@ -232,9 +238,11 @@ See Also : https://bosagora.github.io/boa-sdk-ts/classes/wallet.html#transfer
                     const keypair = BoaSdk.KeyPair.fromSeed(new BoaSdk.SecretKey("SAFRBTFVAB37EEJDIUGCDK5R3KSL3QDBO3SPS6GX752IILWB4NGQY7KJ"));
     
                     const wallet = new BoaSdk.Wallet(keypair, {
-                        agoraEndpoint: "http://agora.bosagora.io:2826",
-                        stoaEndpoint: "http://stoa.bosagora.io:3836",
-                        fee: BoaSdk.WalletFeeOption.Medium,
+                        endpoint: {
+                            agora: "http://agora.bosagora.io:2826",
+                            stoa: "http://stoa.bosagora.io:3836",
+                        },
+                        fee: BoaSdk.WalletTransactionFeeOption.Medium,
                     });
     
                     const res = await wallet.transfer([
@@ -292,9 +300,11 @@ See Also : https://bosagora.github.io/boa-sdk-ts/classes/wallet.html#freeze
         const keypair = sdk.KeyPair.fromSeed(new sdk.SecretKey("SAFRBTFVAB37EEJDIUGCDK5R3KSL3QDBO3SPS6GX752IILWB4NGQY7KJ"));
     
         const wallet = new sdk.Wallet(keypair, {
-            agoraEndpoint: "http://agora.bosagora.io:2826",
-            stoaEndpoint: "http://stoa.bosagora.io:3836",
-            fee: sdk.WalletFeeOption.Medium,
+            endpoint: {
+                agora: "http://agora.bosagora.io:2826",
+                stoa: "http://stoa.bosagora.io:3836",
+            },
+            fee: sdk.WalletTransactionFeeOption.Medium,
         });
     
         const res = await wallet.freeze({
@@ -328,9 +338,11 @@ See Also : https://bosagora.github.io/boa-sdk-ts/classes/wallet.html#freeze
                     const keypair = BoaSdk.KeyPair.fromSeed(new BoaSdk.SecretKey("SAFRBTFVAB37EEJDIUGCDK5R3KSL3QDBO3SPS6GX752IILWB4NGQY7KJ"));
     
                     const wallet = new BoaSdk.Wallet(keypair, {
-                        agoraEndpoint: "http://agora.bosagora.io:2826",
-                        stoaEndpoint: "http://stoa.bosagora.io:3836",
-                        fee: BoaSdk.WalletFeeOption.Medium,
+                        endpoint: {
+                            agora: "http://agora.bosagora.io:2826",
+                            stoa: "http://stoa.bosagora.io:3836",
+                        },
+                        fee: BoaSdk.WalletTransactionFeeOption.Medium,
                     });
     
     
@@ -362,29 +374,64 @@ See Also : https://bosagora.github.io/boa-sdk-ts/classes/wallet.html#freeze
 ---
 
 ### WalletResultCode
-| Value | Code | Description |
-|:-----|:------------|:------------|
-|0|Success|The function was successfully executed.|
-|1|FailedAccessToAgora|Failed access to Agora.|
-|2|FailedAccessToStoa|Failed access to Stoa.|
-|3|FailedRequestHeight|Failed to get the block height.|
-|4|FailedRequestBalance|Failed to check the balance.|
-|5|FailedRequestPendingTransaction|Failed to get the pending transaction.|
-|6|FailedRequestUTXO|Failed to get the UTXO.|
-|7|FailedRequestTxFee|Failed to get the fee of transaction.|
-|8|FailedBuildTransaction|Failed to build the transaction.|
-|9|NotExistReceiver|The recipient doesn't exist.|
-|10|InvalidTransaction|It's an invalid transaction.|
-|11|CoinbaseCanNotCancel|Coinbase transactions cannot be canceled.|
-|12|UnsupportedUnfreezing|This is a case where unfreezing is not supported.|
-|13|ExistNotFrozenUTXO|Frozen UTXO does not exist.|
-|14|NotFoundUTXO|The required UTXO could not be found in the process of canceling the transaction.|
-|15|UnsupportedLockType|An unsupported lock type was found in the process of canceling the transaction.|
-|16|NotFoundKey|There is no secret key required in the process of canceling the transaction.|
-|17|NotEnoughAmount|There is not enough balance to transfer funds.|
-|18|NotEnoughFee|There is not enough fee required in the process of canceling the transaction.|
-|19|FailedSendTx|It failed in the process of transmitting the transaction to Agora.|
-|20|UnknownError|An unknown error has occurred.|
+| Value | Code | Description                                                                                                   |
+|:------------|:-----|:--------------------------------------------------------------------------------------------------------------|
+|0|Success| The function was successfully executed.                                                                       |
+|1001|FailedAccessToAgora| Failed access to Agora.                                                                                       |
+|1002|FailedAccessToStoa| Failed access to Stoa.                                                                                        |
+|1100|FailedRequestHeight| Failed to process a request for block height.                                                                 |
+|1101|FailedRequestBalance| Failed to process a request for the balance of the account.                                                   |
+|1104|FailedRequestUTXO| Failed to process a request for UTXO.                                                                         |
+|1105|FailedRequestUTXOInfo| Failed to process a request for UTXO information.                                                             |
+|1106|FailedRequestTransactionHistory| Failed to process a request for the history of the transactions.                                              |
+|1107|FailedRequestTransactionPending| Failed to process a request for the list of the pending transactions.                                         |
+|1108|FailedRequestTransactionDetail| Failed to process a request for the detail of a transaction.                                                  |
+|1109|FailedRequestTransactionOverview| Failed to process a request for the overview of a transaction.                                                |
+|1110|FailedRequestTransaction| Failed to process a request for a transaction.                                                                |
+|1111|FailedRequestPendingTransaction| Failed to process a request for a pending transaction.                                                        |
+|1112|FailedRequestTxFee| Failed to process a request for the fee of the transaction.                                                   |
+|1113|FailedRequestVotingFee| Failed to process a request for voting fee.                                                                   |
+|1114|FailedVerifyPayment| Failed to process a request for verify payment of the transaction.                                            |
+|1200|NotExistReceiver| Not exists any receiver.                                                                                      |
+|1201|NotEnoughAmount| Not enough amount.                                                                                            |
+|1500|Cancel_NotAllowCoinbase| Transactions of type Coinbase cannot be canceled..                                                            |
+|1501|Cancel_InvalidTransaction| This is not a valid transaction..                                                                             |
+|1502|Cancel_NotAllowUnfreezing| Unfreeze transactions cannot be canceled.                                                                     |
+|1503|Cancel_NotFoundUTXO| UTXO information not found.                                                                                   |
+|1504|Cancel_UnsupportedLockType| This LockType not supported by cancel feature.                                                                |
+|1505|Cancel_NotFoundKey| Secret key not found.                                                                                         |
+|1506|Cancel_NotEnoughFee| Not enough fees are needed to cancel.                                                                         |
+|1507|Cancel_NotAssignedTx| Not assigned a transaction.                                                                                   |
+|1508|Cancel_CancellationTx| This is a cancellation transaction.                                                                           |
+|1600|NotAssignedReceiver| Not assigned any receiver.                                                                                    |
+|1601|NotAssignedReceiverAmount| Not assigned any receiver amount.                                                                             |
+|1602|InsufficientAmount| Insufficient amount.                                                                                          |
+|1603|ExistUnknownSecretKey| An account exists where the secret key is unknown.                                                            |
+|1604|NotAssignedSender| Not assigned any sender.                                                                                      |
+|1605|AmountIsZero| The amount to be transferred is zero.                                                                         |
+|1700|Unfreeze_ExistNotFrozenUTXO| Among the entered UTXOs, there are some that are not frozen.                                                  |
+|1701|Unfreeze_UnsupportedLockType| The key type of the entered UTXO is not supported by this function.                                           |
+|1702|Unfreeze_NotUTXOOwnedAccount| This is not UTXO owned by a registered account.                                                               |
+|1703|Unfreeze_NotFrozenUTXO| The entered UTXO is not frozen.                                                                               |
+|1704|Unfreeze_NotFoundUTXO| The information on the entered UTXO could not be found on the server. Please check if it's already been used. |
+|1705|Unfreeze_AlreadyAdded| The entered UTXO has already been added.                                                                      |
+|1706|Unfreeze_NotAssignedUTXO| No frozen UTXO has been added.                                                                                |
+|1800|FailedBuildTransaction| Among the entered UTXOs, there are some that are not frozen.                                                  |
+|2000|FailedSendTx| Failed to process a transfer transaction.                                                                     |
+|3000|InvalidPublicKey| This is not a valid public key.                                                                               |
+|3001|InvalidPublicKeyLength| This is not a valid public key length.                                                                        |
+|3002|InvalidPublicKeyFormat| This is not a valid public key format.                                                                        |
+|3010|InvalidSecretKey| This is not a valid secret key.                                                                               |
+|3011|InvalidSecretKeyLength| This is not a valid secret key length.                                                                        |
+|3012|InvalidSecretKeyFormat| This is not a valid secret key format.                                                                        |
+|3020|InvalidKeyPair| This is not a valid key pair.                                                                                 |
+|3030|InvalidHash| This is not a valid hash.                                                                                     |
+|3031|InvalidHashLength| This is not a valid hash length.                                                                              |
+|3032|InvalidHashFormat| This is not a valid hash format.                                                                              |
+|3040|InvalidAmount| This is not a valid amount.                                                                                   |
+|3041|InvalidAmountFormat| This is not a valid amount format.                                                                            |
+|9000|UnknownError| Unknown error occurred.                                                                                       |
+|9100|SystemError| An unknown error has occurred.                                                                                        |
 
 [Top](#introduction)
 ---
