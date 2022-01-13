@@ -14,6 +14,7 @@
 import { Amount } from "../common/Amount";
 import { Hash } from "../common/Hash";
 import { KeyPair, PublicKey } from "../common/KeyPair";
+import { Constant } from "../data/Constant";
 import { Transaction } from "../data/Transaction";
 import { OutputType } from "../data/TxOutput";
 import { UnspentTxOutput } from "../net/response/UnspentTxOutput";
@@ -130,17 +131,25 @@ export class TxCanceller {
     private calculateAmount(): ITxAmountInfo {
         let sum_in: Amount = Amount.make(0);
         let sum_out: Amount = Amount.make(0);
+        let freezing_fee: Amount = Amount.make(0);
 
         for (const input of this.tx.inputs) {
             const u = this.findUTXO(input.utxo);
-            if (u !== undefined) sum_in = Amount.add(sum_in, u.amount);
+            if (u !== undefined) {
+                sum_in = Amount.add(sum_in, u.amount);
+                if (u.type === OutputType.Freeze) sum_in = Amount.add(sum_in, Constant.SlashPenaltyAmount);
+            }
         }
 
-        for (const output of this.tx.outputs) sum_out = Amount.add(sum_out, output.value);
+        for (const output of this.tx.outputs) {
+            sum_out = Amount.add(sum_out, output.value);
+            if (output.type === OutputType.Freeze) freezing_fee = Amount.add(freezing_fee, Constant.SlashPenaltyAmount);
+        }
 
         const total_fee = Amount.subtract(sum_in, sum_out);
+        const tx_payload_fee = Amount.subtract(total_fee, freezing_fee);
         const payload_fee = TxPayloadFee.getFeeAmount(this.tx.payload.length);
-        const tx_fee = Amount.subtract(total_fee, payload_fee);
+        const tx_fee = Amount.subtract(tx_payload_fee, payload_fee);
         const tx_size = this.tx.getNumberOfBytes();
 
         return {
@@ -148,9 +157,10 @@ export class TxCanceller {
             sum_output: sum_out,
             total_fee,
             payload_fee,
+            freezing_fee,
             tx_fee,
             tx_size,
-            adjusted_fee: Amount.divide(total_fee, tx_size),
+            adjusted_fee: Amount.divide(tx_payload_fee, tx_size),
         };
     }
 
@@ -243,6 +253,7 @@ interface ITxAmountInfo {
     sum_output: Amount;
     total_fee: Amount;
     payload_fee: Amount;
+    freezing_fee: Amount;
     tx_fee: Amount;
     tx_size: number;
     adjusted_fee: Amount;
